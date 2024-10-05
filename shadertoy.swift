@@ -8,7 +8,7 @@ import Darwin.C
 // - vec3_t (a struct representing a 3D vector)
 // - scale_pos_t (a struct containing 'scale' and 'position' of type vec3_t)
 // - createShader (a function to create and compile shaders)
-// - processInput (a function to handle user input)
+// - processInputSwift (a function to handle user input)
 // - totalFrames and TARGET_FPS (global variables)
 
 var totalFrames = 0
@@ -47,7 +47,7 @@ func shadertoy(window: OpaquePointer!, width: Int32, height: Int32) -> Int32 {
 
     // Main loop
     while glfwWindowShouldClose(window) == GLFW_FALSE {
-        processInput(window, &scale_pos)
+        processInputSwift(window: window, scalePos: &scale_pos)
 
         glClearColor(0.0, 0.0, 0.0, 1.0)
 
@@ -104,3 +104,41 @@ func shadertoy(window: OpaquePointer!, width: Int32, height: Int32) -> Int32 {
 }
 
 
+func processInputSwift(window: OpaquePointer!, scalePos: inout scale_pos_t) {
+    if (glfwGetKey(window, Int32(GLFW_KEY_ESCAPE)) == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, GLFW_TRUE)
+    }
+    if (glfwGetKey(window, Int32(GLFW_KEY_1)) == GLFW_PRESS) {
+        glPolygonMode(GLenum(GL_FRONT_AND_BACK), GLenum(GL_LINE))
+    }
+    if (glfwGetKey(window, Int32(GLFW_KEY_2)) == GLFW_PRESS) {
+        glPolygonMode(GLenum(GL_FRONT_AND_BACK), GLenum(GL_FILL))
+    }
+    if (glfwGetKey(window, Int32(GLFW_KEY_3)) == GLFW_PRESS) {
+        scalePos.scale.x += 0.01
+        scalePos.scale.y += 0.01
+        scalePos.scale.z = 0
+    }
+    if (glfwGetKey(window, Int32(GLFW_KEY_4)) == GLFW_PRESS) {
+        scalePos.scale.x -= 0.01
+        scalePos.scale.y -= 0.01
+        scalePos.scale.z = 0
+    }
+    if (glfwGetKey(window, Int32(GLFW_KEY_5)) == GLFW_PRESS) {
+        scalePos.scale.x = 0.3
+        scalePos.scale.y = 0.3
+        scalePos.scale.z = 0
+    }
+    if (glfwGetKey(window, Int32(GLFW_KEY_UP)) == GLFW_PRESS) {
+        scalePos.position.y += 0.01
+    }
+    if (glfwGetKey(window, Int32(GLFW_KEY_DOWN)) == GLFW_PRESS) {
+        scalePos.position.y -= 0.01
+    }
+    if (glfwGetKey(window, Int32(GLFW_KEY_LEFT)) == GLFW_PRESS) {
+        scalePos.position.x -= 0.01
+    }
+    if (glfwGetKey(window, Int32(GLFW_KEY_RIGHT)) == GLFW_PRESS) {
+        scalePos.position.x += 0.01
+    }
+}

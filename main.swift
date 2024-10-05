@@ -5,7 +5,6 @@ import GraphicsModule
 import Darwin.C
 
 
-
 // Initialize GLFW
 if glfwInit() == GLFW_FALSE {
     print("Failed to initialize GLFW")
