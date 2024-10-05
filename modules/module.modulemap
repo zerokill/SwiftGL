@@ -1,0 +1,5 @@
+module CGLFW3 [system] {
+    header "/opt/homebrew/include/GLFW/glfw3.h"
+    link "glfw"
+    export *
+}
