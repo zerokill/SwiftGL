@@ -6,7 +6,7 @@ SWIFTFLAGS = -I Modules -I src -Xcc -I/usr/local/include -Xcc -I/opt/homebrew/in
 CSOURCES = $(wildcard src/*.c)
 COBJECTS = $(CSOURCES:.c=.o)
 SWIFTSOURCES = main.swift shadertoy.swift
-TARGET = SwiftOpenGLApp
+TARGET = app
 
 # Default target
 all: $(TARGET)
