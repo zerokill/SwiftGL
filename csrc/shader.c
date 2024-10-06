@@ -10,8 +10,6 @@ unsigned int createShader(const char* vertexFile, const char* fragmentFile)
     GLint success = 0;
     GLint logSize = 0;
 
-    printf("createShader\n");
-
     // Create a shader object and compile it during runtime
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
     printf("createShader\n");

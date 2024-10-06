@@ -13,9 +13,9 @@ import Darwin.C
 
 var totalFrames = 0
 
-func shadertoy(window: OpaquePointer!, width: Int32, height: Int32) -> Int32 {
+func shadertoySwift(window: OpaquePointer!, width: Int32, height: Int32) {
     // Create shader program
-    let phongShader = createShader("src/shader/baseVertex.glsl", "src/shader/base.glsl")
+    let phongShader = createShader("resources/shader/baseVertex.glsl", "resources/shader/base.glsl")
 
     var dt: Float = 0.000001
     var lastFrameTime: Float = Float(glfwGetTime())
@@ -98,7 +98,6 @@ func shadertoy(window: OpaquePointer!, width: Int32, height: Int32) -> Int32 {
     }
 
     glfwTerminate()
-    return 0
 }
 
 

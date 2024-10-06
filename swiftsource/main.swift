@@ -6,7 +6,7 @@ func main() {
         switch option {
         case "--benchmark", "-b":
             benchmark()
-        case "--graphics", "-s":
+        case "--graphics", "-g":
             runGraphics()
         default:
             print("Unknown option: \(option)")

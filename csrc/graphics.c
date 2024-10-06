@@ -363,7 +363,7 @@ int totalFrames = 0;
 //}
 //
 int shadertoy(GLFWwindow* window, int width, int height) {
-    unsigned int phongShader = createShader("src/shader/baseVertex.glsl", "src/shader/base.glsl");
+    unsigned int phongShader = createShader("resources/shader/baseVertex.glsl", "resources/shader/base.glsl");
 
     float dt = 0.000001f;
     float lastFrameTime = (float)glfwGetTime();
