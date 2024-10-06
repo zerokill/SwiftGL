@@ -2,7 +2,13 @@ module ShaderModule [system] {
     header "shader.h"
     export *
 }
+
 module GraphicsModule [system] {
     header "graphics.h"
+    export *
+}
+
+module PrimeModule [system] {
+    header "prime.h"
     export *
 }

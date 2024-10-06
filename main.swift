@@ -1,35 +1,32 @@
-import OpenGL.GL3
-import CGLFW3
-import ShaderModule
-import GraphicsModule
-import Darwin.C
 
-
-// Initialize GLFW
-if glfwInit() == GLFW_FALSE {
-    print("Failed to initialize GLFW")
-    exit(1)
+func main() {
+    let args = CommandLine.arguments
+    if args.count > 1 {
+        let option = args[1]
+        switch option {
+        case "--benchmark", "-b":
+            benchmark()
+        case "--graphics", "-s":
+            runGraphics()
+        default:
+            print("Unknown option: \(option)")
+            printUsage()
+        }
+    } else {
+        print("No arguments provided")
+        printUsage()
+    }
 }
 
-// Set window hints (optional)
-glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3)
-glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3)
-#if !os(macOS)
-glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
-#endif
+// Function to display usage information
+func printUsage() {
+    print("""
+    Usage: SwiftOpenGLApp [option]
 
-// Create a windowed mode window and its OpenGL context
-guard let window = glfwCreateWindow(800, 600, "Hello, OpenGL!", nil, nil) else {
-    print("Failed to create GLFW window")
-    glfwTerminate()
-    exit(1)
+    Options:
+      --benchmark, -b   Run the benchmark
+      --graphics, -g    Run the graphics example
+    """)
 }
 
-// Make the window's context current
-glfwMakeContextCurrent(window)
-
-shadertoy(window, 800, 600)
-
-// Terminate GLFW
-glfwTerminate()
-
+main()

@@ -20,8 +20,6 @@ func shadertoy(window: OpaquePointer!, width: Int32, height: Int32) -> Int32 {
     var dt: Float = 0.000001
     var lastFrameTime: Float = Float(glfwGetTime())
 
-    var title = [CChar](repeating: 0, count: 100)
-
     // Initialize vectors
     let VEC_INIT = vec3_t(x: 1.0, y: 1.0, z: 1.0)
     let VEC_CLEAR = vec3_t(x: 0.0, y: 0.0, z: 0.0)
@@ -47,7 +45,7 @@ func shadertoy(window: OpaquePointer!, width: Int32, height: Int32) -> Int32 {
 
     // Main loop
     while glfwWindowShouldClose(window) == GLFW_FALSE {
-        processInputSwift(window: window, scalePos: &scale_pos)
+        processInputSwift(window:window, scalePos: &scale_pos)
 
         glClearColor(0.0, 0.0, 0.0, 1.0)
 
