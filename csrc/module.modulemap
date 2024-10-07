@@ -12,3 +12,8 @@ module PrimeModule [system] {
     header "prime.h"
     export *
 }
+
+module TextureModule [system] {
+    header "texture.h"
+    export *
+}

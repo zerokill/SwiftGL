@@ -28,7 +28,8 @@ func runGraphics() {
     // Make the window's context current
     glfwMakeContextCurrent(window)
 
-    shadertoySwift(window: window, width: 800, height: 600)
+//    shadertoySwift(window: window, width: 800, height: 600)
+    cubeShader(window, 800, 600)
 
     // Terminate GLFW
     glfwTerminate()
