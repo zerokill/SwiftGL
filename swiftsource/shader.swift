@@ -65,6 +65,11 @@ class Shader {
         glUniform1i(location, value)
     }
 
+    func setUniform(_ name: String, value: GLuint) {
+        let location = glGetUniformLocation(programID, name)
+        glUniform1ui(location, value)
+    }
+
     func setUniform(_ name: String, value: Float) {
         let location = glGetUniformLocation(programID, name)
         glUniform1f(location, value)

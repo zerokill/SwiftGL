@@ -22,6 +22,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     var scale_pos = scale_pos_t(scale: VEC_INIT, position: VEC_CLEAR)
 
     let liviaMesh = Mesh(vertices: liviaVertices, indices: liviaIndices)
+    let liviaTexture = texture("resources/livia.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGBA), GLenum(GL_UNSIGNED_BYTE))
 
     // Create the scene
     let scene = Scene()
@@ -42,7 +43,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
 
     // Create a model for each cube position
     for position in liviaPositions {
-        let model = Model(mesh: liviaMesh, shaderName: "basicShader", textureName: "liva")
+        let model = Model(mesh: liviaMesh, shaderName: "basicShader", texture: liviaTexture)
         // Apply translation to position the cube
         model.modelMatrix = float4x4.translation(position)
         scene.models.append(model)

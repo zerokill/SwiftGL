@@ -30,11 +30,6 @@ class Renderer {
         self.rotation_y = 0
         self.view = matrix_identity_float4x4
         self.proj = matrix_identity_float4x4
-//        phongShader = createShader("resources/shader/baseCube.vert", "resources/shader/baseCube.frag")
-
-//        // Load texture and set texture unit
-//        popcat = texture("resources/livia.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGBA), GLenum(GL_UNSIGNED_BYTE))
-//        texUnit(popcat, phongShader, "tex0", 0)
 
         setupOpenGL()
     }
@@ -59,13 +54,10 @@ class Renderer {
         shaderManager.setUniform("view", value: view)
         shaderManager.setUniform("proj", value: proj)
 
-//        glUseProgram(phongShader)
-
-        // Bind the texture
-//        glBindTexture(popcat.type, popcat.ID)
-
         for model in scene.models {
+            shaderManager.use(shaderName: model.shaderName)
             shaderManager.setUniform("model", value: model.modelMatrix)
+            shaderManager.setUniform("texture", value: model.texture.ID)
             model.draw()
         }
     }

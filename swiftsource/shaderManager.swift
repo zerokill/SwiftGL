@@ -23,6 +23,10 @@ class ShaderManager {
         currentShader?.setUniform(name, value: value)
     }
 
+    func setUniform(_ name: String, value: GLuint) {
+        currentShader?.setUniform(name, value: value)
+    }
+
     func setUniform(_ name: String, value: float4x4) {
         currentShader?.setUniform(name, value: value)
     }
