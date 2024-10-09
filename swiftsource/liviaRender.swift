@@ -23,29 +23,36 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
 
     let liviaMesh = Mesh(vertices: liviaVertices, indices: liviaIndices)
     let liviaTexture = texture("resources/livia.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGBA), GLenum(GL_UNSIGNED_BYTE))
+    let liviaTexture2 = texture("resources/livia2.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGB), GLenum(GL_UNSIGNED_BYTE))
 
     // Create the scene
     let scene = Scene()
 
     // Positions for the cubes
-    let liviaPositions: [SIMD3<Float>] = [
-        SIMD3(0.0,  0.0,   0.0),
-        SIMD3(2.0,  5.0, -15.0),
-        SIMD3(-1.5, -2.2, -2.5),
-        SIMD3(-3.8, -2.0, -12.3),
-        SIMD3(2.4, -0.4, -3.5),
-        SIMD3(-1.7,  3.0, -7.5),
-        SIMD3(1.3, -2.0, -2.5),
-        SIMD3(1.5,  2.0, -2.5),
-        SIMD3(1.5,  0.2, -1.5),
-        SIMD3(-1.3,  1.0, -1.5),
+    let liviaPositionsTextures: [(SIMD3<Float>, texture_t)] = [
+        ( SIMD3( 0.0,  0.0,    0.0 ), liviaTexture2 ),
+        ( SIMD3( 2.0,  5.0,  -15.0 ), liviaTexture2 ),
+        ( SIMD3(-1.5, -2.2,   -2.5 ), liviaTexture2 ),
+        ( SIMD3(-3.8, -2.0,  -12.3 ), liviaTexture2 ),
+        ( SIMD3( 2.4, -0.4,   -3.5 ), liviaTexture2 ),
+        ( SIMD3(-1.7,  3.0,   -7.5 ), liviaTexture  ),
+        ( SIMD3( 1.3, -2.0,   -2.5 ), liviaTexture  ),
+        ( SIMD3( 1.5,  2.0,   -2.5 ), liviaTexture  ),
+        ( SIMD3( 1.5,  0.2,   -1.5 ), liviaTexture  ),
+        ( SIMD3(-1.3,  1.0,   -1.5 ), liviaTexture  ),
     ]
 
     // Create a model for each cube position
-    for position in liviaPositions {
-        let model = Model(mesh: liviaMesh, shaderName: "basicShader", texture: liviaTexture)
+    for positionTexture in liviaPositionsTextures {
+        let model = Model(mesh: liviaMesh, shaderName: "basicShader", texture: positionTexture.1)
         // Apply translation to position the cube
-        model.modelMatrix = float4x4.translation(position)
+        model.modelMatrix = float4x4.translation(positionTexture.0)
+
+        // Apply random rotation
+        let rotationXMatrix = float4x4(rotationAngle: radians(fromDegrees: Float.random(in: 1..<360)), axis: SIMD3<Float>(0, 1, 0))
+        let rotationYMatrix = float4x4(rotationAngle: radians(fromDegrees: Float.random(in: 1..<360)), axis: SIMD3<Float>(1, 0, 0))
+        model.modelMatrix = model.modelMatrix * rotationXMatrix * rotationYMatrix
+
         scene.models.append(model)
     }
 
@@ -56,7 +63,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     while glfwWindowShouldClose(window) == 0 {
         processInputSwift(window:window, scalePos: &scale_pos)
 
-        renderer.update(scene: scene, deltaTime:0, scale_pos: scale_pos)
+        renderer.update(scene: scene, deltaTime: dt, scale_pos: scale_pos)
         renderer.render(scene: scene)
 
         // Swap buffers and poll events

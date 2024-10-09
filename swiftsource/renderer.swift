@@ -13,7 +13,6 @@ class Renderer {
     var rotation_y: Float
     var width: Int32
     var height: Int32
-//    var popcat: texture_t
 
     var view: simd_float4x4
     var proj: simd_float4x4
@@ -34,10 +33,6 @@ class Renderer {
         setupOpenGL()
     }
 
-//    deinit {
-//        glDeleteProgram(phongShader)
-//    }
-
     func setupOpenGL() {
         glEnable(GLenum(GL_DEPTH_TEST))
     }
@@ -49,7 +44,7 @@ class Renderer {
 
 
 //        camera.update()
-//
+
         shaderManager.use(shaderName: "basicShader")
         shaderManager.setUniform("view", value: view)
         shaderManager.setUniform("proj", value: proj)
@@ -69,8 +64,8 @@ class Renderer {
         // Update animations or other time-dependent features
 
         // Update rotations based on user input
-        rotation_x = scale_pos.position.x * 50.0
-        rotation_y = scale_pos.position.y * 50.0
+        rotation_x = (scale_pos.position.x * 50.0) + scale_pos.scale.x * 10 * deltaTime
+        rotation_y = (scale_pos.position.y * 50.0) + scale_pos.scale.x * 10 * deltaTime
 
         for model in scene.models {
             // Apply rotations to the model matrix
