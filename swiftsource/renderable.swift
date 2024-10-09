@@ -1,0 +1,3 @@
+protocol Renderable {
+    func draw()
+}

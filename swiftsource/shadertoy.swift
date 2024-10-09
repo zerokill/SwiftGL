@@ -103,9 +103,9 @@ func shadertoySwift(window: OpaquePointer!, width: Int32, height: Int32) {
 }
 
 // Main function
-func cubeShader(window: OpaquePointer, width: Int32, height: Int32) -> Int32 {
+func cubeShaderSwift(window: OpaquePointer, width: Int32, height: Int32) {
     // Initialize shader program
-    let phongShader: GLuint = createShader("src/shader/baseCube.vert", "src/shader/baseCube.frag")
+    let phongShader: GLuint = createShader("resources/shader/baseCube.vert", "resources/shader/baseCube.frag")
 
     var dt: Float = 0.000001
     var lastFrameTime: Float = Float(glfwGetTime())
@@ -180,7 +180,7 @@ func cubeShader(window: OpaquePointer, width: Int32, height: Int32) -> Int32 {
     glEnable(GLenum(GL_DEPTH_TEST))
 
     // Load texture and set texture unit
-    let popcat = texture("livia.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGBA), GLenum(GL_UNSIGNED_BYTE))
+    let popcat = texture("resources/livia.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGBA), GLenum(GL_UNSIGNED_BYTE))
     texUnit(popcat, phongShader, "tex0", 0)
 
     var rotation_x: Float = 0.0
@@ -275,8 +275,6 @@ func cubeShader(window: OpaquePointer, width: Int32, height: Int32) -> Int32 {
     glDeleteBuffers(1, &VBO)
     glDeleteBuffers(1, &EBO)
     glDeleteProgram(phongShader)
-
-    return 0
 }
 
 func processInputSwift(window: OpaquePointer!, scalePos: inout scale_pos_t) {
@@ -304,6 +302,8 @@ func processInputSwift(window: OpaquePointer!, scalePos: inout scale_pos_t) {
         scalePos.scale.y = 0.3
         scalePos.scale.z = 0
     }
+    scalePos.position.y = 0
+    scalePos.position.x = 0
     if (glfwGetKey(window, Int32(GLFW_KEY_UP)) == GLFW_PRESS) {
         scalePos.position.y += 0.01
     }

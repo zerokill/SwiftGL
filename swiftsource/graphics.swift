@@ -29,7 +29,10 @@ func runGraphics() {
     glfwMakeContextCurrent(window)
 
 //    shadertoySwift(window: window, width: 800, height: 600)
-    cubeShader(window, 800, 600)
+//    cubeShader(window, 800, 600)
+//    cubeShaderSwift(window: window, width: 801, height: 600)
+//    cubeExample(window: window, width: 800, height: 600)
+    liviaRender(window: window, width: 800, height: 600)
 
     // Terminate GLFW
     glfwTerminate()
