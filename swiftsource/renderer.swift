@@ -7,28 +7,27 @@ import ShaderModule
 class Renderer {
     var shaderManager: ShaderManager
 //    var camera: Camera
-//    var inputManager: InputManager
-//    var phongShader: GLuint
-    var rotation_x: Float
-    var rotation_y: Float
+    var inputManager: InputManager
     var width: Int32
     var height: Int32
 
     var view: simd_float4x4
     var proj: simd_float4x4
+    
+    var scene: Scene
 
-    init(width: Int32, height: Int32) {
+    init(width: Int32, height: Int32, scene: Scene) {
 //        camera = Camera(position: SIMD3(0.0, 0.0, 3.0), target: SIMD3(0.0, 0.0, 0.0), up: SIMD3(0.0, 1.0, 0.0))
-//        inputManager = InputManager()
+        inputManager = InputManager()
         shaderManager = ShaderManager()
         self.width = width
         self.height = height
 
         // TODO: Why do we need to init everything?
-        self.rotation_x = 0
-        self.rotation_y = 0
         self.view = matrix_identity_float4x4
         self.proj = matrix_identity_float4x4
+
+        self.scene = scene
 
         setupOpenGL()
     }
@@ -37,7 +36,7 @@ class Renderer {
         glEnable(GLenum(GL_DEPTH_TEST))
     }
 
-    func render(scene: Scene) {
+    func render() {
         // Clear the color and depth buffers
         glClearColor(0.07, 0.13, 0.17, 1.0)
         glClear(GLbitfield(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT))
@@ -57,15 +56,15 @@ class Renderer {
         }
     }
 
-    func update(scene: Scene, deltaTime: Float, scale_pos: scale_pos_t) {
+    func update(deltaTime: Float) {
         view = matrix_identity_float4x4
         proj = matrix_identity_float4x4
 
         // Update animations or other time-dependent features
 
         // Update rotations based on user input
-        rotation_x = (scale_pos.position.x * 50.0) + scale_pos.scale.x * 10 * deltaTime
-        rotation_y = (scale_pos.position.y * 50.0) + scale_pos.scale.x * 10 * deltaTime
+        let rotation_x = (inputManager.scalePos.position.x * 50.0) + inputManager.scalePos.scale.x * 10 * deltaTime
+        let rotation_y = (inputManager.scalePos.position.y * 50.0) + inputManager.scalePos.scale.x * 10 * deltaTime
 
         for model in scene.models {
             // Apply rotations to the model matrix

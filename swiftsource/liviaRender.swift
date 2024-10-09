@@ -8,20 +8,13 @@ import TextureModule
 
 // Main function
 func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
-    let renderer = Renderer(width: width, height: height)
-
-    renderer.shaderManager.loadShader(name: "basicShader", vertexPath: "resources/shader/baseCube.vert", fragmentPath: "resources/shader/baseCube.frag")
 
     var dt: Float = 0.000001
     var lastFrameTime: Float = Float(glfwGetTime())
     var title: String = ""
 
-    // Initialize scale and position
-    let VEC_INIT = vec3_t(x: 1.0, y: 1.0, z: 1.0)
-    let VEC_CLEAR = vec3_t(x: 0.0, y: 0.0, z: 0.0)
-    var scale_pos = scale_pos_t(scale: VEC_INIT, position: VEC_CLEAR)
-
     let liviaMesh = Mesh(vertices: liviaVertices, indices: liviaIndices)
+
     let liviaTexture = texture("resources/livia.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGBA), GLenum(GL_UNSIGNED_BYTE))
     let liviaTexture2 = texture("resources/livia2.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGB), GLenum(GL_UNSIGNED_BYTE))
 
@@ -56,15 +49,17 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
         scene.models.append(model)
     }
 
+    let renderer = Renderer(width: width, height: height, scene: scene)
+    renderer.shaderManager.loadShader(name: "basicShader", vertexPath: "resources/shader/baseCube.vert", fragmentPath: "resources/shader/baseCube.frag")
+
     var totalFrames: Int = 0
     let TARGET_FPS: Float = 60.0
 
     // Main render loop
     while glfwWindowShouldClose(window) == 0 {
-        processInputSwift(window:window, scalePos: &scale_pos)
-
-        renderer.update(scene: scene, deltaTime: dt, scale_pos: scale_pos)
-        renderer.render(scene: scene)
+        renderer.inputManager.processInput(window: window)
+        renderer.update(deltaTime: dt)
+        renderer.render()
 
         // Swap buffers and poll events
         glfwSwapBuffers(window)
@@ -72,7 +67,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
 
         // Update the window title every 60 frames
         if totalFrames % 60 == 0 {
-            title = String(format: "FPS : %-4.0f rotation_x=%.2f rotation_y=%.2f", 1.0 / dt, renderer.rotation_x, renderer.rotation_y)
+            title = String(format: "FPS : %-4.0f", 1.0 / dt)
             glfwSetWindowTitle(window, title)
         }
 
