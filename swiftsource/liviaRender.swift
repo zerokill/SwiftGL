@@ -6,6 +6,30 @@ import ShaderModule
 import GraphicsModule
 import TextureModule
 
+// Declare the C functions from the wrapper
+@_silgen_name("ImGuiWrapper_CreateWindow")
+func ImGuiWrapper_CreateWindow(_ width: Int32, _ height: Int32, _ title: UnsafePointer<CChar>) -> UnsafeMutableRawPointer?
+
+@_silgen_name("ImGuiWrapper_Init")
+func ImGuiWrapper_Init(_ window: OpaquePointer?) -> Bool
+
+@_silgen_name("ImGuiWrapper_Render")
+func ImGuiWrapper_Render()
+
+@_silgen_name("ImGuiWrapper_Shutdown")
+func ImGuiWrapper_Shutdown()
+
+@_silgen_name("ImGuiWrapper_ShouldClose")
+func ImGuiWrapper_ShouldClose(_ window: UnsafeMutableRawPointer?) -> Bool
+
+@_silgen_name("ImGuiWrapper_PollEvents")
+func ImGuiWrapper_PollEvents()
+
+@_silgen_name("ImGuiWrapper_SwapBuffers")
+func ImGuiWrapper_SwapBuffers(_ window: UnsafeMutableRawPointer?)
+
+
+
 // Main function
 func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
 
@@ -55,11 +79,22 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     var totalFrames: Int = 0
     let TARGET_FPS: Float = 60.0
 
+    // Initialize ImGui
+    if ImGuiWrapper_Init(window) {
+        print("ImGui initialized successfully.")
+    } else {
+        print("Failed to initialize ImGui.")
+        return
+    }
+
+
     // Main render loop
     while glfwWindowShouldClose(window) == 0 {
         renderer.inputManager.processInput(window: window)
         renderer.update(deltaTime: dt)
         renderer.render()
+
+        ImGuiWrapper_Render()
 
         // Swap buffers and poll events
         glfwSwapBuffers(window)
