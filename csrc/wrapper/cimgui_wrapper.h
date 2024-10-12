@@ -8,7 +8,6 @@
 // Forward declaration of GLFWwindow from GLFW
 typedef struct GLFWwindow GLFWwindow;
 
-extern "C" {
 // Initialize ImGui with OpenGL3 and GLFW
 bool ImGuiWrapper_Init(GLFWwindow* window);
 
@@ -34,8 +33,4 @@ bool ImGuiWrapper_ShouldClose(GLFWwindow* window);
 void ImGuiWrapper_PollEvents();
 void ImGuiWrapper_SwapBuffers(GLFWwindow* window);
 
-//// Additional wrapper functions as needed...
-}
-
 #endif // IMGUI_WRAPPER_H
-

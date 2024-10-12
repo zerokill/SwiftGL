@@ -17,3 +17,8 @@ module TextureModule [system] {
     header "texture.h"
     export *
 }
+
+module ImguiModule [system] {
+    header "wrapper/cimgui_wrapper.h"
+    export *
+}

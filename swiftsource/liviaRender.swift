@@ -5,36 +5,16 @@ import OpenGL.GL3
 import ShaderModule
 import GraphicsModule
 import TextureModule
-
-// Declare the C functions from the wrapper
-@_silgen_name("ImGuiWrapper_CreateWindow")
-func ImGuiWrapper_CreateWindow(_ width: Int32, _ height: Int32, _ title: UnsafePointer<CChar>) -> UnsafeMutableRawPointer?
-
-@_silgen_name("ImGuiWrapper_Init")
-func ImGuiWrapper_Init(_ window: OpaquePointer?) -> Bool
-
-@_silgen_name("ImGuiWrapper_Render")
-func ImGuiWrapper_Render(numLivia: Int)
-
-@_silgen_name("ImGuiWrapper_Shutdown")
-func ImGuiWrapper_Shutdown()
-
-@_silgen_name("ImGuiWrapper_ShouldClose")
-func ImGuiWrapper_ShouldClose(_ window: UnsafeMutableRawPointer?) -> Bool
-
-@_silgen_name("ImGuiWrapper_PollEvents")
-func ImGuiWrapper_PollEvents()
-
-@_silgen_name("ImGuiWrapper_SwapBuffers")
-func ImGuiWrapper_SwapBuffers(_ window: UnsafeMutableRawPointer?)
-
-
+import ImguiModule
 
 // Main function
 func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
 
     var dt: Float = 0.000001
     var lastFrameTime: Float = Float(glfwGetTime())
+    var startTime: Float = Float(glfwGetTime())
+    var updateTime: Float = Float(glfwGetTime())
+    var renderTime: Float = Float(glfwGetTime())
     var title: String = ""
 
     let liviaMesh = Mesh(vertices: liviaVertices, indices: liviaIndices)
@@ -62,14 +42,23 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
         return
     }
 
+    var stats: stats_t = stats_t(numLivia: 0, fps: 0.0, updateTime: 0.0, renderTime: 0.0)
 
     // Main render loop
     while glfwWindowShouldClose(window) == 0 {
+        startTime = Float(glfwGetTime())
         renderer.inputManager.processInput(window: window)
         renderer.update(deltaTime: dt)
+        updateTime = Float(glfwGetTime())
         renderer.render()
+        renderTime = Float(glfwGetTime())
 
-        ImGuiWrapper_Render(numLivia: renderer.scene.models.count)
+        stats.numLivia = Int32(renderer.scene.models.count)
+        stats.fps = 1.0 / dt
+        stats.updateTime = updateTime - startTime
+        stats.renderTime = renderTime - updateTime
+
+        ImGuiWrapper_Render(stats)
 
         // Swap buffers and poll events
         glfwSwapBuffers(window)

@@ -63,7 +63,6 @@ CXXFLAGS         := -std=c++14 -O2 -Wall -fPIC \
 					-DGL_SILENCE_DEPRECATION
 
 ## Swift Flags
-#SWIFTFLAGS = -O -I Modules -I csrc -Xcc -I/usr/local/include -Xcc -I/opt/homebrew/include -L /opt/homebrew/lib -lglfw -framework OpenGL -Xcc -DGL_SILENCE_DEPRECATION
 SWIFTFLAGS       := -O \
                     -I Modules \
                     -I csrc \
