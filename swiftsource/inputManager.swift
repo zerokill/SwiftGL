@@ -3,11 +3,15 @@ import CGLFW3
 class InputManager {
 
     var scalePos: scale_pos_t
+    var liviaAdd: Bool
+    var liviaDelete: Bool
 
     init() {
         // Initialize scale and position
         let VEC_INIT = vec3_t(x: 1.0, y: 1.0, z: 1.0)
         let VEC_CLEAR = vec3_t(x: 0.0, y: 0.0, z: 0.0)
+        self.liviaAdd = false
+        self.liviaDelete = false
         self.scalePos = scale_pos_t(scale: VEC_INIT, position: VEC_CLEAR)
     }
 
@@ -31,10 +35,13 @@ class InputManager {
             scalePos.scale.y -= 0.01
             scalePos.scale.z = 0
         }
+        liviaAdd = false
         if (glfwGetKey(window, Int32(GLFW_KEY_5)) == GLFW_PRESS) {
-            scalePos.scale.x = 0.3
-            scalePos.scale.y = 0.3
-            scalePos.scale.z = 0
+            liviaAdd = true
+        }
+        liviaDelete = false
+        if (glfwGetKey(window, Int32(GLFW_KEY_6)) == GLFW_PRESS) {
+            liviaDelete = true
         }
         scalePos.position.y = 0
         scalePos.position.x = 0

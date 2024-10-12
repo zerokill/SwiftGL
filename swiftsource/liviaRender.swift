@@ -14,7 +14,7 @@ func ImGuiWrapper_CreateWindow(_ width: Int32, _ height: Int32, _ title: UnsafeP
 func ImGuiWrapper_Init(_ window: OpaquePointer?) -> Bool
 
 @_silgen_name("ImGuiWrapper_Render")
-func ImGuiWrapper_Render()
+func ImGuiWrapper_Render(numLivia: Int)
 
 @_silgen_name("ImGuiWrapper_Shutdown")
 func ImGuiWrapper_Shutdown()
@@ -45,33 +45,8 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     // Create the scene
     let scene = Scene()
 
-    // Positions for the cubes
-    let liviaPositionsTextures: [(SIMD3<Float>, texture_t)] = [
-        ( SIMD3( 0.0,  0.0,    0.0 ), liviaTexture2 ),
-        ( SIMD3( 2.0,  5.0,  -15.0 ), liviaTexture2 ),
-        ( SIMD3(-1.5, -2.2,   -2.5 ), liviaTexture2 ),
-        ( SIMD3(-3.8, -2.0,  -12.3 ), liviaTexture2 ),
-        ( SIMD3( 2.4, -0.4,   -3.5 ), liviaTexture2 ),
-        ( SIMD3(-1.7,  3.0,   -7.5 ), liviaTexture  ),
-        ( SIMD3( 1.3, -2.0,   -2.5 ), liviaTexture  ),
-        ( SIMD3( 1.5,  2.0,   -2.5 ), liviaTexture  ),
-        ( SIMD3( 1.5,  0.2,   -1.5 ), liviaTexture  ),
-        ( SIMD3(-1.3,  1.0,   -1.5 ), liviaTexture  ),
-    ]
-
-    // Create a model for each cube position
-    for positionTexture in liviaPositionsTextures {
-        let model = Model(mesh: liviaMesh, shaderName: "basicShader", texture: positionTexture.1)
-        // Apply translation to position the cube
-        model.modelMatrix = float4x4.translation(positionTexture.0)
-
-        // Apply random rotation
-        let rotationXMatrix = float4x4(rotationAngle: radians(fromDegrees: Float.random(in: 1..<360)), axis: SIMD3<Float>(0, 1, 0))
-        let rotationYMatrix = float4x4(rotationAngle: radians(fromDegrees: Float.random(in: 1..<360)), axis: SIMD3<Float>(1, 0, 0))
-        model.modelMatrix = model.modelMatrix * rotationXMatrix * rotationYMatrix
-
-        scene.models.append(model)
-    }
+    let model = Model(mesh: liviaMesh, shaderName: "basicShader", texture: liviaTexture)
+    scene.models.append(model)
 
     let renderer = Renderer(width: width, height: height, scene: scene)
     renderer.shaderManager.loadShader(name: "basicShader", vertexPath: "resources/shader/baseCube.vert", fragmentPath: "resources/shader/baseCube.frag")
@@ -94,7 +69,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
         renderer.update(deltaTime: dt)
         renderer.render()
 
-        ImGuiWrapper_Render()
+        ImGuiWrapper_Render(numLivia: renderer.scene.models.count)
 
         // Swap buffers and poll events
         glfwSwapBuffers(window)

@@ -13,7 +13,7 @@ extern "C" {
 bool ImGuiWrapper_Init(GLFWwindow* window);
 
 // Render ImGui frame
-void ImGuiWrapper_Render();
+void ImGuiWrapper_Render(int numLivia);
 
 // Shutdown ImGui
 void ImGuiWrapper_Shutdown();

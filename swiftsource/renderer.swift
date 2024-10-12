@@ -66,6 +66,28 @@ class Renderer {
         let rotation_x = (inputManager.scalePos.position.x * 50.0) + inputManager.scalePos.scale.x * 10 * deltaTime
         let rotation_y = (inputManager.scalePos.position.y * 50.0) + inputManager.scalePos.scale.x * 10 * deltaTime
 
+        let liviaInc = 100
+
+        if (inputManager.liviaAdd) {
+            for _ in 1...liviaInc {
+                let randomPosition = SIMD3<Float>( Float.random(in: -10.0...10.0), Float.random(in: -10.0...10.0), Float.random(in: -10.0...10.0))
+                let model = Model(mesh: scene.models[0].mesh, shaderName: "basicShader", texture: scene.models[0].texture)
+                // Apply translation to position the cube
+                model.modelMatrix = float4x4.translation(randomPosition)
+
+                // Apply random rotation
+                let rotationXMatrix = float4x4(rotationAngle: radians(fromDegrees: Float.random(in: 1..<360)), axis: SIMD3<Float>(0, 1, 0))
+                let rotationYMatrix = float4x4(rotationAngle: radians(fromDegrees: Float.random(in: 1..<360)), axis: SIMD3<Float>(1, 0, 0))
+                model.modelMatrix = model.modelMatrix * rotationXMatrix * rotationYMatrix
+
+                scene.models.append(model)
+            }
+        }
+
+        if (inputManager.liviaDelete && scene.models.count > liviaInc) {
+            scene.models.removeFirst(liviaInc)
+        }
+
         for model in scene.models {
             // Apply rotations to the model matrix
             let rotationXMatrix = float4x4(rotationAngle: radians(fromDegrees: rotation_x), axis: SIMD3<Float>(0, 1, 0))
