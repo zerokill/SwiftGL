@@ -33,7 +33,6 @@ void ImGuiWrapper_Render(stats_t stats) {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    ImGuiIO& io = ImGui::GetIO();
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
     ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
     if (ImGui::Begin("Example: Simple overlay", NULL, window_flags))
@@ -44,10 +43,6 @@ void ImGuiWrapper_Render(stats_t stats) {
         ImGui::Text("fps: %.1f", stats.fps);
         ImGui::Text("updateTime: %f", stats.updateTime);
         ImGui::Text("renderTime: %f", stats.renderTime);
-        if (ImGui::IsMousePosValid())
-            ImGui::Text("Mouse Position: (%.1f,%.1f)", io.MousePos.x, io.MousePos.y);
-        else
-            ImGui::Text("Mouse Position: <invalid>");
     }
     ImGui::End();
 
