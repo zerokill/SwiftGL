@@ -14,7 +14,7 @@ class Renderer {
     var scene: Scene
 
     init(width: Int32, height: Int32, scene: Scene) {
-        camera = Camera(position: SIMD3(0.0, 0.0, 3.0), target: SIMD3(0.0, 0.0, 0.0), up: SIMD3(0.0, 1.0, 0.0))
+        camera = Camera(position: SIMD3(0.0, 0.0, 3.0), target: SIMD3(0.0, 0.0, 0.0), worldUp: SIMD3(0.0, 1.0, 0.0))
         inputManager = InputManager()
         shaderManager = ShaderManager()
         self.width = width

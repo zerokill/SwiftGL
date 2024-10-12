@@ -19,7 +19,7 @@ func runGraphics() {
     #endif
 
     // Create a windowed mode window and its OpenGL context
-    guard let window = glfwCreateWindow(1600, 1200, "Hello, OpenGL!", nil, nil) else {
+    guard let window = glfwCreateWindow(800, 600, "Hello, OpenGL!", nil, nil) else {
         print("Failed to create GLFW window")
         glfwTerminate()
         exit(1)
@@ -32,7 +32,7 @@ func runGraphics() {
 //    cubeShader(window, 800, 600)
 //    cubeShaderSwift(window: window, width: 801, height: 600)
 //    cubeExample(window: window, width: 800, height: 600)
-    liviaRender(window: window, width: 1600, height: 1200)
+    liviaRender(window: window, width: 800, height: 600)
 
     // Terminate GLFW
     glfwTerminate()

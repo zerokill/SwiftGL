@@ -70,10 +70,10 @@ class InputManager {
 
         self.deltaPosition = SIMD3(0.0, 0.0, 0.0)
         if (glfwGetKey(window, Int32(GLFW_KEY_W)) == GLFW_PRESS) {
-            deltaPosition.z -= 0.05
+            deltaPosition.z += 0.05
         }
         if (glfwGetKey(window, Int32(GLFW_KEY_S)) == GLFW_PRESS) {
-            deltaPosition.z += 0.05
+            deltaPosition.z -= 0.05
         }
         if (glfwGetKey(window, Int32(GLFW_KEY_A)) == GLFW_PRESS) {
             deltaPosition.x -= 0.05
