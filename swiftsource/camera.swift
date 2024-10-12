@@ -39,9 +39,10 @@ class Camera {
         updateViewMatrix()
     }
 
-    func update() {
+    func update(aspectRatio: Float) {
         // Update camera based on input
-//        updateViewMatrix()
+        updateViewMatrix()
+        updateProjectionMatrix(aspectRatio: aspectRatio)
     }
 }
 
