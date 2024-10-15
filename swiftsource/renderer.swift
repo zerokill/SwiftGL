@@ -13,6 +13,7 @@ class Renderer {
 
     var scene: Scene
 
+
     init(width: Int32, height: Int32, scene: Scene) {
         camera = Camera(position: SIMD3(0.0, 0.0, 3.0), target: SIMD3(0.0, 0.0, 0.0), worldUp: SIMD3(0.0, 1.0, 0.0))
         inputManager = InputManager()
@@ -57,23 +58,11 @@ class Renderer {
         let liviaInc = 100
 
         if (inputManager.liviaAdd) {
-            for _ in 1...liviaInc {
-                let randomPosition = SIMD3<Float>( Float.random(in: -10.0...10.0), Float.random(in: -10.0...10.0), Float.random(in: -10.0...10.0))
-                let model = Model(mesh: scene.models[0].mesh, shaderName: "basicShader", texture: scene.models[0].texture)
-                // Apply translation to position the cube
-                model.modelMatrix = float4x4.translation(randomPosition)
-
-                // Apply random rotation
-                let rotationXMatrix = float4x4(rotationAngle: radians(fromDegrees: Float.random(in: 1..<360)), axis: SIMD3<Float>(0, 1, 0))
-                let rotationYMatrix = float4x4(rotationAngle: radians(fromDegrees: Float.random(in: 1..<360)), axis: SIMD3<Float>(1, 0, 0))
-                model.modelMatrix = model.modelMatrix * rotationXMatrix * rotationYMatrix
-
-                scene.models.append(model)
-            }
+            scene.models[0].activeInstances += liviaInc
         }
 
-        if (inputManager.liviaDelete && scene.models.count > liviaInc) {
-            scene.models.removeFirst(liviaInc)
+        if (inputManager.liviaDelete && scene.models[0].activeInstances > liviaInc) {
+            scene.models[0].activeInstances -= liviaInc
         }
 
         for model in scene.models {

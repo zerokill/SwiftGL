@@ -6,7 +6,6 @@ uniform float iTime;
 out vec4 FragColor;
 
 in vec3 color;
-in vec3 pos;
 in vec2 texCoord;
 
 uniform sampler2D tex0;

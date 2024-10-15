@@ -26,10 +26,12 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     let scene = Scene()
 
     let model = Model(mesh: liviaMesh, shaderName: "basicShader", texture: liviaTexture)
+    model.setupInstances()
     scene.models.append(model)
 
     let renderer = Renderer(width: width, height: height, scene: scene)
     renderer.shaderManager.loadShader(name: "basicShader", vertexPath: "resources/shader/baseCube.vert", fragmentPath: "resources/shader/baseCube.frag")
+
 
     var totalFrames: Int = 0
     let TARGET_FPS: Float = 60.0
@@ -53,7 +55,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
         renderer.render()
         renderTime = Float(glfwGetTime())
 
-        stats.numLivia = Int32(renderer.scene.models.count)
+        stats.numLivia = Int32(renderer.scene.models[0].activeInstances)
         stats.fps = 1.0 / dt
         stats.updateTime = updateTime - startTime
         stats.renderTime = renderTime - updateTime

@@ -1,4 +1,10 @@
 import OpenGL.GL3
+import simd
+
+// TODO: Move this to util?
+struct InstanceData {
+    var modelMatrix: simd_float4x4
+}
 
 class Mesh {
 //    var vertices: [Vertex]
@@ -8,6 +14,9 @@ class Mesh {
     private var VAO: GLuint = 0
     private var VBO: GLuint = 0
     private var EBO: GLuint = 0
+    private var instanceVBO: GLuint = 0
+
+    let maxInstanceCount: Int = 10000
 
     init(vertices: [GLfloat], indices: [GLuint]) {
         self.vertices = vertices
@@ -54,9 +63,33 @@ class Mesh {
         glVertexAttribPointer(2, 2, GLenum(GL_FLOAT), GLboolean(GL_FALSE), stride, texCoordOffset)
         glEnableVertexAttribArray(2)
 
+        glGenBuffers(1, &instanceVBO)
+        glBindBuffer(GLenum(GL_ARRAY_BUFFER), instanceVBO)
+        glBufferData(GLenum(GL_ARRAY_BUFFER), maxInstanceCount * MemoryLayout<InstanceData>.stride, nil, GLenum(GL_DYNAMIC_DRAW))
+
+        let vec4Size = MemoryLayout<SIMD4<Float>>.stride
+        for i in 0..<4 {
+            glEnableVertexAttribArray(3 + GLuint(i))
+            glVertexAttribPointer(3 + GLuint(i), 4, GLenum(GL_FLOAT), GLboolean(GL_FALSE), GLsizei(MemoryLayout<InstanceData>.stride), UnsafeRawPointer(bitPattern: i * vec4Size))
+            glVertexAttribDivisor(3 + GLuint(i), 1) // Advance per instance
+        }
+
         glBindBuffer(GLenum(GL_ARRAY_BUFFER), 0)
         glBindVertexArray(0)
         glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), 0)
+    }
+
+    func updateInstanceData(_ instances: [InstanceData]) {
+        print("DEBUG: updateInstanceData ", instances.count)
+        glBindBuffer(GLenum(GL_ARRAY_BUFFER), instanceVBO)
+        glBufferSubData(GLenum(GL_ARRAY_BUFFER), 0, instances.count * MemoryLayout<InstanceData>.stride, instances)
+        glBindBuffer(GLenum(GL_ARRAY_BUFFER), 0)
+    }
+
+    func drawInstances(count: Int) {
+        glBindVertexArray(VAO)
+        glDrawElementsInstanced(GLenum(GL_TRIANGLES), GLsizei(indices.count), GLenum(GL_UNSIGNED_INT), nil, GLsizei(count))
+        glBindVertexArray(0)
     }
 
     func draw() {
