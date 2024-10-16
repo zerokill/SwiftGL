@@ -57,7 +57,7 @@ class Renderer {
 
         let liviaInc = 100
 
-        if (inputManager.liviaAdd) {
+        if (inputManager.liviaAdd && scene.models[0].activeInstances < scene.models[0].mesh.maxInstanceCount) {
             scene.models[0].activeInstances += liviaInc
         }
 
