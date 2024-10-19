@@ -3,26 +3,41 @@
 layout(location = 0) in vec3 aPos;
 layout(location = 1) in vec3 aColor;
 layout(location = 2) in vec2 aTex;
+layout(location = 3) in mat4 instanceModel;
+
 
 out vec3 color;
 out vec2 texCoord;
 
-uniform vec3 uScale;
-uniform vec3 uPosition;
-
 // Inputs the matrices needed for 3D viewing with perspective
-uniform mat4 model;
 uniform mat4 view;
 uniform mat4 proj;
+uniform float rotation_x;
+uniform float rotation_y;
 
 void main()
 {
-//    vec3 scaledPositon = aPos * uScale;
-//    vec3 finalPosition = scaledPositon + uPosition;
-//    gl_Position = vec4(
-//            finalPosition,
-//            1.0);
-    gl_Position = proj * view * model * vec4(aPos, 1.0);
+    // Create a rotation matrix around the Y-axis
+    mat4 rotationY = mat4(
+        cos(rotation_y), 0.0, sin(rotation_y), 0.0,
+        0.0,             1.0, 0.0,             0.0,
+       -sin(rotation_y), 0.0, cos(rotation_y), 0.0,
+        0.0,             0.0, 0.0,             1.0
+    );
+
+    // Rotation matrix around X-axis
+    mat4 rotationX = mat4(
+        1.0, 0.0,              0.0,             0.0,
+        0.0, cos(rotation_x), -sin(rotation_x), 0.0,
+        0.0, sin(rotation_x),  cos(rotation_x), 0.0,
+        0.0, 0.0,              0.0,             1.0
+    );
+
+    // Apply rotation to the instance model matrix
+    mat4 transformedModel = instanceModel * rotationY * rotationX;
+
+    gl_Position = proj * view * transformedModel * vec4(aPos, 1.0);
+
     color = aColor;
     texCoord = aTex;
 }
