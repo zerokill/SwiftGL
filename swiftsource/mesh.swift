@@ -1,9 +1,12 @@
 import OpenGL.GL3
 import simd
 
-// TODO: Move this to util?
 struct InstanceData {
     var modelMatrix: simd_float4x4
+
+    var velocity: SIMD3<Float>
+    var positionMatrix: simd_float4x4
+    var rotationMatrix: simd_float4x4
 }
 
 class Mesh {
@@ -16,7 +19,7 @@ class Mesh {
     private var EBO: GLuint = 0
     private var instanceVBO: GLuint = 0
 
-    let maxInstanceCount: Int = 1000000
+    let maxInstanceCount: Int = 10000
 
     init(vertices: [GLfloat], indices: [GLuint]) {
         self.vertices = vertices
@@ -80,7 +83,6 @@ class Mesh {
     }
 
     func updateInstanceData(_ instances: [InstanceData]) {
-        print("DEBUG: updateInstanceData ", instances.count)
         glBindBuffer(GLenum(GL_ARRAY_BUFFER), instanceVBO)
         glBufferSubData(GLenum(GL_ARRAY_BUFFER), 0, instances.count * MemoryLayout<InstanceData>.stride, instances)
         glBindBuffer(GLenum(GL_ARRAY_BUFFER), 0)

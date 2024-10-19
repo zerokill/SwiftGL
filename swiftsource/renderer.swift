@@ -13,6 +13,8 @@ class Renderer {
 
     var scene: Scene
 
+    var rotation_x: Float = 0.0
+    var rotation_y: Float = 0.0
 
     init(width: Int32, height: Int32, scene: Scene) {
         camera = Camera(position: SIMD3(0.0, 0.0, 3.0), target: SIMD3(0.0, 0.0, 0.0), worldUp: SIMD3(0.0, 1.0, 0.0))
@@ -35,15 +37,17 @@ class Renderer {
         glClearColor(0.07, 0.13, 0.17, 1.0)
         glClear(GLbitfield(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT))
 
-
         shaderManager.use(shaderName: "basicShader")
         shaderManager.setUniform("view", value: camera.viewMatrix)
         shaderManager.setUniform("proj", value: camera.projectionMatrix)
 
         for model in scene.models {
             shaderManager.use(shaderName: model.shaderName)
-            shaderManager.setUniform("model", value: model.modelMatrix)
             shaderManager.setUniform("texture", value: model.texture.ID)
+            if (inputManager.updateRotation) {
+                shaderManager.setUniform("rotation_x", value: self.rotation_x)
+                shaderManager.setUniform("rotation_y", value: self.rotation_y)
+            }
             model.draw()
         }
     }
@@ -52,24 +56,23 @@ class Renderer {
         // Update animations or other time-dependent features
 
         // Update rotations based on user input
-        let rotation_x = (inputManager.scalePos.position.x * 50.0) + inputManager.scalePos.scale.x * 10 * deltaTime
-        let rotation_y = (inputManager.scalePos.position.y * 50.0) + inputManager.scalePos.scale.x * 10 * deltaTime
+        rotation_x += deltaTime
+        rotation_y += deltaTime
 
-        let liviaInc = 100
-
-        if (inputManager.liviaAdd && scene.models[0].activeInstances < scene.models[0].mesh.maxInstanceCount) {
-            scene.models[0].activeInstances += liviaInc
+        if (inputManager.liviaMove && !inputManager.liviaMoved) {
+            for model in scene.models {
+                model.shootInstance(position: camera.position, direction: camera.front)
+            }
         }
-
-        if (inputManager.liviaDelete && scene.models[0].activeInstances > liviaInc) {
-            scene.models[0].activeInstances -= liviaInc
+        if (inputManager.liviaResetMove) {
+            for model in scene.models {
+                model.resetAllInstances()
+            }
         }
 
         for model in scene.models {
-            // Apply rotations to the model matrix
-            let rotationXMatrix = float4x4(rotationAngle: radians(fromDegrees: rotation_x), axis: SIMD3<Float>(0, 1, 0))
-            let rotationYMatrix = float4x4(rotationAngle: radians(fromDegrees: rotation_y), axis: SIMD3<Float>(1, 0, 0))
-            model.modelMatrix = model.modelMatrix * rotationXMatrix * rotationYMatrix
+
+            model.updateMove(updateVelocity: inputManager.updateVelocity, updateRotation: inputManager.updateRotation)
         }
 
         camera.move(delta: inputManager.deltaPosition)

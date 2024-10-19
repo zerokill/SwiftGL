@@ -12,10 +12,31 @@ out vec2 texCoord;
 // Inputs the matrices needed for 3D viewing with perspective
 uniform mat4 view;
 uniform mat4 proj;
+uniform float rotation_x;
+uniform float rotation_y;
 
 void main()
 {
-    gl_Position = proj * view * instanceModel * vec4(aPos, 1.0);
+    // Create a rotation matrix around the Y-axis
+    mat4 rotationY = mat4(
+        cos(rotation_y), 0.0, sin(rotation_y), 0.0,
+        0.0,             1.0, 0.0,             0.0,
+       -sin(rotation_y), 0.0, cos(rotation_y), 0.0,
+        0.0,             0.0, 0.0,             1.0
+    );
+
+    // Rotation matrix around X-axis
+    mat4 rotationX = mat4(
+        1.0, 0.0,              0.0,             0.0,
+        0.0, cos(rotation_x), -sin(rotation_x), 0.0,
+        0.0, sin(rotation_x),  cos(rotation_x), 0.0,
+        0.0, 0.0,              0.0,             1.0
+    );
+
+    // Apply rotation to the instance model matrix
+    mat4 transformedModel = instanceModel * rotationY * rotationX;
+
+    gl_Position = proj * view * transformedModel * vec4(aPos, 1.0);
 
     color = aColor;
     texCoord = aTex;

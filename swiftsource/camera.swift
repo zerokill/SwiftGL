@@ -30,7 +30,7 @@ class Camera {
 
     func updateProjectionMatrix(aspectRatio: Float) {
         let fovy = radians(fromDegrees: 45.0)
-        projectionMatrix = float4x4.perspective(fovyRadians: fovy, aspectRatio: aspectRatio, nearZ: 0.1, farZ: 100.0)
+        projectionMatrix = float4x4.perspective(fovyRadians: fovy, aspectRatio: aspectRatio, nearZ: 1.0, farZ: 100.0)
     }
 
     func move(delta: SIMD3<Float>) {
