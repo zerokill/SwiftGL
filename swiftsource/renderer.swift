@@ -61,7 +61,7 @@ class Renderer {
 
         if (inputManager.liviaMove && !inputManager.liviaMoved) {
             for model in scene.models {
-                model.shootInstance(position: camera.position, direction: camera.front)
+                model.shootInstance(position: camera.position, direction: camera.front, enableExplode: true)
             }
         }
         if (inputManager.liviaResetMove) {
@@ -72,7 +72,7 @@ class Renderer {
 
         for model in scene.models {
 
-            model.updateMove(updateVelocity: inputManager.updateVelocity, updateRotation: inputManager.updateRotation)
+            model.updateMove(deltaTime: deltaTime, updateVelocity: inputManager.updateVelocity, updateRotation: inputManager.updateRotation)
         }
 
         camera.move(delta: inputManager.deltaPosition)

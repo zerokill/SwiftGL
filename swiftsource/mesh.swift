@@ -4,9 +4,14 @@ import simd
 struct InstanceData {
     var modelMatrix: simd_float4x4
 
+    var enable: Bool
+    var enableExplode: Bool
+
     var velocity: SIMD3<Float>
     var positionMatrix: simd_float4x4
     var rotationMatrix: simd_float4x4
+
+    var timeAlive: Float
 }
 
 class Mesh {
