@@ -66,7 +66,7 @@ class Model: Renderable {
 
                 if (instances[i].enableExplode) {
                     for _ in 1...100 {
-                        let direction = SIMD3<Float>(x: Float.random(in: 0..<1), y: Float.random(in: 0..<1), z: Float.random(in: 0..<1))
+                        let direction = SIMD3<Float>(x: Float.random(in: -10..<10), y: Float.random(in: -10..<10), z: Float.random(in: -10..<10))
                         shootInstance(position: position, direction: direction, enableExplode: false)
                     }
                 }
