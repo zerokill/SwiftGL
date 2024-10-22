@@ -24,7 +24,7 @@ class Mesh {
     private var EBO: GLuint = 0
     private var instanceVBO: GLuint = 0
 
-    let maxInstanceCount: Int = 10000
+    let maxInstanceCount: Int = 100000
 
     init(vertices: [GLfloat], indices: [GLuint]) {
         self.vertices = vertices

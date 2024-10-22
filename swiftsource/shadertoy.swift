@@ -7,8 +7,8 @@ import TextureModule
 import Darwin.C
 
 // Assume these custom types and functions are defined elsewhere:
-// - vec3_t (a struct representing a 3D vector)
-// - scale_pos_t (a struct containing 'scale' and 'position' of type vec3_t)
+// - SIMD3<Float> (a struct representing a 3D vector)
+// - scale_pos_t (a struct containing 'scale' and 'position' of type SIMD3<Float>)
 // - createShader (a function to create and compile shaders)
 // - processInputSwift (a function to handle user input)
 // - totalFrames and TARGET_FPS (global variables)
@@ -23,8 +23,8 @@ func shadertoySwift(window: OpaquePointer!, width: Int32, height: Int32) {
     var lastFrameTime: Float = Float(glfwGetTime())
 
     // Initialize vectors
-    let VEC_INIT = vec3_t(x: 1.0, y: 1.0, z: 1.0)
-    let VEC_CLEAR = vec3_t(x: 0.0, y: 0.0, z: 0.0)
+    let VEC_INIT = SIMD3<Float>(x: 1.0, y: 1.0, z: 1.0)
+    let VEC_CLEAR = SIMD3<Float>(x: 0.0, y: 0.0, z: 0.0)
     var scale_pos = scale_pos_t(scale: VEC_INIT, position: VEC_CLEAR)
 
     let vertices: [GLfloat] = [

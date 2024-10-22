@@ -7,8 +7,8 @@ class Camera {
     var right: SIMD3<Float>
     var worldUp: SIMD3<Float>
 
-    var viewMatrix: float4x4
-    var projectionMatrix: float4x4
+    var viewMatrix: simd_float4x4
+    var projectionMatrix: simd_float4x4
 
     init(position: SIMD3<Float>, target: SIMD3<Float>, worldUp: SIMD3<Float>) {
         self.position = position
@@ -19,18 +19,18 @@ class Camera {
         self.right = normalize(cross(front, worldUp))
         self.up = normalize(cross(right, front))
 
-        self.viewMatrix = float4x4.lookAt(eye: position, center: target, up: up)
+        self.viewMatrix = simd_float4x4.lookAt(eye: position, center: target, up: up)
         self.projectionMatrix = matrix_identity_float4x4
     }
 
     func updateViewMatrix() {
         let center = position + front
-        viewMatrix = float4x4.lookAt(eye: position, center: center, up: up)
+        viewMatrix = simd_float4x4.lookAt(eye: position, center: center, up: up)
     }
 
     func updateProjectionMatrix(aspectRatio: Float) {
         let fovy = radians(fromDegrees: 45.0)
-        projectionMatrix = float4x4.perspective(fovyRadians: fovy, aspectRatio: aspectRatio, nearZ: 1.0, farZ: 100.0)
+        projectionMatrix = simd_float4x4.perspective(fovyRadians: fovy, aspectRatio: aspectRatio, nearZ: 1.0, farZ: 100.0)
     }
 
     func move(delta: SIMD3<Float>) {

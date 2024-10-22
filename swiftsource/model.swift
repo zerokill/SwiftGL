@@ -29,7 +29,7 @@ class Model: Renderable {
     }
 
     func shootInstance(position: SIMD3<Float>, direction: SIMD3<Float>, enableExplode: Bool) {
-        Logger.debug("shootInstance", position, direction)
+//        Logger.debug("shootInstance", position, direction)
         instances[activeInstances].enable = true
         instances[activeInstances].enableExplode = enableExplode
         instances[activeInstances].modelMatrix = float4x4.translation(position)
@@ -65,17 +65,14 @@ class Model: Renderable {
                 )
 
                 if (instances[i].enableExplode) {
-                    for _ in 1...100 {
+                    for _ in 1...1000 {
                         let direction = SIMD3<Float>(x: Float.random(in: -10..<10), y: Float.random(in: -10..<10), z: Float.random(in: -10..<10))
                         shootInstance(position: position, direction: direction, enableExplode: false)
                     }
                 }
 
                 activeInstances -= 1
-                instances.remove(at: i)
-                instances.append(resetMove())
-
-
+                instances.swapAt(i, activeInstances)    // Efficient removal. Swap is simpler then delete (O(n))
             }
         }
         mesh.updateInstanceData(instances)

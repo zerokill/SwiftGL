@@ -44,7 +44,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
         return
     }
 
-    var stats: stats_t = stats_t(numLivia: 0, fps: 0.0, updateTime: 0.0, renderTime: 0.0)
+    var stats: stats_t = stats_t(numLivia: 0, fps: 0.0, updateTime: 0.0, renderTime: 0.0, updateTimeHigh: 0.0, renderTimeHigh: 0.0)
 
     // Main render loop
     while glfwWindowShouldClose(window) == 0 {
@@ -58,7 +58,9 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
         stats.numLivia = Int32(renderer.scene.models[0].activeInstances)
         stats.fps = 1.0 / dt
         stats.updateTime = updateTime - startTime
+        stats.updateTimeHigh = stats.updateTimeHigh > stats.updateTime ? stats.updateTimeHigh : stats.updateTime
         stats.renderTime = renderTime - updateTime
+        stats.renderTimeHigh = stats.renderTimeHigh > stats.renderTime ? stats.renderTimeHigh : stats.renderTime
 
         ImGuiWrapper_Render(stats)
 

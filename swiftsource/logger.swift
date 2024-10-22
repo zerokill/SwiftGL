@@ -11,7 +11,7 @@ struct Logger {
     static var isEnabled = true
     static var logLevel: LogLevel = .debug
 
-    static func log(_ items: Any..., level: LogLevel = .debug) {
+    static func log(_ items: Any..., level: LogLevel = .info) {
         guard isEnabled else { return }
 
         let dateFormatter = DateFormatter()

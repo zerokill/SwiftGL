@@ -18,6 +18,8 @@ typedef struct
     float fps;
     float updateTime;
     float renderTime;
+    float updateTimeHigh;
+    float renderTimeHigh;
 } stats_t;
 
 

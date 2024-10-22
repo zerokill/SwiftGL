@@ -5,7 +5,7 @@ func radians(fromDegrees degrees: Float) -> Float {
     return degrees * (.pi / 180.0)
 }
 
-extension float4x4 {
+extension simd_float4x4 {
     // Rotation around an arbitrary axis
     init(rotationAngle angle: Float, axis: SIMD3<Float>) {
         let normalizedAxis = normalize(axis)
@@ -25,13 +25,13 @@ extension float4x4 {
     }
 
     // Translation matrix
-    static func translation(_ t: SIMD3<Float>) -> float4x4 {
+    static func translation(_ t: SIMD3<Float>) -> simd_float4x4 {
         var matrix = matrix_identity_float4x4
         matrix.columns.3 = SIMD4<Float>(t.x, t.y, t.z, 1)
         return matrix
     }
 
-    static func lookAt(eye: SIMD3<Float>, center: SIMD3<Float>, up: SIMD3<Float>) -> float4x4 {
+    static func lookAt(eye: SIMD3<Float>, center: SIMD3<Float>, up: SIMD3<Float>) -> simd_float4x4 {
         let f = normalize(center - eye)
         let s = normalize(cross(f, up))
         let u = cross(s, f)
@@ -45,11 +45,11 @@ extension float4x4 {
     }
 
     // Perspective projection matrix
-    static func perspective(fovyRadians fovy: Float, aspectRatio: Float, nearZ: Float, farZ: Float) -> float4x4 {
+    static func perspective(fovyRadians fovy: Float, aspectRatio: Float, nearZ: Float, farZ: Float) -> simd_float4x4 {
         let ys = 1 / tan(fovy * 0.5)
         let xs = ys / aspectRatio
         let zs = farZ / (nearZ - farZ)
-        return float4x4(columns: (
+        return simd_float4x4(columns: (
             SIMD4<Float>(xs,  0,   0,         0),
             SIMD4<Float>(0,   ys,  0,         0),
             SIMD4<Float>(0,   0,   zs,       -1),

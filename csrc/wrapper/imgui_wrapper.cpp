@@ -43,6 +43,8 @@ void ImGuiWrapper_Render(stats_t stats) {
         ImGui::Text("fps: %.1f", stats.fps);
         ImGui::Text("updateTime: %f", stats.updateTime);
         ImGui::Text("renderTime: %f", stats.renderTime);
+        ImGui::Text("updateTimeHigh: %f", stats.updateTimeHigh);
+        ImGui::Text("renderTimeHigh: %f", stats.renderTimeHigh);
     }
     ImGui::End();
 
