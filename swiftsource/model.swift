@@ -18,7 +18,7 @@ class Model: Renderable {
         self.texture = texture
     }
 
-    func setupInstances() {
+    func setupInstances(randomPosition: Bool = false) {
         let count = mesh.maxInstanceCount
 
         instances.reserveCapacity(count)
@@ -28,12 +28,33 @@ class Model: Renderable {
         mesh.updateInstanceData(instances)
     }
 
+    func setupRandomInstances(randomPosition: Bool = false) {
+        let count = mesh.maxInstanceCount
+
+        instances.reserveCapacity(count)
+        for _ in 0..<count {
+            var instance = resetMove()
+            if randomPosition {
+                let randomPosition = SIMD3<Float>( Float.random(in: -50.0...50.0), Float.random(in: -50.0...50.0), Float.random(in: -50.0...50.0))
+                let rotationXMatrix = float4x4(rotationAngle: radians(fromDegrees: Float.random(in: 1..<360)), axis: SIMD3<Float>(0, 1, 0))
+                let rotationYMatrix = float4x4(rotationAngle: radians(fromDegrees: Float.random(in: 1..<360)), axis: SIMD3<Float>(1, 0, 0))
+                instance.positionMatrix = float4x4.translation(randomPosition)
+                instance.rotationMatrix = rotationXMatrix * rotationYMatrix
+                instance.enable = true
+                instance.timeAlive = -1
+                activeInstances += 1
+            }
+            instances.append(instance)
+        }
+        mesh.updateInstanceData(instances)
+    }
+
     func shootInstance(position: SIMD3<Float>, direction: SIMD3<Float>, enableExplode: Bool) {
 //        Logger.debug("shootInstance", position, direction)
         instances[activeInstances].enable = true
         instances[activeInstances].enableExplode = enableExplode
         instances[activeInstances].modelMatrix = float4x4.translation(position)
-        instances[activeInstances].velocity = direction * 0.05
+        instances[activeInstances].velocity = direction * 0.10
 
         instances[activeInstances].positionMatrix = float4x4.translation(position)
 
@@ -47,7 +68,9 @@ class Model: Renderable {
 
     func updateMove(deltaTime: Float, updateVelocity: Bool, updateRotation: Bool) {
         for i in instances.indices {
-            instances[i].timeAlive += deltaTime
+            if instances[i].timeAlive >= 0 {
+                instances[i].timeAlive += deltaTime
+            }
 
             // Update translation based on velocity and delta time
             if (updateVelocity) {
@@ -65,7 +88,7 @@ class Model: Renderable {
                 )
 
                 if (instances[i].enableExplode) {
-                    for _ in 1...1000 {
+                    for _ in 1...100 {
                         let direction = SIMD3<Float>(x: Float.random(in: -10..<10), y: Float.random(in: -10..<10), z: Float.random(in: -10..<10))
                         shootInstance(position: position, direction: direction, enableExplode: false)
                     }

@@ -40,6 +40,7 @@ void ImGuiWrapper_Render(stats_t stats) {
         ImGui::Text("Simple overlay\n");
         ImGui::Separator();
         ImGui::Text("Num Livia: %0d", stats.numLivia);
+        ImGui::Text("Num Leon: %0d", stats.numLeon);
         ImGui::Text("fps: %.1f", stats.fps);
         ImGui::Text("updateTime: %f", stats.updateTime);
         ImGui::Text("renderTime: %f", stats.renderTime);

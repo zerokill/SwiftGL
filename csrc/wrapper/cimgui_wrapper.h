@@ -1,8 +1,5 @@
 // wrapper/imgui_wrapper.h
 
-#ifndef IMGUI_WRAPPER_H
-#define IMGUI_WRAPPER_H
-
 #include <stdbool.h>
 
 // Forward declaration of GLFWwindow from GLFW
@@ -14,6 +11,7 @@ bool ImGuiWrapper_Init(GLFWwindow* window);
 typedef struct
 {
     int numLivia;
+    int numLeon;
     float fps;
     float updateTime;
     float renderTime;
@@ -35,4 +33,3 @@ bool ImGuiWrapper_ShouldClose(GLFWwindow* window);
 void ImGuiWrapper_PollEvents();
 void ImGuiWrapper_SwapBuffers(GLFWwindow* window);
 
-#endif // IMGUI_WRAPPER_H

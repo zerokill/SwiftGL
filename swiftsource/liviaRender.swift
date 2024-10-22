@@ -17,17 +17,23 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     var renderTime: Float = Float(glfwGetTime())
     var title: String = ""
 
-    let liviaMesh = Mesh(vertices: liviaVertices, indices: liviaIndices)
+    let liviaMesh = Mesh(vertices: liviaVertices, indices: liviaIndices, maxInstanceCount: 1000)
 
     let liviaTexture = texture("resources/livia.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGBA), GLenum(GL_UNSIGNED_BYTE))
-//    let liviaTexture2 = texture("resources/livia2.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGB), GLenum(GL_UNSIGNED_BYTE))
+    let leonTexture = texture("resources/leon.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGB), GLenum(GL_UNSIGNED_BYTE))
 
     // Create the scene
     let scene = Scene()
 
-    let model = Model(mesh: liviaMesh, shaderName: "basicShader", texture: liviaTexture)
-    model.setupInstances()
-    scene.models.append(model)
+    let leonSpereParameters = SphereParameters(radius: 0.2, latitudeBands: 20, longitudeBands: 20)
+    let leonSphere = LeonMesh(sphere: leonSpereParameters)
+    let leonModel = Model(mesh: leonSphere, shaderName: "basicShader", texture: leonTexture)
+    leonModel.setupInstances()
+    scene.models.append(leonModel)
+
+    let liviaModel = Model(mesh: liviaMesh, shaderName: "basicShader", texture: liviaTexture)
+    liviaModel.setupRandomInstances(randomPosition: true)
+    scene.models.append(liviaModel)
 
     let renderer = Renderer(width: width, height: height, scene: scene)
     renderer.shaderManager.loadShader(name: "basicShader", vertexPath: "resources/shader/baseCube.vert", fragmentPath: "resources/shader/baseCube.frag")
@@ -44,7 +50,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
         return
     }
 
-    var stats: stats_t = stats_t(numLivia: 0, fps: 0.0, updateTime: 0.0, renderTime: 0.0, updateTimeHigh: 0.0, renderTimeHigh: 0.0)
+    var stats: stats_t = stats_t(numLivia: 0, numLeon: 0, fps: 0.0, updateTime: 0.0, renderTime: 0.0, updateTimeHigh: 0.0, renderTimeHigh: 0.0)
 
     // Main render loop
     while glfwWindowShouldClose(window) == 0 {
@@ -55,7 +61,8 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
         renderer.render()
         renderTime = Float(glfwGetTime())
 
-        stats.numLivia = Int32(renderer.scene.models[0].activeInstances)
+        stats.numLeon = Int32(renderer.scene.models[0].activeInstances)
+        stats.numLivia = Int32(renderer.scene.models[1].activeInstances)
         stats.fps = 1.0 / dt
         stats.updateTime = updateTime - startTime
         stats.updateTimeHigh = stats.updateTimeHigh > stats.updateTime ? stats.updateTimeHigh : stats.updateTime

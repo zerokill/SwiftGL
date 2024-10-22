@@ -15,20 +15,22 @@ struct InstanceData {
 }
 
 class Mesh {
-//    var vertices: [Vertex]
-//    var indices: [GLuint]
-    var vertices: [GLfloat]
+    var vertices: [Vertex]
     var indices: [GLuint]
+//    var vertices: [GLfloat]
+//    var indices: [GLuint]
+    var maxInstanceCount: Int
+
     private var VAO: GLuint = 0
     private var VBO: GLuint = 0
     private var EBO: GLuint = 0
     private var instanceVBO: GLuint = 0
 
-    let maxInstanceCount: Int = 100000
 
-    init(vertices: [GLfloat], indices: [GLuint]) {
+    init(vertices: [Vertex], indices: [GLuint], maxInstanceCount: Int) {
         self.vertices = vertices
         self.indices = indices
+        self.maxInstanceCount = maxInstanceCount
         setupMesh()
     }
 
@@ -38,7 +40,7 @@ class Mesh {
         glDeleteBuffers(1, &EBO)
     }
 
-    private func setupMesh() {
+    func setupMesh() {
         // Generate and bind buffers, set attribute pointers
         glGenVertexArrays(1, &VAO)
         glGenBuffers(1, &VBO)
@@ -46,9 +48,17 @@ class Mesh {
 
         glBindVertexArray(VAO)
 
+        // Flatten vertex data
+        var vertexData: [GLfloat] = []
+        for vertex in vertices {
+            vertexData += [vertex.position.x, vertex.position.y, vertex.position.z]
+            vertexData += [vertex.color.x, vertex.color.y, vertex.color.z]
+            vertexData += [vertex.texCoords.x, vertex.texCoords.y]
+        }
+
         // Bind and set VBO
         glBindBuffer(GLenum(GL_ARRAY_BUFFER), VBO)
-        glBufferData(GLenum(GL_ARRAY_BUFFER), vertices.count * MemoryLayout<GLfloat>.size, vertices, GLenum(GL_STATIC_DRAW))
+        glBufferData(GLenum(GL_ARRAY_BUFFER), vertexData.count * MemoryLayout<GLfloat>.size, vertexData, GLenum(GL_STATIC_DRAW))
 
         // Bind and set EBO
         glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), EBO)
