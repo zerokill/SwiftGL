@@ -59,16 +59,7 @@ class Renderer {
         rotation_x += deltaTime
         rotation_y += deltaTime
 
-        if (inputManager.liviaMove && !inputManager.liviaMoved) {
-            scene.models[0].shootInstance(position: camera.position, direction: camera.front, enableExplode: true)
-        }
-        if (inputManager.liviaResetMove) {
-            scene.models[0].resetAllInstances()
-        }
-
-        for model in scene.models {
-            model.updateMove(deltaTime: deltaTime, updateVelocity: inputManager.updateVelocity, updateRotation: inputManager.updateRotation)
-        }
+        scene.update(deltaTime: deltaTime, input: inputManager, camera: camera)
 
         camera.move(delta: inputManager.deltaPosition)
         camera.rotate(yaw: inputManager.deltaYaw, pitch: inputManager.deltaPitch)
