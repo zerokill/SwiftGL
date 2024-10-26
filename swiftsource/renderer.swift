@@ -30,9 +30,9 @@ class Renderer {
 
     func setupOpenGL() {
         glEnable(GLenum(GL_DEPTH_TEST))
-        glEnable(GLenum(GL_CULL_FACE))
-        glCullFace(GLenum(GL_BACK))
-        glFrontFace(GLenum(GL_CCW)) 
+//        glEnable(GLenum(GL_CULL_FACE))
+//        glCullFace(GLenum(GL_BACK))
+//        glFrontFace(GLenum(GL_CW))
     }
 
     func render() {
@@ -56,6 +56,7 @@ class Renderer {
         for model in scene.models {
             shaderManager.use(shaderName: model.shaderName)
             shaderManager.setUniform("texture", value: model.texture.ID)
+            shaderManager.setUniform("visualizeNormals", value: inputManager.toggleNormal)
             shaderManager.setUniform("objectColor", value: SIMD3<Float>(1.0, 0.5, 0.31));
             shaderManager.setUniform("lightColor",  value: SIMD3<Float>(1.0, 1.0, 1.0));
             if let light = scene.light {

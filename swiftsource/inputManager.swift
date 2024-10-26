@@ -12,6 +12,8 @@ class InputManager {
     var addLight: Bool = false
     var addedLight: Bool = false
 
+    var toggleNormal: Bool = false
+
     var updateVelocity: Bool = true
     var updateRotation: Bool = true
 
@@ -56,6 +58,8 @@ class InputManager {
 
         addedLight = addLight
         addLight = (glfwGetKey(window, Int32(GLFW_KEY_8)) == GLFW_PRESS)
+
+        toggleNormal = (glfwGetKey(window, Int32(GLFW_KEY_9)) == GLFW_PRESS)
 
         liviaMoved = liviaMove
         liviaMove = (glfwGetKey(window, Int32(GLFW_KEY_SPACE)) == GLFW_PRESS)

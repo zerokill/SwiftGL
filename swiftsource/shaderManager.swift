@@ -19,6 +19,10 @@ class ShaderManager {
         currentShader = shader
     }
 
+    func setUniform(_ name: String, value: Bool) {
+        currentShader?.setUniform(name, value: value)
+    }
+
     func setUniform(_ name: String, value: Float) {
         currentShader?.setUniform(name, value: value)
     }

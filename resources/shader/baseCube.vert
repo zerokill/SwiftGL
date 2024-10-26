@@ -37,9 +37,9 @@ void main()
     // Apply rotation to the instance model matrix
     mat4 transformedModel = instanceModel * rotationY * rotationX;
 
-    gl_Position = proj * view * instanceModel * vec4(aPos, 1.0);
+    gl_Position = proj * view * transformedModel * vec4(aPos, 1.0);
 
-    normal = mat3(transpose(inverse(instanceModel))) * aNormal;
+    normal = mat3(transpose(inverse(transformedModel))) * aNormal;
     texCoord = aTex;
-    fragPos = vec3(instanceModel * vec4(aPos, 1.0));
+    fragPos = vec3(transformedModel * vec4(aPos, 1.0));
 }

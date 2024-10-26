@@ -3,6 +3,7 @@
 uniform vec2 iResolution;
 uniform float iTime;
 
+uniform bool visualizeNormals; // Toggle for normal visualization
 uniform vec3 objectColor;
 uniform vec3 lightColor;
 uniform vec3 lightPos;
@@ -31,6 +32,8 @@ void main()
 
     FragColor = vec4(result, 1.0) * texColor;
 
-//    vec3 color = normalize(normal) * 0.5 + 0.5;
-//    FragColor = vec4(color, 1.0);
+    if (visualizeNormals) {
+        vec3 color = normalize(normal) * 0.5 + 0.5;
+        FragColor = vec4(color, 1.0);
+    }
 }
