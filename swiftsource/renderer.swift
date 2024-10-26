@@ -30,6 +30,9 @@ class Renderer {
 
     func setupOpenGL() {
         glEnable(GLenum(GL_DEPTH_TEST))
+        glEnable(GLenum(GL_CULL_FACE))
+        glCullFace(GLenum(GL_BACK))
+        glFrontFace(GLenum(GL_CCW)) 
     }
 
     func render() {
@@ -37,18 +40,44 @@ class Renderer {
         glClearColor(0.07, 0.13, 0.17, 1.0)
         glClear(GLbitfield(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT))
 
+        // FIXME: Make this a loop or add the shader init code to a dedicated method in the model
         shaderManager.use(shaderName: "basicShader")
+        shaderManager.setUniform("view", value: camera.viewMatrix)
+        shaderManager.setUniform("proj", value: camera.projectionMatrix)
+
+        shaderManager.use(shaderName: "lightShader")
+        shaderManager.setUniform("view", value: camera.viewMatrix)
+        shaderManager.setUniform("proj", value: camera.projectionMatrix)
+
+        shaderManager.use(shaderName: "objectShader")
         shaderManager.setUniform("view", value: camera.viewMatrix)
         shaderManager.setUniform("proj", value: camera.projectionMatrix)
 
         for model in scene.models {
             shaderManager.use(shaderName: model.shaderName)
             shaderManager.setUniform("texture", value: model.texture.ID)
+            shaderManager.setUniform("objectColor", value: SIMD3<Float>(1.0, 0.5, 0.31));
+            shaderManager.setUniform("lightColor",  value: SIMD3<Float>(1.0, 1.0, 1.0));
+            if let light = scene.light {
+                let position = SIMD3<Float>(
+                    light.instances[0].modelMatrix.columns.3.x,
+                    light.instances[0].modelMatrix.columns.3.y,
+                    light.instances[0].modelMatrix.columns.3.z
+                )
+                shaderManager.setUniform("lightPos",    value: position)
+            }
             if (inputManager.updateRotation) {
                 shaderManager.setUniform("rotation_x", value: self.rotation_x)
                 shaderManager.setUniform("rotation_y", value: self.rotation_y)
             }
             model.draw()
+        }
+
+        if let light = scene.light {
+            shaderManager.use(shaderName: light.shaderName)
+            shaderManager.setUniform("objectColor", value: SIMD3<Float>(1.0, 0.5, 0.31));
+            shaderManager.setUniform("lightColor",  value: SIMD3<Float>(1.0, 1.0, 1.0));
+            scene.light?.draw()
         }
     }
 

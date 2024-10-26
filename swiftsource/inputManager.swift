@@ -6,6 +6,12 @@ class InputManager {
     var liviaMoved: Bool
     var liviaResetMove: Bool
 
+    var addObject: Bool = false
+    var addedObject: Bool = false
+
+    var addLight: Bool = false
+    var addedLight: Bool = false
+
     var updateVelocity: Bool = true
     var updateRotation: Bool = true
 
@@ -44,6 +50,13 @@ class InputManager {
         if (glfwGetKey(window, Int32(GLFW_KEY_6)) == GLFW_PRESS) {
             updateRotation = false
         }
+
+        addedObject = addObject
+        addObject = (glfwGetKey(window, Int32(GLFW_KEY_7)) == GLFW_PRESS)
+
+        addedLight = addLight
+        addLight = (glfwGetKey(window, Int32(GLFW_KEY_8)) == GLFW_PRESS)
+
         liviaMoved = liviaMove
         liviaMove = (glfwGetKey(window, Int32(GLFW_KEY_SPACE)) == GLFW_PRESS)
 

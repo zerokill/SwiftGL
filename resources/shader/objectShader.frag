@@ -1,19 +1,13 @@
 #version 330 core
 
-uniform vec2 iResolution;
-uniform float iTime;
+out vec4 FragColor;
 
 uniform vec3 objectColor;
 uniform vec3 lightColor;
 uniform vec3 lightPos;
 
-out vec4 FragColor;
-
-in vec2 texCoord;
 in vec3 fragPos;
 in vec3 normal;
-
-uniform sampler2D tex0;
 
 void main()
 {
@@ -26,11 +20,6 @@ void main()
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = diff * lightColor;
 
-    vec3 result = (ambient + diffuse);
-    vec4 texColor =  texture(tex0, texCoord);
-
-    FragColor = vec4(result, 1.0) * texColor;
-
-//    vec3 color = normalize(normal) * 0.5 + 0.5;
-//    FragColor = vec4(color, 1.0);
+    vec3 result = (ambient + diffuse) * objectColor;
+    FragColor = vec4(result, 1.0);
 }

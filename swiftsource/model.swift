@@ -49,6 +49,17 @@ class Model: Renderable {
         mesh.updateInstanceData(instances)
     }
 
+    func addInstance(position: SIMD3<Float>) {
+//        Logger.debug("shootInstance", position, direction)
+        instances[activeInstances].enable = true
+        instances[activeInstances].enableExplode = false
+        instances[activeInstances].modelMatrix = float4x4.translation(position)
+        instances[activeInstances].positionMatrix = float4x4.translation(position)
+
+        instances[activeInstances].timeAlive = -1
+        activeInstances += 1
+    }
+
     func shootInstance(position: SIMD3<Float>, direction: SIMD3<Float>, enableExplode: Bool) {
 //        Logger.debug("shootInstance", position, direction)
         instances[activeInstances].enable = true

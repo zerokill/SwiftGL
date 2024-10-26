@@ -17,10 +17,15 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     var renderTime: Float = Float(glfwGetTime())
     var title: String = ""
 
-    let liviaMesh = Mesh(vertices: liviaVertices, indices: liviaIndices, maxInstanceCount: 1000)
+//    let liviaMesh = Mesh(vertices: liviaVertices, indices: liviaIndices, maxInstanceCount: 1000)
+    let liviaPyramid = generatePyramid()
+    let liviaMesh = Mesh(vertices: liviaPyramid.vertices, indices: liviaPyramid.indices, maxInstanceCount: 1000)
 
     let liviaTexture = texture("resources/livia.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGBA), GLenum(GL_UNSIGNED_BYTE))
     let leonTexture = texture("resources/leon.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGB), GLenum(GL_UNSIGNED_BYTE))
+
+//    print(calculateNormals(vertices: liviaVertices, indices: liviaIndices))
+    print(generatePyramid())
 
     // Create the scene
     let scene = Scene()
@@ -37,6 +42,8 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
 
     let renderer = Renderer(width: width, height: height, scene: scene)
     renderer.shaderManager.loadShader(name: "basicShader", vertexPath: "resources/shader/baseCube.vert", fragmentPath: "resources/shader/baseCube.frag")
+    renderer.shaderManager.loadShader(name: "lightShader", vertexPath: "resources/shader/lightShader.vert", fragmentPath: "resources/shader/lightShader.frag")
+    renderer.shaderManager.loadShader(name: "objectShader", vertexPath: "resources/shader/objectShader.vert", fragmentPath: "resources/shader/objectShader.frag")
 
 
     var totalFrames: Int = 0

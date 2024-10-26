@@ -8,41 +8,8 @@ class Shader {
     let programID: GLuint
 
     init(vertexPath: String, fragmentPath: String) {
-        programID = createShader("resources/shader/baseCube.vert", "resources/shader/baseCube.frag")
-//        // 1. Retrieve the vertex/fragment source code from file paths
-//        let vertexCode: String
-//        let fragmentCode: String
-//
-//        do {
-//            vertexCode = try String(contentsOfFile: vertexPath, encoding: .utf8)
-//            fragmentCode = try String(contentsOfFile: fragmentPath, encoding: .utf8)
-//        } catch {
-//            fatalError("Failed to read shader files: \(error)")
-//        }
-//
-//        // 2. Compile shaders
-//        let vertexShader = Shader.compileShader(source: vertexCode, type: GLenum(GL_VERTEX_SHADER))
-//        let fragmentShader = Shader.compileShader(source: fragmentCode, type: GLenum(GL_FRAGMENT_SHADER))
-//
-//        // 3. Link shaders into a program
-//        programID = glCreateProgram()
-//        glAttachShader(programID, vertexShader)
-//        glAttachShader(programID, fragmentShader)
-//        glLinkProgram(programID)
-//
-//        // Check for linking errors
-//        var success: GLint = 0
-//        glGetProgramiv(programID, GLenum(GL_LINK_STATUS), &success)
-//        if success == GL_FALSE {
-//            var infoLog = [GLchar](repeating: 0, count: 512)
-//            glGetProgramInfoLog(programID, GLsizei(infoLog.count), nil, &infoLog)
-//            let message = String(cString: infoLog)
-//            fatalError("ERROR::SHADER::PROGRAM::LINKING_FAILED\n\(message)")
-//        }
-//
-//        // 4. Delete the shaders as they're linked into our program now and no longer necessary
-//        glDeleteShader(vertexShader)
-//        glDeleteShader(fragmentShader)
+        print("createShader: ", vertexPath, fragmentPath)
+        programID = createShader(vertexPath, fragmentPath)
     }
 
     deinit {

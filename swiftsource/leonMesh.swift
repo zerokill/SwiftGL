@@ -41,8 +41,7 @@ class LeonMesh: Mesh {
                 
                 let vertex = Vertex(
                     position: [x * radius, y * radius, z * radius],
-//                    normal: [x, y, z],
-                    color: [x, y, z],
+                    normal: [x, y, z],
                     texCoords: [u, v]
                 )
                 vertices.append(vertex)

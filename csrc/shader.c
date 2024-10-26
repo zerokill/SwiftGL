@@ -12,7 +12,6 @@ unsigned int createShader(const char* vertexFile, const char* fragmentFile)
 
     // Create a shader object and compile it during runtime
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    printf("createShader\n");
     const char* vertexShaderSource = readFile(vertexFile);
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
     glCompileShader(vertexShader);

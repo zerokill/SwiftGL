@@ -27,6 +27,10 @@ class ShaderManager {
         currentShader?.setUniform(name, value: value)
     }
 
+    func setUniform(_ name: String, value: SIMD3<Float>) {
+        currentShader?.setUniform(name, value: value)
+    }
+
     func setUniform(_ name: String, value: float4x4) {
         currentShader?.setUniform(name, value: value)
     }

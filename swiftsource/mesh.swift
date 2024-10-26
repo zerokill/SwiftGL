@@ -21,11 +21,10 @@ class Mesh {
 //    var indices: [GLuint]
     var maxInstanceCount: Int
 
-    private var VAO: GLuint = 0
-    private var VBO: GLuint = 0
-    private var EBO: GLuint = 0
-    private var instanceVBO: GLuint = 0
-
+    var VAO: GLuint = 0
+    var VBO: GLuint = 0
+    var EBO: GLuint = 0
+    var instanceVBO: GLuint = 0
 
     init(vertices: [Vertex], indices: [GLuint], maxInstanceCount: Int) {
         self.vertices = vertices
@@ -52,7 +51,7 @@ class Mesh {
         var vertexData: [GLfloat] = []
         for vertex in vertices {
             vertexData += [vertex.position.x, vertex.position.y, vertex.position.z]
-            vertexData += [vertex.color.x, vertex.color.y, vertex.color.z]
+            vertexData += [vertex.normal.x, vertex.normal.y, vertex.normal.z]
             vertexData += [vertex.texCoords.x, vertex.texCoords.y]
         }
 
@@ -71,9 +70,9 @@ class Mesh {
         glVertexAttribPointer(0, 3, GLenum(GL_FLOAT), GLboolean(GL_FALSE), stride, nil)
         glEnableVertexAttribArray(0)
 
-        // Color attribute
-        let colorOffset = UnsafeRawPointer(bitPattern: 3 * MemoryLayout<GLfloat>.size)
-        glVertexAttribPointer(1, 3, GLenum(GL_FLOAT), GLboolean(GL_FALSE), stride, colorOffset)
+        // Normal attribute
+        let normalOffset = UnsafeRawPointer(bitPattern: 3 * MemoryLayout<GLfloat>.size)
+        glVertexAttribPointer(1, 3, GLenum(GL_FLOAT), GLboolean(GL_FALSE), stride, normalOffset)
         glEnableVertexAttribArray(1)
 
         // Texture coordinate attribute
