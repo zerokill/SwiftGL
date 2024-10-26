@@ -5,8 +5,8 @@ class ShaderManager {
     private var shaders: [String: Shader] = [:]
     private var currentShader: Shader?
 
-    func loadShader(name: String, vertexPath: String, fragmentPath: String) {
-        let shader = Shader(vertexPath: vertexPath, fragmentPath: fragmentPath)
+    func loadShader(name: String, vertexPath: String, geometryPath: String?, fragmentPath: String) {
+        let shader = Shader(vertexPath: vertexPath, geometryPath: geometryPath, fragmentPath: fragmentPath)
         shaders[name] = shader
     }
 

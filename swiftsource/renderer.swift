@@ -53,6 +53,10 @@ class Renderer {
         shaderManager.setUniform("view", value: camera.viewMatrix)
         shaderManager.setUniform("proj", value: camera.projectionMatrix)
 
+        shaderManager.use(shaderName: "normalShader")
+        shaderManager.setUniform("view", value: camera.viewMatrix)
+        shaderManager.setUniform("proj", value: camera.projectionMatrix)
+
         for model in scene.models {
             shaderManager.use(shaderName: model.shaderName)
             shaderManager.setUniform("texture", value: model.texture.ID)
@@ -79,6 +83,22 @@ class Renderer {
             shaderManager.setUniform("objectColor", value: SIMD3<Float>(1.0, 0.5, 0.31));
             shaderManager.setUniform("lightColor",  value: SIMD3<Float>(1.0, 1.0, 1.0));
             scene.light?.draw()
+        }
+
+        if (inputManager.toggleNormal) {
+            shaderManager.use(shaderName: "normalShader")
+            shaderManager.setUniform("visualizeNormals", value: inputManager.toggleNormal)
+            if (inputManager.updateRotation) {
+                shaderManager.setUniform("rotation_x", value: self.rotation_x)
+                shaderManager.setUniform("rotation_y", value: self.rotation_y)
+            }
+            for model in scene.models {
+                model.draw()
+            }
+
+            if scene.light != nil {
+                scene.light?.draw()
+            }
         }
     }
 
