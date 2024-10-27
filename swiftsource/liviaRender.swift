@@ -17,9 +17,6 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     var renderTime: Float = Float(glfwGetTime())
     var title: String = ""
 
-    let liviaPyramid = generateFlatShadedPyramid()
-    let liviaMesh = Mesh(vertices: liviaPyramid.vertices, indices: liviaPyramid.indices, maxInstanceCount: 1000)
-
     let liviaTexture = texture("resources/livia.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGBA), GLenum(GL_UNSIGNED_BYTE))
     let leonTexture = texture("resources/leon.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGB), GLenum(GL_UNSIGNED_BYTE))
 
@@ -32,15 +29,23 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     leonModel.setupInstances()
     scene.models.append(leonModel)
 
+    let liviaPyramid = generateFlatShadedPyramid()
+    let liviaMesh = Mesh(vertices: liviaPyramid.vertices, indices: liviaPyramid.indices, maxInstanceCount: 1000)
     let liviaModel = Model(mesh: liviaMesh, shaderName: "basicShader", texture: liviaTexture)
     liviaModel.setupRandomInstances(randomPosition: true)
     scene.models.append(liviaModel)
+
+    let gridMesh = Mesh(vertices: [], indices: [], maxInstanceCount: 1)
+    let gridModel = Model(mesh: gridMesh, shaderName: "infiniteGridShader", texture: liviaTexture)
+    gridModel.setupInstances()
+    scene.models.append(gridModel)
 
     let renderer = Renderer(width: width, height: height, scene: scene)
     renderer.shaderManager.loadShader(name: "basicShader", vertexPath: "resources/shader/baseCube.vert", geometryPath: nil, fragmentPath: "resources/shader/baseCube.frag")
     renderer.shaderManager.loadShader(name: "lightShader", vertexPath: "resources/shader/lightShader.vert", geometryPath: nil, fragmentPath: "resources/shader/lightShader.frag")
     renderer.shaderManager.loadShader(name: "objectShader", vertexPath: "resources/shader/objectShader.vert", geometryPath: nil, fragmentPath: "resources/shader/objectShader.frag")
     renderer.shaderManager.loadShader(name: "normalShader", vertexPath: "resources/shader/normalShader.vert", geometryPath: "resources/shader/normalShader.geom", fragmentPath: "resources/shader/normalShader.frag")
+    renderer.shaderManager.loadShader(name: "infiniteGridShader", vertexPath: "resources/shader/infiniteGrid.vert", geometryPath: nil, fragmentPath: "resources/shader/infiniteGrid.frag")
 
     var totalFrames: Int = 0
     let TARGET_FPS: Float = 60.0

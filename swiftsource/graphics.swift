@@ -88,6 +88,8 @@ func runGraphics(options: Options) {
             liviaRender(window: window, width: options.width, height: options.height)
         case 2:
             shadertoySwift(window: window, width: options.width, height: options.height)
+        case 3:
+            infiniteGrid(window: window, width: options.width, height: options.height)
         default:
             Logger.error("Unknown program")
     }

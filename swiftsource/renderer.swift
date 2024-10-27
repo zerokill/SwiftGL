@@ -100,6 +100,7 @@ class Renderer {
                 scene.light?.draw()
             }
         }
+
     }
 
     func update(deltaTime: Float) {
