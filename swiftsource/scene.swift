@@ -20,7 +20,6 @@ class Scene {
             let lightModel = Model(mesh: lightSphere, shaderName: "lightShader", texture: lightTexture) // FIXME: Ideally a texture is not needed for this one
             lightModel.setupInstances()
             lightModel.addInstance(position: camera.position)
-//            models.append(lightModel)
             light = lightModel
         }
 

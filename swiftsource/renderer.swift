@@ -30,9 +30,9 @@ class Renderer {
 
     func setupOpenGL() {
         glEnable(GLenum(GL_DEPTH_TEST))
-//        glEnable(GLenum(GL_CULL_FACE))
-//        glCullFace(GLenum(GL_BACK))
-//        glFrontFace(GLenum(GL_CW))
+        glEnable(GLenum(GL_CULL_FACE))
+        glCullFace(GLenum(GL_BACK))
+        glFrontFace(GLenum(GL_CCW))
     }
 
     func render() {

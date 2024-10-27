@@ -54,12 +54,12 @@ class LeonMesh: Mesh {
                 let second = first + longitudeBands + 1
                 
                 indices.append(GLuint(first))
-                indices.append(GLuint(second))
                 indices.append(GLuint(first + 1))
+                indices.append(GLuint(second))
                 
                 indices.append(GLuint(second))
-                indices.append(GLuint(second + 1))
                 indices.append(GLuint(first + 1))
+                indices.append(GLuint(second + 1))
             }
         }
         
