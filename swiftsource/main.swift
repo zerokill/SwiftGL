@@ -99,23 +99,23 @@ func parseArguments() throws -> Options {
 func main() {
     do {
         let options = try parseArguments()
-        
+
         if options.benchmark {
             print("Benchmark mode enabled.")
             benchmark()
         }
-        
+
         if options.graphics {
             print("Graphics mode enabled.")
             runGraphics(options: options)
         }
-        
+
         if !options.benchmark && !options.graphics {
             print("No options selected. Use --help to see available options.")
         }
-        
+
         // Your application logic here
-        
+
     } catch let error as NSError {
         print("Error: \(error.domain)")
         print("Use --help to see available options.")

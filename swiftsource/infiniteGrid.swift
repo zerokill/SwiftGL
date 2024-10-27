@@ -15,8 +15,7 @@ import Darwin.C
 
 func infiniteGrid(window: OpaquePointer!, width: Int32, height: Int32) {
     // Create shader program
-    let phongShader = createShader("resources/shader/baseVertex.glsl", "resources/shader/base.glsl")
-//    let phongShader = createShader("resources/shader/infiniteGrid.vert", "resources/shader/infiniteGrid.frag")
+    let infiniteGridShader = createShader("resources/shader/infiniteGrid.vert", "resources/shader/infiniteGrid.frag")
 
     var dt: Float = 0.000001
     var lastFrameTime: Float = Float(glfwGetTime())
@@ -57,28 +56,9 @@ func infiniteGrid(window: OpaquePointer!, width: Int32, height: Int32) {
         glClear(GLbitfield(GL_COLOR_BUFFER_BIT) | GLbitfield(GL_DEPTH_BUFFER_BIT))
 
         // Render here
-        glUseProgram(phongShader)
+        glUseProgram(infiniteGridShader)
 
-        // Set uniforms
-        let scaleLocation = glGetUniformLocation(phongShader, "uScale")
-        withUnsafePointer(to: &scale_pos.scale.x) {
-            $0.withMemoryRebound(to: GLfloat.self, capacity: 3) {
-                glUniform3fv(scaleLocation, 1, $0)
-            }
-        }
-
-        let positionLocation = glGetUniformLocation(phongShader, "uPosition")
-        withUnsafePointer(to: &scale_pos.position.x) {
-            $0.withMemoryRebound(to: GLfloat.self, capacity: 3) {
-                glUniform3fv(positionLocation, 1, $0)
-            }
-        }
-
-        glUniform3f(glGetUniformLocation(phongShader, "gCameraWorldPos"), 0.0, 0.0, 0.0)
-        glUniform2f(glGetUniformLocation(phongShader, "iResolution"), GLfloat(width), GLfloat(height))
-        glUniform1f(glGetUniformLocation(phongShader, "iTime"), GLfloat(glfwGetTime()))
-
-        glDrawArrays(GLenum(GL_TRIANGLE_STRIP), 0, 4)
+        glDrawArrays(GLenum(GL_TRIANGLES), 0, 6)
 
         if totalFrames % 60 == 0 {
             let fps = 1.0 / dt

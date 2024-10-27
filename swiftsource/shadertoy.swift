@@ -60,20 +60,20 @@ func shadertoySwift(window: OpaquePointer!, width: Int32, height: Int32) {
         // Render here
         glUseProgram(phongShader)
 
-        // Set uniforms
-        let scaleLocation = glGetUniformLocation(phongShader, "uScale")
-        withUnsafePointer(to: &scale_pos.scale.x) {
-            $0.withMemoryRebound(to: GLfloat.self, capacity: 3) {
-                glUniform3fv(scaleLocation, 1, $0)
-            }
-        }
-
-        let positionLocation = glGetUniformLocation(phongShader, "uPosition")
-        withUnsafePointer(to: &scale_pos.position.x) {
-            $0.withMemoryRebound(to: GLfloat.self, capacity: 3) {
-                glUniform3fv(positionLocation, 1, $0)
-            }
-        }
+//        // Set uniforms
+//        let scaleLocation = glGetUniformLocation(phongShader, "uScale")
+//        withUnsafePointer(to: &scale_pos.scale.x) {
+//            $0.withMemoryRebound(to: GLfloat.self, capacity: 3) {
+//                glUniform3fv(scaleLocation, 1, $0)
+//            }
+//        }
+//
+//        let positionLocation = glGetUniformLocation(phongShader, "uPosition")
+//        withUnsafePointer(to: &scale_pos.position.x) {
+//            $0.withMemoryRebound(to: GLfloat.self, capacity: 3) {
+//                glUniform3fv(positionLocation, 1, $0)
+//            }
+//        }
 
         glUniform2f(glGetUniformLocation(phongShader, "iResolution"), GLfloat(width), GLfloat(height))
         glUniform1f(glGetUniformLocation(phongShader, "iTime"), GLfloat(glfwGetTime()))

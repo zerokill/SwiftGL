@@ -35,10 +35,14 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     liviaModel.setupRandomInstances(randomPosition: true)
     scene.models.append(liviaModel)
 
-    let gridMesh = Mesh(vertices: [], indices: [], maxInstanceCount: 1)
-    let gridModel = Model(mesh: gridMesh, shaderName: "infiniteGridShader", texture: liviaTexture)
-    gridModel.setupInstances()
-    scene.models.append(gridModel)
+    let gridVertices: [Vertex] = [
+        Vertex(position: SIMD3<Float>(-1.0, -1.0, 0.0),   normal: SIMD3<Float>(),   texCoords: SIMD2<Float>()),
+        Vertex(position: SIMD3<Float>( 1.0, -1.0, 0.0),   normal: SIMD3<Float>(),   texCoords: SIMD2<Float>()),
+        Vertex(position: SIMD3<Float>(-1.0,  1.0, 0.0),   normal: SIMD3<Float>(),   texCoords: SIMD2<Float>()),
+        Vertex(position: SIMD3<Float>( 1.0,  1.0, 0.0),   normal: SIMD3<Float>(),   texCoords: SIMD2<Float>()),
+    ]
+    let gridMesh = Mesh(vertices: gridVertices, indices: [], maxInstanceCount: 1)
+    scene.grid = gridMesh
 
     let renderer = Renderer(width: width, height: height, scene: scene)
     renderer.shaderManager.loadShader(name: "basicShader", vertexPath: "resources/shader/baseCube.vert", geometryPath: nil, fragmentPath: "resources/shader/baseCube.frag")

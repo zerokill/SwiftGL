@@ -5,6 +5,8 @@ class Scene {
 
     var light: Model? = nil
 
+    var grid: Mesh? = nil
+
     func update(deltaTime: Float, input: InputManager, camera: Camera) {
         if (input.liviaMove && !input.liviaMoved) {
             models[0].shootInstance(position: camera.position, direction: camera.front, enableExplode: true)
