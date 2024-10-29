@@ -9,9 +9,12 @@ struct SphereParameters {
 
 class LeonMesh: Mesh {
 
+    var sphereParameters: SphereParameters
+
     // Initialize Mesh with sphere parameters
     init(sphere: SphereParameters) {
         let (vertices, indices) = LeonMesh.generateSphere(parameters: sphere)
+        self.sphereParameters = sphere;
         super.init(vertices: vertices, indices: indices, maxInstanceCount: 10000)
     }
 

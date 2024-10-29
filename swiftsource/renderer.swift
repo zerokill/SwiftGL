@@ -17,7 +17,7 @@ class Renderer {
     var rotation_y: Float = 0.0
 
     init(width: Int32, height: Int32, scene: Scene) {
-        camera = Camera(position: SIMD3(0.0, 0.1, 0.0), target: SIMD3(0.0, 0.0, 0.0), worldUp: SIMD3(0.0, 1.0, 0.0))
+        camera = Camera(position: SIMD3(0.0, 0.5, 0.0), target: SIMD3(0.0, 0.0, 0.0), worldUp: SIMD3(0.0, 1.0, 0.0))
         inputManager = InputManager()
         shaderManager = ShaderManager()
         self.width = width
@@ -30,9 +30,9 @@ class Renderer {
 
     func setupOpenGL() {
         glEnable(GLenum(GL_DEPTH_TEST))
-//        glEnable(GLenum(GL_CULL_FACE))
-//        glCullFace(GLenum(GL_BACK))
-//        glFrontFace(GLenum(GL_CCW))
+        glEnable(GLenum(GL_CULL_FACE))
+        glCullFace(GLenum(GL_BACK))
+        glFrontFace(GLenum(GL_CCW))
     }
 
     func render() {
@@ -101,11 +101,11 @@ class Renderer {
             }
         }
 
-//        shaderManager.use(shaderName: "infiniteGridShader")
-//        shaderManager.setUniform("view", value: camera.viewMatrix)
-//        shaderManager.setUniform("proj", value: camera.projectionMatrix)
-//        scene.grid?.draw2()
-
+        shaderManager.use(shaderName: "infiniteGridShader")
+        shaderManager.setUniform("view", value: camera.viewMatrix)
+        shaderManager.setUniform("proj", value: camera.projectionMatrix)
+        shaderManager.setUniform("gCameraWorldPos", value: camera.position)
+        scene.grid?.draw2()
     }
 
     func update(deltaTime: Float) {

@@ -30,12 +30,19 @@ class Camera {
 
     func updateProjectionMatrix(aspectRatio: Float) {
         let fovy = radians(fromDegrees: 45.0)
-        projectionMatrix = simd_float4x4.perspective(fovyRadians: fovy, aspectRatio: aspectRatio, nearZ: 1.0, farZ: 100.0)
+        projectionMatrix = simd_float4x4.perspective(fovyRadians: fovy, aspectRatio: aspectRatio, nearZ: 0.1, farZ: 100.0)
     }
 
     func move(delta: SIMD3<Float>) {
         if (abs(delta.z) > 0.00001) {
-            position += front * delta.z
+            let newPosition = position + (front * delta.z)
+            position.x = newPosition.x
+            position.z = newPosition.z
+            if (newPosition.y < 0.5) {
+                position.y = 0.5;
+            } else {
+                position.y = newPosition.y
+            }
         }
         if (abs(delta.x) > 0.00001) {
             position += right * delta.x
@@ -49,6 +56,7 @@ class Camera {
         newFront.y = sin(pitch)
         newFront.z = sin(yaw) * cos(pitch)
         front = normalize(newFront)
+
 
         // Recalculate right and up vectors
         right = normalize(cross(front, worldUp))

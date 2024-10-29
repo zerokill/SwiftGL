@@ -83,10 +83,14 @@ class InputManager {
         }
 
         if (glfwGetKey(window, Int32(GLFW_KEY_UP)) == GLFW_PRESS) {
-            deltaPitch += 0.01
+            if (deltaPitch < 0.9) {
+                deltaPitch += 0.01
+            }
         }
         if (glfwGetKey(window, Int32(GLFW_KEY_DOWN)) == GLFW_PRESS) {
-            deltaPitch -= 0.01
+            if (deltaPitch > -0.9) {
+                deltaPitch -= 0.01
+            }
         }
         if (glfwGetKey(window, Int32(GLFW_KEY_LEFT)) == GLFW_PRESS) {
             deltaYaw -= 0.01

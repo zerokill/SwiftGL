@@ -12,6 +12,8 @@ class Model: Renderable {
     var instances: [InstanceData] = []
     var activeInstances: Int = 0
 
+    let dampingFactor: Float = 0.8
+
     init(mesh: Mesh, shaderName: String, texture: texture_t) {
         self.mesh = mesh
         self.shaderName = shaderName
@@ -35,7 +37,7 @@ class Model: Renderable {
         for _ in 0..<count {
             var instance = resetMove()
             if randomPosition {
-                let randomPosition = SIMD3<Float>( Float.random(in: -50.0...50.0), Float.random(in: -50.0...50.0), Float.random(in: -50.0...50.0))
+                let randomPosition = SIMD3<Float>( Float.random(in: -50.0...50.0), Float.random(in: 0.0...50.0), Float.random(in: -50.0...50.0))
                 let rotationXMatrix = float4x4(rotationAngle: radians(fromDegrees: Float.random(in: 1..<360)), axis: SIMD3<Float>(0, 1, 0))
                 let rotationYMatrix = float4x4(rotationAngle: radians(fromDegrees: Float.random(in: 1..<360)), axis: SIMD3<Float>(1, 0, 0))
                 instance.positionMatrix = float4x4.translation(randomPosition)
@@ -79,28 +81,43 @@ class Model: Renderable {
 
     func updateMove(deltaTime: Float, updateVelocity: Bool, updateRotation: Bool) {
         for i in instances.indices {
+            let position = SIMD3<Float>(
+                instances[i].modelMatrix.columns.3.x,
+                instances[i].modelMatrix.columns.3.y,
+                instances[i].modelMatrix.columns.3.z
+            )
+
             if instances[i].timeAlive >= 0 {
                 instances[i].timeAlive += deltaTime
             }
 
             // Update translation based on velocity and delta time
             if (updateVelocity) {
+
+                if let leonMesh = mesh as? LeonMesh {
+                    if ((position.y < leonMesh.sphereParameters.radius) && (instances[i].velocity.y < 0)) {
+                        instances[i].velocity.y = -instances[i].velocity.y // Bounce up if we go below 0
+                        instances[i].velocity *= dampingFactor;
+                    }
+
+                    // Naive gravity
+                    instances[i].velocity.y -= 0.001;
+                }
                 let translation = instances[i].velocity
                 instances[i].positionMatrix = instances[i].positionMatrix * float4x4.translation(translation)
+                if let leonMesh = mesh as? LeonMesh {
+                    if ((instances[i].positionMatrix.columns.3.y < leonMesh.sphereParameters.radius) && (abs(instances[i].velocity.y) < 0.001)) {
+                        instances[i].positionMatrix.columns.3.y = leonMesh.sphereParameters.radius;
+                    }
+                }
                 instances[i].modelMatrix = instances[i].positionMatrix * instances[i].rotationMatrix
             }
 
-            if (instances[i].timeAlive > 4 && instances[i].enable) {
+            if (instances[i].timeAlive > 8 && instances[i].enable) {
                 instances[i].enable = false
-                let position = SIMD3<Float>(
-                    instances[i].modelMatrix.columns.3.x,
-                    instances[i].modelMatrix.columns.3.y,
-                    instances[i].modelMatrix.columns.3.z
-                )
-
                 if (instances[i].enableExplode) {
                     for _ in 1...100 {
-                        let direction = SIMD3<Float>(x: Float.random(in: -10..<10), y: Float.random(in: -10..<10), z: Float.random(in: -10..<10))
+                        let direction = SIMD3<Float>(x: Float.random(in: -5..<5), y: Float.random(in: -5..<5), z: Float.random(in: -5..<5))
                         shootInstance(position: position, direction: direction, enableExplode: false)
                     }
                 }

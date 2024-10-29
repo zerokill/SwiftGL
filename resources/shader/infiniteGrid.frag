@@ -8,8 +8,8 @@ uniform vec3 gCameraWorldPos;
 uniform float gGridSize = 100.0;
 uniform float gGridMinPixelsBetweenCells = 2.0;
 uniform float gGridCellSize = 0.025;
-uniform vec4 gGridColorThin = vec4(0.5, 0.5, 0.5, 1.0);
-uniform vec4 gGridColorThick = vec4(0.0, 0.0, 0.0, 1.0);
+uniform vec4 gGridColorThin = vec4(0.9, 0.9, 0.9, 1.0);
+uniform vec4 gGridColorThick = vec4(0.5, 0.5, 0.5, 1.0);
 
 
 float log10(float x)
