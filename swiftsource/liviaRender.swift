@@ -19,6 +19,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
 
     let liviaTexture = texture("resources/livia.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGBA), GLenum(GL_UNSIGNED_BYTE))
     let leonTexture = texture("resources/leon.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGB), GLenum(GL_UNSIGNED_BYTE))
+    let sheepTexture = texture("resources/sheep.jpg", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGB), GLenum(GL_UNSIGNED_BYTE))
 
     // Create the scene
     let scene = Scene()
@@ -73,8 +74,12 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
         renderer.render()
         renderTime = Float(glfwGetTime())
 
-        stats.numLeon = Int32(renderer.scene.models[0].activeInstances)
-        stats.numLivia = Int32(renderer.scene.models[1].activeInstances)
+        if let leonModel = renderer.scene.models[0] as? Model {
+            stats.numLeon = Int32(leonModel.activeInstances)
+        }
+        if let liviaModel = renderer.scene.models[1] as? Model {
+            stats.numLivia = Int32(liviaModel.activeInstances)
+        }
         stats.fps = 1.0 / dt
         stats.updateTime = updateTime - startTime
         stats.updateTimeHigh = stats.updateTimeHigh > stats.updateTime ? stats.updateTimeHigh : stats.updateTime

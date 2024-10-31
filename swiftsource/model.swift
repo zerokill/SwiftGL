@@ -4,21 +4,17 @@ import simd
 
 import TextureModule
 
-class Model: Renderable {
-    var mesh: Mesh
-    var shaderName: String
-    var texture: texture_t
-
+class Model: BaseModel {
     var instances: [InstanceData] = []
     var activeInstances: Int = 0
 
     let dampingFactor: Float = 0.8
 
-    init(mesh: Mesh, shaderName: String, texture: texture_t) {
-        self.mesh = mesh
-        self.shaderName = shaderName
-        self.texture = texture
-    }
+//    init(mesh: Mesh, shaderName: String, texture: texture_t) {
+//        self.mesh = mesh
+//        self.shaderName = shaderName
+//        self.texture = texture
+//    }
 
     func setupInstances(randomPosition: Bool = false) {
         let count = mesh.maxInstanceCount
@@ -146,7 +142,7 @@ class Model: Renderable {
             timeAlive: 0)
     }
 
-    func draw() {
+    override func draw() {
         glBindTexture(texture.type, texture.ID)
         mesh.drawInstances(count: activeInstances)
     }

@@ -1,18 +1,26 @@
 import TextureModule
 
 class Scene {
-    var models: [Model] = []
+    var models: [BaseModel] = []
 
     var light: Model? = nil
 
     var grid: Mesh? = nil
 
     func update(deltaTime: Float, input: InputManager, camera: Camera) {
-        if (input.liviaMove && !input.liviaMoved) {
-            models[0].shootInstance(position: camera.position, direction: camera.front, enableExplode: true)
-        }
-        if (input.liviaResetMove) {
-            models[0].resetAllInstances()
+        for model in models {
+            if let downcastModel = models[0] as? Model {
+                if (input.liviaMove && !input.liviaMoved) {
+                    downcastModel.shootInstance(position: camera.position, direction: camera.front, enableExplode: true)
+                }
+                downcastModel.updateMove(deltaTime: deltaTime, updateVelocity: input.updateVelocity, updateRotation: input.updateRotation)
+            }
+            if let downcastModel = models[1] as? Model {
+                if (input.liviaResetMove) {
+                    downcastModel.resetAllInstances()
+                }
+                downcastModel.updateMove(deltaTime: deltaTime, updateVelocity: input.updateVelocity, updateRotation: input.updateRotation)
+            }
         }
 
         if (input.addLight && !input.addedLight) {
@@ -33,10 +41,6 @@ class Scene {
             objectModel.setupInstances()
             objectModel.addInstance(position: camera.position)
             models.append(objectModel)
-        }
-
-        for model in models {
-            model.updateMove(deltaTime: deltaTime, updateVelocity: input.updateVelocity, updateRotation: input.updateRotation)
         }
 
         light?.updateMove(deltaTime: deltaTime, updateVelocity: input.updateVelocity, updateRotation: input.updateRotation)
