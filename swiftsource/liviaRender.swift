@@ -26,13 +26,13 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
 
     let leonSpereParameters = SphereParameters(radius: 0.2, latitudeBands: 20, longitudeBands: 20)
     let leonSphere = LeonMesh(sphere: leonSpereParameters)
-    let leonModel = Model(mesh: leonSphere, shaderName: "basicShader", texture: leonTexture)
+    let leonModel = LeonModel(mesh: leonSphere, shaderName: "basicShader", texture: leonTexture)
     leonModel.setupInstances()
     scene.models.append(leonModel)
 
     let liviaPyramid = generateFlatShadedPyramid()
     let liviaMesh = Mesh(vertices: liviaPyramid.vertices, indices: liviaPyramid.indices, maxInstanceCount: 1000)
-    let liviaModel = Model(mesh: liviaMesh, shaderName: "basicShader", texture: liviaTexture)
+    let liviaModel = LiviaModel(mesh: liviaMesh, shaderName: "basicShader", texture: liviaTexture)
     liviaModel.setupRandomInstances(randomPosition: true)
     scene.models.append(liviaModel)
 
@@ -74,10 +74,10 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
         renderer.render()
         renderTime = Float(glfwGetTime())
 
-        if let leonModel = renderer.scene.models[0] as? Model {
+        if let leonModel = renderer.scene.models[0] as? LeonModel {
             stats.numLeon = Int32(leonModel.activeInstances)
         }
-        if let liviaModel = renderer.scene.models[1] as? Model {
+        if let liviaModel = renderer.scene.models[1] as? LiviaModel {
             stats.numLivia = Int32(liviaModel.activeInstances)
         }
         stats.fps = 1.0 / dt
