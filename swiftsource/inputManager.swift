@@ -14,9 +14,6 @@ class InputManager {
 
     var toggleNormal: Bool = false
 
-    var updateVelocity: Bool = true
-    var updateRotation: Bool = true
-
     var deltaPosition: SIMD3<Float>
     var deltaYaw: Float
     var deltaPitch: Float
@@ -39,18 +36,6 @@ class InputManager {
         }
         if (glfwGetKey(window, Int32(GLFW_KEY_2)) == GLFW_PRESS) {
             glPolygonMode(GLenum(GL_FRONT_AND_BACK), GLenum(GL_FILL))
-        }
-        if (glfwGetKey(window, Int32(GLFW_KEY_3)) == GLFW_PRESS) {
-            updateVelocity = true
-        }
-        if (glfwGetKey(window, Int32(GLFW_KEY_4)) == GLFW_PRESS) {
-            updateVelocity = false
-        }
-        if (glfwGetKey(window, Int32(GLFW_KEY_5)) == GLFW_PRESS) {
-            updateRotation = true
-        }
-        if (glfwGetKey(window, Int32(GLFW_KEY_6)) == GLFW_PRESS) {
-            updateRotation = false
         }
 
         addedObject = addObject

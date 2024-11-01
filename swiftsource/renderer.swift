@@ -40,26 +40,13 @@ class Renderer {
         glClearColor(0.07, 0.13, 0.17, 1.0)
         glClear(GLbitfield(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT))
 
-        // FIXME: Make this a loop or add the shader init code to a dedicated method in the model
-        shaderManager.use(shaderName: "basicShader")
-        shaderManager.setUniform("view", value: camera.viewMatrix)
-        shaderManager.setUniform("proj", value: camera.projectionMatrix)
-
-        shaderManager.use(shaderName: "lightShader")
-        shaderManager.setUniform("view", value: camera.viewMatrix)
-        shaderManager.setUniform("proj", value: camera.projectionMatrix)
-
-        shaderManager.use(shaderName: "objectShader")
-        shaderManager.setUniform("view", value: camera.viewMatrix)
-        shaderManager.setUniform("proj", value: camera.projectionMatrix)
-
-        shaderManager.use(shaderName: "normalShader")
-        shaderManager.setUniform("view", value: camera.viewMatrix)
-        shaderManager.setUniform("proj", value: camera.projectionMatrix)
-
         for model in scene.models {
             shaderManager.use(shaderName: model.shaderName)
-            shaderManager.setUniform("texture", value: model.texture.ID)
+            shaderManager.setUniform("view", value: camera.viewMatrix)
+            shaderManager.setUniform("proj", value: camera.projectionMatrix)
+            if let texture = model.texture {
+                shaderManager.setUniform("texture", value: texture.ID)
+            }
             shaderManager.setUniform("visualizeNormals", value: inputManager.toggleNormal)
             shaderManager.setUniform("objectColor", value: SIMD3<Float>(1.0, 0.5, 0.31));
             shaderManager.setUniform("lightColor",  value: SIMD3<Float>(1.0, 1.0, 1.0));
@@ -71,15 +58,15 @@ class Renderer {
                 )
                 shaderManager.setUniform("lightPos",    value: position)
             }
-            if (inputManager.updateRotation) {
-                shaderManager.setUniform("rotation_x", value: self.rotation_x)
-                shaderManager.setUniform("rotation_y", value: self.rotation_y)
-            }
+            shaderManager.setUniform("rotation_x", value: self.rotation_x)
+            shaderManager.setUniform("rotation_y", value: self.rotation_y)
             model.draw()
         }
 
         if let light = scene.light {
             shaderManager.use(shaderName: light.shaderName)
+            shaderManager.setUniform("view", value: camera.viewMatrix)
+            shaderManager.setUniform("proj", value: camera.projectionMatrix)
             shaderManager.setUniform("objectColor", value: SIMD3<Float>(1.0, 0.5, 0.31));
             shaderManager.setUniform("lightColor",  value: SIMD3<Float>(1.0, 1.0, 1.0));
             scene.light?.draw()
@@ -87,18 +74,16 @@ class Renderer {
 
         if (inputManager.toggleNormal) {
             shaderManager.use(shaderName: "normalShader")
+            shaderManager.setUniform("view", value: camera.viewMatrix)
+            shaderManager.setUniform("proj", value: camera.projectionMatrix)
             shaderManager.setUniform("visualizeNormals", value: inputManager.toggleNormal)
-            if (inputManager.updateRotation) {
-                shaderManager.setUniform("rotation_x", value: self.rotation_x)
-                shaderManager.setUniform("rotation_y", value: self.rotation_y)
-            }
+            shaderManager.setUniform("rotation_x", value: self.rotation_x)
+            shaderManager.setUniform("rotation_y", value: self.rotation_y)
             for model in scene.models {
                 model.draw()
             }
 
-            if scene.light != nil {
-                scene.light?.draw()
-            }
+            scene.light?.draw()
         }
 
         shaderManager.use(shaderName: "infiniteGridShader")
@@ -109,8 +94,6 @@ class Renderer {
     }
 
     func update(deltaTime: Float) {
-        // Update animations or other time-dependent features
-
         // Update rotations based on user input
         rotation_x += deltaTime
         rotation_y += deltaTime

@@ -21,20 +21,30 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     let leonTexture = texture("resources/leon.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGB), GLenum(GL_UNSIGNED_BYTE))
     let sheepTexture = texture("resources/sheep.jpg", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGB), GLenum(GL_UNSIGNED_BYTE))
 
+    ResourceManager.shared.loadTexture(name: "liviaTexture", texture: liviaTexture)
+    ResourceManager.shared.loadTexture(name: "leonTexture", texture: leonTexture)
+    ResourceManager.shared.loadTexture(name: "sheepTexture", texture: sheepTexture)
+
+    if let texture = ResourceManager.shared.getTexture(name: "leonTexture") {
+        let leonSpereParameters = SphereParameters(radius: 0.2, latitudeBands: 20, longitudeBands: 20)
+        let leonSphere = LeonMesh(sphere: leonSpereParameters)
+        let leonModel = LeonModel(mesh: leonSphere, shaderName: "baseCube", texture: texture)
+        leonModel.setupInstances()
+        ResourceManager.shared.loadModel(name: "leonModel", model: leonModel)
+    }
+        
+    if let texture = ResourceManager.shared.getTexture(name: "liviaTexture") {
+        let liviaPyramid = generateFlatShadedPyramid()
+        let liviaMesh = Mesh(vertices: liviaPyramid.vertices, indices: liviaPyramid.indices, maxInstanceCount: 1000)
+        let liviaModel = LiviaModel(mesh: liviaMesh, shaderName: "baseCube", texture: texture)
+        liviaModel.setupRandomInstances(randomPosition: true)
+        ResourceManager.shared.loadModel(name: "liviaModel", model: liviaModel)
+    }
+
+    Logger.info("resource loading done");
+
     // Create the scene
     let scene = Scene()
-
-    let leonSpereParameters = SphereParameters(radius: 0.2, latitudeBands: 20, longitudeBands: 20)
-    let leonSphere = LeonMesh(sphere: leonSpereParameters)
-    let leonModel = LeonModel(mesh: leonSphere, shaderName: "basicShader", texture: leonTexture)
-    leonModel.setupInstances()
-    scene.models.append(leonModel)
-
-    let liviaPyramid = generateFlatShadedPyramid()
-    let liviaMesh = Mesh(vertices: liviaPyramid.vertices, indices: liviaPyramid.indices, maxInstanceCount: 1000)
-    let liviaModel = LiviaModel(mesh: liviaMesh, shaderName: "basicShader", texture: liviaTexture)
-    liviaModel.setupRandomInstances(randomPosition: true)
-    scene.models.append(liviaModel)
 
     let gridVertices: [Vertex] = [
         Vertex(position: SIMD3<Float>(-1.0, -1.0, 0.0),   normal: SIMD3<Float>(),   texCoords: SIMD2<Float>()),
@@ -46,7 +56,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     scene.grid = gridMesh
 
     let renderer = Renderer(width: width, height: height, scene: scene)
-    renderer.shaderManager.loadShader(name: "basicShader", vertexPath: "resources/shader/baseCube.vert", geometryPath: nil, fragmentPath: "resources/shader/baseCube.frag")
+    renderer.shaderManager.loadShader(name: "baseCube", vertexPath: "resources/shader/baseCube.vert", geometryPath: nil, fragmentPath: "resources/shader/baseCube.frag")
     renderer.shaderManager.loadShader(name: "lightShader", vertexPath: "resources/shader/lightShader.vert", geometryPath: nil, fragmentPath: "resources/shader/lightShader.frag")
     renderer.shaderManager.loadShader(name: "objectShader", vertexPath: "resources/shader/objectShader.vert", geometryPath: nil, fragmentPath: "resources/shader/objectShader.frag")
     renderer.shaderManager.loadShader(name: "normalShader", vertexPath: "resources/shader/normalShader.vert", geometryPath: "resources/shader/normalShader.geom", fragmentPath: "resources/shader/normalShader.frag")
