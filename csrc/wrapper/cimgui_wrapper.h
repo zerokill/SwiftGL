@@ -21,7 +21,7 @@ typedef struct
 
 
 // Render ImGui frame
-void ImGuiWrapper_Render(stats_t stats);
+//void ImGuiWrapper_Render(stats_t stats);
 
 // Shutdown ImGui
 void ImGuiWrapper_Shutdown();
@@ -33,3 +33,6 @@ bool ImGuiWrapper_ShouldClose(GLFWwindow* window);
 void ImGuiWrapper_PollEvents();
 void ImGuiWrapper_SwapBuffers(GLFWwindow* window);
 
+void ImGuiWrapper_RenderStart();
+void ImGuiWrapper_RenderEnd();
+void ImGuiWrapper_Text(const char* text);

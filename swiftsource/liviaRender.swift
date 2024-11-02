@@ -107,7 +107,15 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
         stats.renderTime = renderTime - updateTime
         stats.renderTimeHigh = stats.renderTimeHigh > stats.renderTime ? stats.renderTimeHigh : stats.renderTime
 
-        ImGuiWrapper_Render(stats)
+        ImGuiWrapper_RenderStart()
+        ImGuiWrapper_Text(String(format: "FPS: %-4.0f",             1.0/dt))
+        ImGuiWrapper_Text(String(format: "numLeon: %0d",            stats.numLeon))
+        ImGuiWrapper_Text(String(format: "numLivia: %0d",           stats.numLivia))
+        ImGuiWrapper_Text(String(format: "updateTime: %.4f",        stats.updateTime))
+        ImGuiWrapper_Text(String(format: "updateTimeHigh: %.4f",    stats.updateTimeHigh))
+        ImGuiWrapper_Text(String(format: "renderTime: %.4f",        stats.renderTime))
+        ImGuiWrapper_Text(String(format: "renderTimeHigh: %.4f",    stats.renderTimeHigh))
+        ImGuiWrapper_RenderEnd()
 
         // Swap buffers and poll events
         glfwSwapBuffers(window)

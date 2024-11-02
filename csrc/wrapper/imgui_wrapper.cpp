@@ -27,7 +27,7 @@ bool ImGuiWrapper_Init(GLFWwindow* window) {
     return true;
 }
 
-void ImGuiWrapper_Render(stats_t stats) {
+void ImGuiWrapper_RenderStart() {
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -35,18 +35,22 @@ void ImGuiWrapper_Render(stats_t stats) {
 
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
     ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
-    if (ImGui::Begin("Example: Simple overlay", NULL, window_flags))
-    {
-        ImGui::Text("Simple overlay\n");
-        ImGui::Separator();
-        ImGui::Text("Num Livia: %0d", stats.numLivia);
-        ImGui::Text("Num Leon: %0d", stats.numLeon);
-        ImGui::Text("fps: %.1f", stats.fps);
-        ImGui::Text("updateTime: %f", stats.updateTime);
-        ImGui::Text("renderTime: %f", stats.renderTime);
-        ImGui::Text("updateTimeHigh: %f", stats.updateTimeHigh);
-        ImGui::Text("renderTimeHigh: %f", stats.renderTimeHigh);
-    }
+    ImGui::Begin("Example: Simple overlay", NULL, window_flags);
+//    {
+//        ImGui::Text("Simple overlay\n");
+//        ImGui::Separator();
+//        ImGui::Text("Num Livia: %0d", stats.numLivia);
+//        ImGui::Text("Num Leon: %0d", stats.numLeon);
+//        ImGui::Text("fps: %.1f", stats.fps);
+//        ImGui::Text("updateTime: %f", stats.updateTime);
+//        ImGui::Text("renderTime: %f", stats.renderTime);
+//        ImGui::Text("updateTimeHigh: %f", stats.updateTimeHigh);
+//        ImGui::Text("renderTimeHigh: %f", stats.renderTimeHigh);
+//    }
+}
+
+void ImGuiWrapper_RenderEnd() {
+    // Start the Dear ImGui frame
     ImGui::End();
 
     // Render ImGui
@@ -59,6 +63,10 @@ void ImGuiWrapper_Shutdown() {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
+}
+
+void ImGuiWrapper_Text(const char* text) {
+    ImGui::Text(text);
 }
 
 GLFWwindow* ImGuiWrapper_CreateWindow(int width, int height, const char* title) {
