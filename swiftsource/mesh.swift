@@ -17,8 +17,6 @@ struct InstanceData {
 class Mesh {
     var vertices: [Vertex]
     var indices: [GLuint]
-//    var vertices: [GLfloat]
-//    var indices: [GLuint]
     var maxInstanceCount: Int
 
     var VAO: GLuint = 0

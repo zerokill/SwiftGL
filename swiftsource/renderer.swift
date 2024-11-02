@@ -42,6 +42,9 @@ class Renderer {
 
         for model in scene.models {
             shaderManager.use(shaderName: model.shaderName)
+            if let lightModel = model as? LightModel {
+                shaderManager.setUniform("model", value: lightModel.modelMatrix)
+            }
             shaderManager.setUniform("view", value: camera.viewMatrix)
             shaderManager.setUniform("proj", value: camera.projectionMatrix)
             if let texture = model.texture {
@@ -52,9 +55,9 @@ class Renderer {
             shaderManager.setUniform("lightColor",  value: SIMD3<Float>(1.0, 1.0, 1.0));
             if let light = scene.light {
                 let position = SIMD3<Float>(
-                    light.instances[0].modelMatrix.columns.3.x,
-                    light.instances[0].modelMatrix.columns.3.y,
-                    light.instances[0].modelMatrix.columns.3.z
+                    light.modelMatrix.columns.3.x,
+                    light.modelMatrix.columns.3.y,
+                    light.modelMatrix.columns.3.z
                 )
                 shaderManager.setUniform("lightPos",    value: position)
             }
@@ -65,6 +68,7 @@ class Renderer {
 
         if let light = scene.light {
             shaderManager.use(shaderName: light.shaderName)
+            shaderManager.setUniform("model", value: light.modelMatrix)
             shaderManager.setUniform("view", value: camera.viewMatrix)
             shaderManager.setUniform("proj", value: camera.projectionMatrix)
             shaderManager.setUniform("objectColor", value: SIMD3<Float>(1.0, 0.5, 0.31));

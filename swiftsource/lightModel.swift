@@ -2,55 +2,47 @@ import os
 import OpenGL.GL3
 import simd
 
+import TextureModule
+
 class LightModel: BaseModel {
     var instances: [InstanceData] = []
-    var activeInstances: Int = 0
+    var modelMatrix: float4x4 = matrix_identity_float4x4
+    var positionMatrix: float4x4 = matrix_identity_float4x4
+    var rotationMatrix: float4x4 = matrix_identity_float4x4
+    var velocity: SIMD3<Float> = SIMD3<Float>()
 
     let dampingFactor: Float = 0.9
 
-    func setupInstances(randomPosition: Bool = false) {
-        let count = mesh.maxInstanceCount
-
-        instances.reserveCapacity(count)
-        for _ in 0..<count {
-            instances.append(resetMove())
-        }
-        mesh.updateInstanceData(instances)
-    }
-
-    func addInstance(position: SIMD3<Float>) {
-        instances[activeInstances].modelMatrix = float4x4.translation(position)
-        instances[activeInstances].positionMatrix = float4x4.translation(position)
-        activeInstances += 1
+    init(mesh: Mesh, shaderName: String, texture: texture_t?, position: SIMD3<Float>) {
+        modelMatrix = float4x4.translation(position)
+        positionMatrix = float4x4.translation(position)
+        super.init(mesh: mesh, shaderName: shaderName, texture: texture)
     }
 
     override func updateMove(deltaTime: Float) {
-        for i in instances.indices {
-            let position = SIMD3<Float>(
-                instances[i].modelMatrix.columns.3.x,
-                instances[i].modelMatrix.columns.3.y,
-                instances[i].modelMatrix.columns.3.z
-            )
+        let position = SIMD3<Float>(
+            modelMatrix.columns.3.x,
+            modelMatrix.columns.3.y,
+            modelMatrix.columns.3.z
+        )
 
-            if let leonMesh = mesh as? LeonMesh {
-                if ((position.y < leonMesh.sphereParameters.radius) && (instances[i].velocity.y < 0)) {
-                    instances[i].velocity.y = -instances[i].velocity.y // Bounce up if we go below 0
-                    instances[i].velocity *= dampingFactor;
-                }
+        if let leonMesh = mesh as? LeonMesh {
+            if ((position.y < leonMesh.sphereParameters.radius) && (velocity.y < 0)) {
+                velocity.y = -velocity.y // Bounce up if we go below 0
+                velocity *= dampingFactor;
+            }
 
-                // Naive gravity
-                instances[i].velocity.y -= 0.001;
-            }
-            let translation = instances[i].velocity
-            instances[i].positionMatrix = instances[i].positionMatrix * float4x4.translation(translation)
-            if let leonMesh = mesh as? LeonMesh {
-                if ((instances[i].positionMatrix.columns.3.y < leonMesh.sphereParameters.radius) && (abs(instances[i].velocity.y) < 0.001)) {
-                    instances[i].positionMatrix.columns.3.y = leonMesh.sphereParameters.radius;
-                }
-            }
-            instances[i].modelMatrix = instances[i].positionMatrix * instances[i].rotationMatrix
+            // Naive gravity
+            velocity.y -= 0.001;
         }
-        mesh.updateInstanceData(instances)
+        let translation = velocity
+        positionMatrix = positionMatrix * float4x4.translation(translation)
+        if let leonMesh = mesh as? LeonMesh {
+            if ((positionMatrix.columns.3.y < leonMesh.sphereParameters.radius) && (abs(velocity.y) < 0.001)) {
+                positionMatrix.columns.3.y = leonMesh.sphereParameters.radius;
+            }
+        }
+        modelMatrix = positionMatrix * rotationMatrix
     }
 
     func resetMove() -> InstanceData {
@@ -65,7 +57,7 @@ class LightModel: BaseModel {
     }
 
     override func draw() {
-        mesh.drawInstances(count: activeInstances)
+        mesh.draw()
     }
 }
 

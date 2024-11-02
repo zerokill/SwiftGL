@@ -33,13 +33,17 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
         ResourceManager.shared.loadModel(name: "leonModel", model: leonModel)
     }
         
-    if let texture = ResourceManager.shared.getTexture(name: "liviaTexture") {
+    if let texture = ResourceManager.shared.getTexture(name: "sheepTexture") {
         let liviaPyramid = generateFlatShadedPyramid()
         let liviaMesh = Mesh(vertices: liviaPyramid.vertices, indices: liviaPyramid.indices, maxInstanceCount: 1000)
         let liviaModel = LiviaModel(mesh: liviaMesh, shaderName: "baseCube", texture: texture)
         liviaModel.setupRandomInstances(randomPosition: true)
         ResourceManager.shared.loadModel(name: "liviaModel", model: liviaModel)
     }
+
+    let objectSpereParameters = SphereParameters(radius: 0.2, latitudeBands: 20, longitudeBands: 20)
+    let objectSphere = LeonMesh(sphere: objectSpereParameters)
+    ResourceManager.shared.loadMesh(name: "objectSphere", mesh: objectSphere)
 
     Logger.info("resource loading done");
 
