@@ -22,14 +22,14 @@ class Scene {
 
     func update(deltaTime: Float, input: InputManager, camera: Camera) {
         if (input.addLight && !input.addedLight) {
-            if let lightSphere = ResourceManager.shared.getMesh(name: "objectSphere") {
+            if let lightSphere = ResourceManager.shared.getModel(name: "leonModel")?.mesh {
                 let lightModel = LightModel(mesh: lightSphere, shaderName: "lightShader", texture: nil, position: camera.position)
                 light = lightModel
             }
         }
 
         if (input.addObject && !input.addedObject) {
-            if let objectSphere = ResourceManager.shared.getMesh(name: "objectSphere") {
+            if let objectSphere = ResourceManager.shared.getModel(name: "leonModel")?.mesh {
                 let objectModel = LightModel(mesh: objectSphere, shaderName: "objectShader", texture: nil, position: camera.position)
                 models.append(objectModel)
             }

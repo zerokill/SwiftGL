@@ -32,7 +32,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
         leonModel.setupInstances()
         ResourceManager.shared.loadModel(name: "leonModel", model: leonModel)
     }
-        
+
     if let texture = ResourceManager.shared.getTexture(name: "sheepTexture") {
         let liviaPyramid = generateFlatShadedPyramid()
         let liviaMesh = Mesh(vertices: liviaPyramid.vertices, indices: liviaPyramid.indices, maxInstanceCount: 1000)
@@ -88,11 +88,18 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
         renderer.render()
         renderTime = Float(glfwGetTime())
 
-        if let leonModel = renderer.scene.models[0] as? LeonModel {
-            stats.numLeon = Int32(leonModel.activeInstances)
-        }
-        if let liviaModel = renderer.scene.models[1] as? LiviaModel {
-            stats.numLivia = Int32(liviaModel.activeInstances)
+        stats.numLeon = 0
+        stats.numLivia = 0
+        for model in renderer.scene.models {
+            if let leonModel = model as? LeonModel {
+                stats.numLeon += Int32(leonModel.activeInstances)
+            }
+            if model as? LightModel != nil {
+                stats.numLeon += 1
+            }
+            if let liviaModel = model as? LiviaModel {
+                stats.numLivia += Int32(liviaModel.activeInstances)
+            }
         }
         stats.fps = 1.0 / dt
         stats.updateTime = updateTime - startTime
