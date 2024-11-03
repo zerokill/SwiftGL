@@ -30,6 +30,7 @@ class Renderer {
 
     func setupOpenGL() {
         glEnable(GLenum(GL_DEPTH_TEST))
+        glEnable(GLenum(GL_MULTISAMPLE));
         glEnable(GLenum(GL_CULL_FACE))
         glCullFace(GLenum(GL_BACK))
         glFrontFace(GLenum(GL_CCW))
@@ -51,8 +52,8 @@ class Renderer {
                 shaderManager.setUniform("texture", value: texture.ID)
             }
             shaderManager.setUniform("visualizeNormals", value: inputManager.toggleNormal)
-            shaderManager.setUniform("objectColor", value: SIMD3<Float>(1.0, 0.5, 0.31));
             shaderManager.setUniform("lightColor",  value: SIMD3<Float>(1.0, 1.0, 1.0));
+            shaderManager.setUniform("cameraPos", value: camera.position)
             if let light = scene.light {
                 let position = SIMD3<Float>(
                     light.modelMatrix.columns.3.x,
@@ -71,7 +72,6 @@ class Renderer {
             shaderManager.setUniform("model", value: light.modelMatrix)
             shaderManager.setUniform("view", value: camera.viewMatrix)
             shaderManager.setUniform("proj", value: camera.projectionMatrix)
-            shaderManager.setUniform("objectColor", value: SIMD3<Float>(1.0, 0.5, 0.31));
             shaderManager.setUniform("lightColor",  value: SIMD3<Float>(1.0, 1.0, 1.0));
             scene.light?.draw()
         }
@@ -93,8 +93,14 @@ class Renderer {
         shaderManager.use(shaderName: "infiniteGridShader")
         shaderManager.setUniform("view", value: camera.viewMatrix)
         shaderManager.setUniform("proj", value: camera.projectionMatrix)
-        shaderManager.setUniform("gCameraWorldPos", value: camera.position)
+        shaderManager.setUniform("cameraPos", value: camera.position)
         scene.grid?.draw2()
+
+        let viewMatrix = getViewMatrixWithoutTranslation(from: camera.viewMatrix)
+        shaderManager.use(shaderName: "skyboxShader")
+        shaderManager.setUniform("view", value: viewMatrix)
+        shaderManager.setUniform("proj", value: camera.projectionMatrix)
+        scene.skybox?.draw()
     }
 
     func update(deltaTime: Float) {

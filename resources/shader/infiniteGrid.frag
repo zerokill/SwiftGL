@@ -4,7 +4,7 @@ in vec3 WorldPos;
 
 layout(location = 0) out vec4 FragColor;
 
-uniform vec3 gCameraWorldPos;
+uniform vec3 cameraPos;
 uniform float gGridSize = 100.0;
 uniform float gGridMinPixelsBetweenCells = 2.0;
 uniform float gGridCellSize = 0.025;
@@ -85,7 +85,7 @@ void main()
         }
     }
 
-    float OpacityFalloff = (1.0 - satf(length(WorldPos.xz - gCameraWorldPos.xz) / gGridSize));
+    float OpacityFalloff = (1.0 - satf(length(WorldPos.xz - cameraPos.xz) / gGridSize));
 
     Color.a *= OpacityFalloff;
 

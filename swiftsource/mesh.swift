@@ -114,7 +114,7 @@ class Mesh {
 
     func draw2() {
         glBindVertexArray(VAO)
-        glDrawArrays(GLenum(GL_TRIANGLES), 0, 6)
+        glDrawArrays(GLenum(GL_TRIANGLES), 0, 24)
         glBindVertexArray(0)
     }
 }

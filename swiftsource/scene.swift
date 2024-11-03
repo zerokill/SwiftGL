@@ -6,6 +6,7 @@ class Scene {
     var light: LightModel? = nil
 
     var grid: Mesh? = nil
+    var skybox: SkyboxModel? = nil
 
     init() {
         Logger.info("scene init");

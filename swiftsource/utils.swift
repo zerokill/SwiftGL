@@ -61,3 +61,23 @@ func generateNormalLines(from vertices: [Vertex], normalLength: Float) -> [Verte
 
     return normalLines
 }
+
+func getViewMatrixWithoutTranslation(from originalViewMatrix: simd_float4x4) -> simd_float4x4 {
+    // Extract the 3x3 rotation matrix
+    // Extract the rotational part of the matrix (upper-left 3x3)
+    let rotationMatrix = simd_float3x3(
+        SIMD3<Float>(originalViewMatrix.columns.0.x, originalViewMatrix.columns.0.y, originalViewMatrix.columns.0.z),
+        SIMD3<Float>(originalViewMatrix.columns.1.x, originalViewMatrix.columns.1.y, originalViewMatrix.columns.1.z),
+        SIMD3<Float>(originalViewMatrix.columns.2.x, originalViewMatrix.columns.2.y, originalViewMatrix.columns.2.z)
+    )
+    
+    // Construct a new 4x4 matrix with zero translation
+    let rotationOnlyViewMatrix = simd_float4x4(
+        SIMD4<Float>(rotationMatrix.columns.0, 0.0),
+        SIMD4<Float>(rotationMatrix.columns.1, 0.0),
+        SIMD4<Float>(rotationMatrix.columns.2, 0.0),
+        SIMD4<Float>(0.0, 0.0, 0.0, 1.0)
+    )
+    
+    return rotationOnlyViewMatrix
+}

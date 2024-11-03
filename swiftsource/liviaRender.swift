@@ -20,10 +20,20 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     let liviaTexture = texture("resources/livia.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGBA), GLenum(GL_UNSIGNED_BYTE))
     let leonTexture = texture("resources/leon.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGB), GLenum(GL_UNSIGNED_BYTE))
     let sheepTexture = texture("resources/sheep.jpg", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGB), GLenum(GL_UNSIGNED_BYTE))
+    let skyTexture = textureCubeMap(images: [
+            "resources/skybox/right.jpg",
+            "resources/skybox/left.jpg",
+            "resources/skybox/top.jpg",
+            "resources/skybox/bottom.jpg",
+            "resources/skybox/front.jpg",
+            "resources/skybox/back.jpg",
+        ],
+        texType: GLenum(GL_TEXTURE_CUBE_MAP), slot: GLenum(GL_TEXTURE0), format: GLenum(GL_RGB), pixelType: GLenum(GL_UNSIGNED_BYTE))
 
     ResourceManager.shared.loadTexture(name: "liviaTexture", texture: liviaTexture)
     ResourceManager.shared.loadTexture(name: "leonTexture", texture: leonTexture)
     ResourceManager.shared.loadTexture(name: "sheepTexture", texture: sheepTexture)
+    ResourceManager.shared.loadTexture(name: "skyboxTexture", texture: skyTexture)
 
     if let texture = ResourceManager.shared.getTexture(name: "leonTexture") {
         let leonSpereParameters = SphereParameters(radius: 0.2, latitudeBands: 20, longitudeBands: 20)
@@ -59,12 +69,19 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     let gridMesh = Mesh(vertices: gridVertices, indices: [], maxInstanceCount: 1)
     scene.grid = gridMesh
 
+    if let texture = ResourceManager.shared.getTexture(name: "skyboxTexture") {
+        let skyboxMesh = CubeMesh()
+        let skyboxModel = SkyboxModel(mesh: skyboxMesh, shaderName: "skybox", texture: texture)
+        scene.skybox = skyboxModel
+    }
+
     let renderer = Renderer(width: width, height: height, scene: scene)
     renderer.shaderManager.loadShader(name: "baseCube", vertexPath: "resources/shader/baseCube.vert", geometryPath: nil, fragmentPath: "resources/shader/baseCube.frag")
     renderer.shaderManager.loadShader(name: "lightShader", vertexPath: "resources/shader/lightShader.vert", geometryPath: nil, fragmentPath: "resources/shader/lightShader.frag")
     renderer.shaderManager.loadShader(name: "objectShader", vertexPath: "resources/shader/objectShader.vert", geometryPath: nil, fragmentPath: "resources/shader/objectShader.frag")
     renderer.shaderManager.loadShader(name: "normalShader", vertexPath: "resources/shader/normalShader.vert", geometryPath: "resources/shader/normalShader.geom", fragmentPath: "resources/shader/normalShader.frag")
     renderer.shaderManager.loadShader(name: "infiniteGridShader", vertexPath: "resources/shader/infiniteGrid.vert", geometryPath: nil, fragmentPath: "resources/shader/infiniteGrid.frag")
+    renderer.shaderManager.loadShader(name: "skyboxShader", vertexPath: "resources/shader/skybox.vert", geometryPath: nil, fragmentPath: "resources/shader/skybox.frag")
 
     var totalFrames: Int = 0
     let TARGET_FPS: Float = 60.0

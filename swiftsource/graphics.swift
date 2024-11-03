@@ -24,7 +24,8 @@ func initializeWindow(options: Options) -> OpaquePointer? {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
-    // glfwWindowHint(GLFW_DECORATED, GLFW_FALSE) // Optional: Remove window decorations for borderless windowed mode
+    glfwWindowHint(GLFW_SAMPLES, 4);
+    glfwWindowHint(GLFW_DECORATED, GLFW_FALSE) // Optional: Remove window decorations for borderless windowed mode
 
     // Select the primary monitor
     guard let primaryMonitor = getPrimaryMonitor() else {
