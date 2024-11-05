@@ -7,10 +7,12 @@ class Scene {
 
     var grid: Mesh? = nil
     var skybox: SkyboxModel? = nil
-    var terrain: TerrainModel? = nil
+    var terrain: TerrainModel
 
-    init() {
+    init(terrain: TerrainModel) {
         Logger.info("scene init");
+
+        self.terrain = terrain
 
         if let model = ResourceManager.shared.getModel(name: "liviaModel") {
             Logger.info("liviaModel loaded");
@@ -25,14 +27,14 @@ class Scene {
     func update(deltaTime: Float, input: InputManager, camera: Camera) {
         if (input.addLight && !input.addedLight) {
             if let lightSphere = ResourceManager.shared.getModel(name: "leonModel")?.mesh {
-                let lightModel = LightModel(mesh: lightSphere, shaderName: "lightShader", texture: nil, position: camera.position)
+                let lightModel = LightModel(mesh: lightSphere, shaderName: "lightShader", texture: nil, position: camera.position, terrainMesh: terrain.mesh)
                 light = lightModel
             }
         }
 
         if (input.addObject && !input.addedObject) {
             if let objectSphere = ResourceManager.shared.getModel(name: "leonModel")?.mesh {
-                let objectModel = LightModel(mesh: objectSphere, shaderName: "objectShader", texture: nil, position: camera.position)
+                let objectModel = LightModel(mesh: objectSphere, shaderName: "objectShader", texture: nil, position: camera.position, terrainMesh: terrain.mesh)
                 models.append(objectModel)
             }
         }

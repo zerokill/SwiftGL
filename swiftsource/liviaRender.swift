@@ -35,6 +35,9 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     ResourceManager.shared.loadTexture(name: "sheepTexture", texture: sheepTexture)
     ResourceManager.shared.loadTexture(name: "skyboxTexture", texture: skyTexture)
 
+    let terrainMesh = TerrainMesh(width: 1000, depth: 1000, scale: 10, octaves: 4, persistence: 0.5, seed: 1)
+    let terrainModel = TerrainModel(mesh: terrainMesh, shaderName: "terrainShader", texture: nil)
+
     if let texture = ResourceManager.shared.getTexture(name: "leonTexture") {
         let leonSpereParameters = SphereParameters(radius: 0.2, latitudeBands: 20, longitudeBands: 20)
         let leonSphere = LeonMesh(sphere: leonSpereParameters)
@@ -58,7 +61,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     Logger.info("resource loading done");
 
     // Create the scene
-    let scene = Scene()
+    let scene = Scene(terrain: terrainModel)
 
     let gridVertices: [Vertex] = [
         Vertex(position: SIMD3<Float>(-1.0, -1.0, 0.0),   normal: SIMD3<Float>(),   texCoords: SIMD2<Float>()),
@@ -74,10 +77,6 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
         let skyboxModel = SkyboxModel(mesh: skyboxMesh, shaderName: "skyboxShader", texture: texture)
         scene.skybox = skyboxModel
     }
-
-    let terrainMesh = TerrainMesh(width: 1000, depth: 1000, scale: 10, octaves: 4, persistence: 0.5, seed: 1)
-    let terrainModel = TerrainModel(mesh: terrainMesh, shaderName: "terrainShader", texture: nil)
-    scene.terrain = terrainModel
 
     let renderer = Renderer(width: width, height: height, scene: scene)
     renderer.shaderManager.loadShader(name: "baseCube", vertexPath: "resources/shader/baseCube.vert", geometryPath: nil, fragmentPath: "resources/shader/baseCube.frag")

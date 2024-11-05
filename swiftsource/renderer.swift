@@ -17,7 +17,7 @@ class Renderer {
     var rotation_y: Float = 0.0
 
     init(width: Int32, height: Int32, scene: Scene) {
-        camera = Camera(position: SIMD3(0.0, 0.5, 0.0), target: SIMD3(0.0, 0.0, 0.0), worldUp: SIMD3(0.0, 1.0, 0.0))
+        camera = Camera(position: SIMD3(0.0, 10.0, 0.0), target: SIMD3(0.0, 0.0, 0.0), worldUp: SIMD3(0.0, 1.0, 0.0))
         inputManager = InputManager()
         shaderManager = ShaderManager()
         self.width = width
@@ -41,23 +41,21 @@ class Renderer {
         glClearColor(0.07, 0.13, 0.17, 1.0)
         glClear(GLbitfield(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT))
 
-        if let terrain = scene.terrain {
-            shaderManager.use(shaderName: "terrainShader")
-            shaderManager.setUniform("view", value: camera.viewMatrix)
-            shaderManager.setUniform("proj", value: camera.projectionMatrix)
-            shaderManager.setUniform("visualizeNormals", value: inputManager.toggleNormal)
-            shaderManager.setUniform("objectColor", value: SIMD3<Float>(1.0, 0.5, 0.31));
-            shaderManager.setUniform("lightColor",  value: SIMD3<Float>(1.0, 1.0, 1.0));
-            if let light = scene.light {
-                let position = SIMD3<Float>(
-                    light.modelMatrix.columns.3.x,
-                    light.modelMatrix.columns.3.y,
-                    light.modelMatrix.columns.3.z
-                )
-                shaderManager.setUniform("lightPos",    value: position)
-            }
-            terrain.draw()
+        shaderManager.use(shaderName: "terrainShader")
+        shaderManager.setUniform("view", value: camera.viewMatrix)
+        shaderManager.setUniform("proj", value: camera.projectionMatrix)
+        shaderManager.setUniform("visualizeNormals", value: inputManager.toggleNormal)
+        shaderManager.setUniform("objectColor", value: SIMD3<Float>(1.0, 0.5, 0.31));
+        shaderManager.setUniform("lightColor",  value: SIMD3<Float>(1.0, 1.0, 1.0));
+        if let light = scene.light {
+            let position = SIMD3<Float>(
+                light.modelMatrix.columns.3.x,
+                light.modelMatrix.columns.3.y,
+                light.modelMatrix.columns.3.z
+            )
+            shaderManager.setUniform("lightPos",    value: position)
         }
+        scene.terrain.draw()
 
         for model in scene.models {
             shaderManager.use(shaderName: model.shaderName)
@@ -108,11 +106,11 @@ class Renderer {
             scene.light?.draw()
         }
 
-//        shaderManager.use(shaderName: "infiniteGridShader")
-//        shaderManager.setUniform("view", value: camera.viewMatrix)
-//        shaderManager.setUniform("proj", value: camera.projectionMatrix)
-//        shaderManager.setUniform("cameraPos", value: camera.position)
-//        scene.grid?.draw2()
+        shaderManager.use(shaderName: "infiniteGridShader")
+        shaderManager.setUniform("view", value: camera.viewMatrix)
+        shaderManager.setUniform("proj", value: camera.projectionMatrix)
+        shaderManager.setUniform("cameraPos", value: camera.position)
+        scene.grid?.draw2()
 
         let viewMatrix = getViewMatrixWithoutTranslation(from: camera.viewMatrix)
         shaderManager.use(shaderName: "skyboxShader")

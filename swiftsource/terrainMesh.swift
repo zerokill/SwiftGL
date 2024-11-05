@@ -2,17 +2,10 @@ import simd
 import OpenGL.GL3
 
 class TerrainMesh: Mesh {
+    var noiseArray: [[Double]]
+
     init(width: Int, depth: Int, scale: Double, octaves: Int, persistence: Double, seed: UInt64) {
-        let (vertices, indices) = TerrainMesh.generateTerrain(width: width, depth: depth, scale: scale, octaves: octaves, persistence: persistence, seed: seed)
-        super.init(vertices: vertices, indices: indices, maxInstanceCount: 1)
-    }
-
-    private static func generateTerrain(width: Int, depth: Int, scale: Double, octaves: Int, persistence: Double, seed: UInt64) -> (vertices: [Vertex], indices: [GLuint]) {
-        let worldScale: Float = 0.1
-
-        var vertices: [Vertex] = []
-
-        let noiseArray = generateFractalPerlinNoise2D(
+        noiseArray = generateFractalPerlinNoise2D(
             width: width,
             height: depth,
             scale: scale,
@@ -21,12 +14,22 @@ class TerrainMesh: Mesh {
             seed: seed
         )
 
+        let (vertices, indices) = TerrainMesh.generateTerrain(width: width, depth: depth, noiseArray: noiseArray)
+        super.init(vertices: vertices, indices: indices, maxInstanceCount: 1)
+    }
+
+    private static func generateTerrain(width: Int, depth: Int, noiseArray: [[Double]]) -> (vertices: [Vertex], indices: [GLuint]) {
+        let worldScale: Float = 0.1
+
+        var vertices: [Vertex] = []
+
         let maxHeight = 10.0
 
         for z in 0..<depth {
             for x in 0..<width {
-                let heightValue = noiseArray[x][z] * maxHeight
-                vertices.append(Vertex( position: SIMD3<Float>(Float(x) * worldScale, Float(heightValue), Float(z) * worldScale), normal: SIMD3<Float>(), texCoords: SIMD2<Float>()))
+                let normalizedValue = (noiseArray[x][z] + 1) / 2
+                let heightValue = normalizedValue * maxHeight
+                vertices.append(Vertex( position: SIMD3<Float>(Float(x - (width/2)) * worldScale, Float(heightValue), Float(z - (depth/2)) * worldScale), normal: SIMD3<Float>(), texCoords: SIMD2<Float>()))
             }
         }
 
