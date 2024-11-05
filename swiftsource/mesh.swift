@@ -112,6 +112,12 @@ class Mesh {
         glBindVertexArray(0)
     }
 
+    func drawPoints() {
+        glBindVertexArray(VAO)
+        glDrawArrays(GLenum(GL_POINTS), 0, GLsizei(vertices.count))
+        glBindVertexArray(0)
+    }
+
     func draw2() {
         glBindVertexArray(VAO)
         glDrawArrays(GLenum(GL_TRIANGLES), 0, 24)

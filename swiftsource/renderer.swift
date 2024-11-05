@@ -41,6 +41,14 @@ class Renderer {
         glClearColor(0.07, 0.13, 0.17, 1.0)
         glClear(GLbitfield(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT))
 
+        if let terrain = scene.terrain {
+            shaderManager.use(shaderName: "terrainShader")
+            shaderManager.setUniform("view", value: camera.viewMatrix)
+            shaderManager.setUniform("proj", value: camera.projectionMatrix)
+            shaderManager.setUniform("cameraPos", value: camera.position)
+            terrain.draw()
+        }
+
         for model in scene.models {
             shaderManager.use(shaderName: model.shaderName)
             if let lightModel = model as? LightModel {
@@ -90,17 +98,17 @@ class Renderer {
             scene.light?.draw()
         }
 
-        shaderManager.use(shaderName: "infiniteGridShader")
-        shaderManager.setUniform("view", value: camera.viewMatrix)
-        shaderManager.setUniform("proj", value: camera.projectionMatrix)
-        shaderManager.setUniform("cameraPos", value: camera.position)
-        scene.grid?.draw2()
-
-        let viewMatrix = getViewMatrixWithoutTranslation(from: camera.viewMatrix)
-        shaderManager.use(shaderName: "skyboxShader")
-        shaderManager.setUniform("view", value: viewMatrix)
-        shaderManager.setUniform("proj", value: camera.projectionMatrix)
-        scene.skybox?.draw()
+//        shaderManager.use(shaderName: "infiniteGridShader")
+//        shaderManager.setUniform("view", value: camera.viewMatrix)
+//        shaderManager.setUniform("proj", value: camera.projectionMatrix)
+//        shaderManager.setUniform("cameraPos", value: camera.position)
+//        scene.grid?.draw2()
+//
+//        let viewMatrix = getViewMatrixWithoutTranslation(from: camera.viewMatrix)
+//        shaderManager.use(shaderName: "skyboxShader")
+//        shaderManager.setUniform("view", value: viewMatrix)
+//        shaderManager.setUniform("proj", value: camera.projectionMatrix)
+//        scene.skybox?.draw()
     }
 
     func update(deltaTime: Float) {

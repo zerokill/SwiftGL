@@ -7,6 +7,7 @@ class Scene {
 
     var grid: Mesh? = nil
     var skybox: SkyboxModel? = nil
+    var terrain: TerrainModel? = nil
 
     init() {
         Logger.info("scene init");

@@ -43,7 +43,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
         ResourceManager.shared.loadModel(name: "leonModel", model: leonModel)
     }
 
-    if let texture = ResourceManager.shared.getTexture(name: "sheepTexture") {
+    if let texture = ResourceManager.shared.getTexture(name: "liviaTexture") {
         let liviaPyramid = generateFlatShadedPyramid()
         let liviaMesh = Mesh(vertices: liviaPyramid.vertices, indices: liviaPyramid.indices, maxInstanceCount: 1000)
         let liviaModel = LiviaModel(mesh: liviaMesh, shaderName: "baseCube", texture: texture)
@@ -71,9 +71,13 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
 
     if let texture = ResourceManager.shared.getTexture(name: "skyboxTexture") {
         let skyboxMesh = CubeMesh()
-        let skyboxModel = SkyboxModel(mesh: skyboxMesh, shaderName: "skybox", texture: texture)
+        let skyboxModel = SkyboxModel(mesh: skyboxMesh, shaderName: "skyboxShader", texture: texture)
         scene.skybox = skyboxModel
     }
+
+    let terrainMesh = TerrainMesh(x: 100, z: 100)
+    let terrainModel = TerrainModel(mesh: terrainMesh, shaderName: "terrainShader", texture: nil)
+    scene.terrain = terrainModel
 
     let renderer = Renderer(width: width, height: height, scene: scene)
     renderer.shaderManager.loadShader(name: "baseCube", vertexPath: "resources/shader/baseCube.vert", geometryPath: nil, fragmentPath: "resources/shader/baseCube.frag")
@@ -82,6 +86,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     renderer.shaderManager.loadShader(name: "normalShader", vertexPath: "resources/shader/normalShader.vert", geometryPath: "resources/shader/normalShader.geom", fragmentPath: "resources/shader/normalShader.frag")
     renderer.shaderManager.loadShader(name: "infiniteGridShader", vertexPath: "resources/shader/infiniteGrid.vert", geometryPath: nil, fragmentPath: "resources/shader/infiniteGrid.frag")
     renderer.shaderManager.loadShader(name: "skyboxShader", vertexPath: "resources/shader/skybox.vert", geometryPath: nil, fragmentPath: "resources/shader/skybox.frag")
+    renderer.shaderManager.loadShader(name: "terrainShader", vertexPath: "resources/shader/terrain.vert", geometryPath: nil, fragmentPath: "resources/shader/terrain.frag")
 
     var totalFrames: Int = 0
     let TARGET_FPS: Float = 60.0
