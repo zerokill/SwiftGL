@@ -81,3 +81,9 @@ func getViewMatrixWithoutTranslation(from originalViewMatrix: simd_float4x4) -> 
     
     return rotationOnlyViewMatrix
 }
+
+func reflect(_ velocity: SIMD3<Float>, over normal: SIMD3<Float>) -> SIMD3<Float> {
+    return velocity - 2 * dot(velocity, normal) * normal
+}
+
+

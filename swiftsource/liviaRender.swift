@@ -41,7 +41,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     if let texture = ResourceManager.shared.getTexture(name: "leonTexture") {
         let leonSpereParameters = SphereParameters(radius: 0.2, latitudeBands: 20, longitudeBands: 20)
         let leonSphere = LeonMesh(sphere: leonSpereParameters)
-        let leonModel = LeonModel(mesh: leonSphere, shaderName: "baseCube", texture: texture)
+        let leonModel = LeonModel(mesh: leonSphere, shaderName: "baseCube", texture: texture, terrainMesh: terrainMesh)
         leonModel.setupInstances()
         ResourceManager.shared.loadModel(name: "leonModel", model: leonModel)
     }

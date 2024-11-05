@@ -55,10 +55,6 @@ class LightModel: BaseModel {
         return a + (b - a) * t
     }
 
-    func reflect(_ velocity: SIMD3<Float>, over normal: SIMD3<Float>) -> SIMD3<Float> {
-        return velocity - 2 * dot(velocity, normal) * normal
-    }
-
     override func updateMove(deltaTime: Float) {
         let position = SIMD3<Float>(
             modelMatrix.columns.3.x,
