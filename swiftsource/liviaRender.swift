@@ -75,7 +75,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
         scene.skybox = skyboxModel
     }
 
-    let terrainMesh = TerrainMesh(x: 100, z: 100)
+    let terrainMesh = TerrainMesh(width: 1000, depth: 1000, scale: 10, octaves: 4, persistence: 0.5, seed: 1)
     let terrainModel = TerrainModel(mesh: terrainMesh, shaderName: "terrainShader", texture: nil)
     scene.terrain = terrainModel
 

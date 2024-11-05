@@ -45,7 +45,17 @@ class Renderer {
             shaderManager.use(shaderName: "terrainShader")
             shaderManager.setUniform("view", value: camera.viewMatrix)
             shaderManager.setUniform("proj", value: camera.projectionMatrix)
-            shaderManager.setUniform("cameraPos", value: camera.position)
+            shaderManager.setUniform("visualizeNormals", value: inputManager.toggleNormal)
+            shaderManager.setUniform("objectColor", value: SIMD3<Float>(1.0, 0.5, 0.31));
+            shaderManager.setUniform("lightColor",  value: SIMD3<Float>(1.0, 1.0, 1.0));
+            if let light = scene.light {
+                let position = SIMD3<Float>(
+                    light.modelMatrix.columns.3.x,
+                    light.modelMatrix.columns.3.y,
+                    light.modelMatrix.columns.3.z
+                )
+                shaderManager.setUniform("lightPos",    value: position)
+            }
             terrain.draw()
         }
 
@@ -103,12 +113,12 @@ class Renderer {
 //        shaderManager.setUniform("proj", value: camera.projectionMatrix)
 //        shaderManager.setUniform("cameraPos", value: camera.position)
 //        scene.grid?.draw2()
-//
-//        let viewMatrix = getViewMatrixWithoutTranslation(from: camera.viewMatrix)
-//        shaderManager.use(shaderName: "skyboxShader")
-//        shaderManager.setUniform("view", value: viewMatrix)
-//        shaderManager.setUniform("proj", value: camera.projectionMatrix)
-//        scene.skybox?.draw()
+
+        let viewMatrix = getViewMatrixWithoutTranslation(from: camera.viewMatrix)
+        shaderManager.use(shaderName: "skyboxShader")
+        shaderManager.setUniform("view", value: viewMatrix)
+        shaderManager.setUniform("proj", value: camera.projectionMatrix)
+        scene.skybox?.draw()
     }
 
     func update(deltaTime: Float) {

@@ -4,7 +4,7 @@ import simd
 class TerrainModel: BaseModel {
 
     override func draw() {
-        mesh.drawPoints()
+        mesh.draw()
     }
 }
 
