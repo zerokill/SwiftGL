@@ -60,7 +60,7 @@ CXXFLAGS         := -std=c++14 -O2 -Wall -fPIC \
                     -I$(IMGUILIB_DIR) \
                     -I$(IMGUILIB_BACKENDS_DIR) \
                     -I$(WRAPPER_DIR) \
-					-DGL_SILENCE_DEPRECATION
+                    -DGL_SILENCE_DEPRECATION
 
 ## Swift Flags
 SWIFTFLAGS       := -O \
@@ -72,7 +72,7 @@ SWIFTFLAGS       := -O \
                     -lglfw \
                     -framework OpenGL \
                     -Xcc -DGL_SILENCE_DEPRECATION \
-					-lc++
+                    -lc++
 
 # Linker Flags
 LDFLAGS          := -L /opt/homebrew/lib -lglfw -framework OpenGL -lc++

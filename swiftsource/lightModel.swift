@@ -29,7 +29,7 @@ class LightModel: BaseModel {
         let z0 = Int(floor(zPos)) + 500
         let z1 = z0 + 1
 
-        guard x0 >= 0, x1 < terrainMesh.vertices.count, z0 >= 0, z1 < terrainMesh.vertices.count else {
+        guard z0 > 0, x0 > 0, z0 * 1000 + x0 < terrainMesh.vertices.count else {
             return (0.0, SIMD3<Float>(0, 1, 0)) // Default normal pointing up
         }
 
@@ -66,8 +66,18 @@ class LightModel: BaseModel {
 
         if let leonMesh = mesh as? LeonMesh {
             
-            if ((position.y < heightNormal.height + leonMesh.sphereParameters.radius) && (velocity.y < 0)) {
-                velocity = reflect(velocity, over: heightNormal.normal) * dampingFactor
+//            if ((position.y < heightNormal.height + leonMesh.sphereParameters.radius) && (velocity.y < 0)) {
+//                velocity = reflect(velocity, over: heightNormal.normal) * dampingFactor
+//            }
+            if (velocity.y < 0 ) {
+                if ((position.y < heightNormal.height + leonMesh.sphereParameters.radius)) {
+                    velocity = reflect(velocity, over: heightNormal.normal) * dampingFactor
+                    positionMatrix.columns.3.y = heightNormal.height + leonMesh.sphereParameters.radius;
+                } else if (position.y < leonMesh.sphereParameters.radius) {
+                    velocity.y = -velocity.y;
+                    velocity *= dampingFactor
+                    positionMatrix.columns.3.y = leonMesh.sphereParameters.radius;
+                }
             }
 
             // Naive gravity
@@ -76,8 +86,12 @@ class LightModel: BaseModel {
         let translation = velocity
         positionMatrix = positionMatrix * float4x4.translation(translation)
         if let leonMesh = mesh as? LeonMesh {
-            if ((positionMatrix.columns.3.y < heightNormal.height + leonMesh.sphereParameters.radius) && (abs(velocity.y) < 0.001)) {
-                positionMatrix.columns.3.y = heightNormal.height + leonMesh.sphereParameters.radius;
+            if (abs(velocity.y) < 0.001) {
+                if (positionMatrix.columns.3.y < heightNormal.height + leonMesh.sphereParameters.radius) {
+                    positionMatrix.columns.3.y = heightNormal.height + leonMesh.sphereParameters.radius;
+                } else if (positionMatrix.columns.3.y < leonMesh.sphereParameters.radius) {
+                    positionMatrix.columns.3.y = leonMesh.sphereParameters.radius;
+                }
             }
         }
         modelMatrix = positionMatrix * rotationMatrix

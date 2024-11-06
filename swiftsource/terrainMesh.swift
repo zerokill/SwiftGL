@@ -27,7 +27,8 @@ class TerrainMesh: Mesh {
 
         for z in 0..<depth {
             for x in 0..<width {
-                let normalizedValue = (noiseArray[x][z] + 1) / 2
+                //let normalizedValue = (noiseArray[x][z] + 1) / 2
+                let normalizedValue = noiseArray[x][z]
                 let heightValue = normalizedValue * maxHeight
                 vertices.append(Vertex( position: SIMD3<Float>(Float(x - (width/2)) * worldScale, Float(heightValue), Float(z - (depth/2)) * worldScale), normal: SIMD3<Float>(), texCoords: SIMD2<Float>()))
             }
