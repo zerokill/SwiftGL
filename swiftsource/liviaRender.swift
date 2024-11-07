@@ -42,6 +42,9 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     let waterMesh = WaterMesh(width: 1000, depth: 1000, scale: 10, octaves: 4, persistence: 0.5, seed: 1)
     let waterModel = WaterModel(mesh: waterMesh, shaderName: "waterShader", texture: nil)
 
+    let guiMesh = GuiMesh(width: 10, height: 10)
+    let guiModel = GuiModel(mesh: guiMesh, shaderName: "guiShader", texture: sheepTexture)
+
     if let texture = ResourceManager.shared.getTexture(name: "leonTexture") {
         let leonSpereParameters = SphereParameters(radius: 0.2, latitudeBands: 20, longitudeBands: 20)
         let leonSphere = LeonMesh(sphere: leonSpereParameters)
@@ -65,7 +68,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     Logger.info("resource loading done");
 
     // Create the scene
-    let scene = Scene(terrain: terrainModel, water: waterModel)
+    let scene = Scene(terrain: terrainModel, water: waterModel, gui: guiModel)
 
     let gridVertices: [Vertex] = [
         Vertex(position: SIMD3<Float>(-1.0, -1.0, 0.0),   normal: SIMD3<Float>(),   texCoords: SIMD2<Float>()),
@@ -91,6 +94,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     renderer.shaderManager.loadShader(name: "skyboxShader", vertexPath: "resources/shader/skybox.vert", geometryPath: nil, fragmentPath: "resources/shader/skybox.frag")
     renderer.shaderManager.loadShader(name: "terrainShader", vertexPath: "resources/shader/terrain.vert", geometryPath: nil, fragmentPath: "resources/shader/terrain.frag")
     renderer.shaderManager.loadShader(name: "waterShader", vertexPath: "resources/shader/water.vert", geometryPath: nil, fragmentPath: "resources/shader/water.frag")
+    renderer.shaderManager.loadShader(name: "guiShader", vertexPath: "resources/shader/gui.vert", geometryPath: nil, fragmentPath: "resources/shader/gui.frag")
 
     var totalFrames: Int = 0
     let TARGET_FPS: Float = 60.0

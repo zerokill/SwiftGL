@@ -1,28 +1,30 @@
 import simd
 import OpenGL.GL3
 
-class WaterMesh: Mesh {
-    init(width: Int, depth: Int, scale: Double, octaves: Int, persistence: Double, seed: UInt64) {
-        let (vertices, indices) = WaterMesh.createPlane(width: 2, depth: 2)
+class GuiMesh: Mesh {
+    init(width: Int, height: Int) {
+        let (vertices, indices) = GuiMesh.createPlane(width: 2, height: 2)
         super.init(vertices: vertices, indices: indices, maxInstanceCount: 1)
     }
 
-    private static func createPlane(width: Int, depth: Int) -> (vertices: [Vertex], indices: [GLuint]) {
+    private static func createPlane(width: Int, height: Int) -> (vertices: [Vertex], indices: [GLuint]) {
         // FIXME: THis function can be shared with the terrainmesh
-        let worldScale: Float = 100.0
+        let worldScale: Float = 1.0
 
         var vertices: [Vertex] = []
 
-        for z in 0..<depth {
-            for x in 0..<width {
-                vertices.append(Vertex( position: SIMD3<Float>(Float(x) * worldScale, 0.0, Float(z) * worldScale), normal: SIMD3<Float>(), texCoords: SIMD2<Float>(Float(x), Float(z))))
+        for x in 0..<width {
+            for y in 0..<height {
+                vertices.append(Vertex( position: SIMD3<Float>(Float(x) * worldScale, Float(y) * worldScale, 0.0), normal: SIMD3<Float>(), texCoords: SIMD2<Float>(Float(x), Float(y))))
             }
         }
+
+        Logger.info("gui: ", vertices)
 
         // Define the indices for the cube (two triangles per face)
         var indices: [GLuint] = []
 
-        for z in 0..<depth - 1 {
+        for z in 0..<height - 1 {
             for x in 0..<width - 1 {
                 let bottomLeft = z * width + x
                 let topLeft = (z+1) * width + x
@@ -66,3 +68,4 @@ class WaterMesh: Mesh {
         return (vertices, indices)
     }
 }
+

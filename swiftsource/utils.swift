@@ -86,4 +86,23 @@ func reflect(_ velocity: SIMD3<Float>, over normal: SIMD3<Float>) -> SIMD3<Float
     return velocity - 2 * dot(velocity, normal) * normal
 }
 
+func createOrthographicProjection(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float) -> simd_float4x4 {
+    let rl = right - left
+    let tb = top - bottom
+    let fn = far - near
+
+    let tx = -(right + left) / rl
+    let ty = -(top + bottom) / tb
+    let tz = -(far + near) / fn
+
+    let orthoMatrix = simd_float4x4(
+        SIMD4<Float>( 2.0 / rl,       0.0,            0.0,        0.0),
+        SIMD4<Float>(      0.0,   2.0 / tb,           0.0,        0.0),
+        SIMD4<Float>(      0.0,       0.0,      -2.0 / fn,        0.0),
+        SIMD4<Float>(      tx,        ty,             tz,         1.0)
+    )
+
+    return orthoMatrix
+}
+
 

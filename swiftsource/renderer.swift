@@ -141,6 +141,14 @@ class Renderer {
         shaderManager.setUniform("view", value: viewMatrix)
         shaderManager.setUniform("proj", value: camera.projectionMatrix)
         scene.skybox?.draw()
+
+        glDisable(GLenum(GL_DEPTH_TEST))
+        shaderManager.use(shaderName: "guiShader")
+        if let texture = scene.gui.texture {
+            shaderManager.setUniform("texture", value: texture.ID)
+        }
+        scene.gui.draw()
+        glEnable(GLenum(GL_DEPTH_TEST))
     }
 
     func update(deltaTime: Float) {
