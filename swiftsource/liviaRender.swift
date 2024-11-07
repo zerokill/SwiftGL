@@ -39,6 +39,9 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     let terrainMesh = TerrainMesh(width: 1000, depth: 1000, scale: 10, octaves: 4, persistence: 0.5, seed: 1)
     let terrainModel = TerrainModel(mesh: terrainMesh, shaderName: "terrainShader", texture: nil)
 
+    let waterMesh = WaterMesh(width: 1000, depth: 1000, scale: 10, octaves: 4, persistence: 0.5, seed: 1)
+    let waterModel = WaterModel(mesh: waterMesh, shaderName: "waterShader", texture: nil)
+
     if let texture = ResourceManager.shared.getTexture(name: "leonTexture") {
         let leonSpereParameters = SphereParameters(radius: 0.2, latitudeBands: 20, longitudeBands: 20)
         let leonSphere = LeonMesh(sphere: leonSpereParameters)
@@ -62,7 +65,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     Logger.info("resource loading done");
 
     // Create the scene
-    let scene = Scene(terrain: terrainModel)
+    let scene = Scene(terrain: terrainModel, water: waterModel)
 
     let gridVertices: [Vertex] = [
         Vertex(position: SIMD3<Float>(-1.0, -1.0, 0.0),   normal: SIMD3<Float>(),   texCoords: SIMD2<Float>()),
@@ -87,6 +90,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     renderer.shaderManager.loadShader(name: "infiniteGridShader", vertexPath: "resources/shader/infiniteGrid.vert", geometryPath: nil, fragmentPath: "resources/shader/infiniteGrid.frag")
     renderer.shaderManager.loadShader(name: "skyboxShader", vertexPath: "resources/shader/skybox.vert", geometryPath: nil, fragmentPath: "resources/shader/skybox.frag")
     renderer.shaderManager.loadShader(name: "terrainShader", vertexPath: "resources/shader/terrain.vert", geometryPath: nil, fragmentPath: "resources/shader/terrain.frag")
+    renderer.shaderManager.loadShader(name: "waterShader", vertexPath: "resources/shader/water.vert", geometryPath: nil, fragmentPath: "resources/shader/water.frag")
 
     var totalFrames: Int = 0
     let TARGET_FPS: Float = 60.0
@@ -116,7 +120,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
             if let leonModel = model as? LeonModel {
                 stats.numLeon += Int32(leonModel.activeInstances)
             }
-            if model as? LightModel != nil {
+            if model as? ObjectModel != nil {
                 stats.numLeon += 1
             }
             if let liviaModel = model as? LiviaModel {

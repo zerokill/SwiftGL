@@ -8,11 +8,13 @@ class Scene {
     var grid: Mesh? = nil
     var skybox: SkyboxModel? = nil
     var terrain: TerrainModel
+    var water: WaterModel
 
-    init(terrain: TerrainModel) {
+    init(terrain: TerrainModel, water: WaterModel) {
         Logger.info("scene init");
 
         self.terrain = terrain
+        self.water = water
 
         if let model = ResourceManager.shared.getModel(name: "liviaModel") {
             Logger.info("liviaModel loaded");
@@ -34,7 +36,7 @@ class Scene {
 
         if (input.addObject && !input.addedObject) {
             if let objectSphere = ResourceManager.shared.getModel(name: "leonModel")?.mesh {
-                let objectModel = LightModel(mesh: objectSphere, shaderName: "objectShader", texture: nil, position: camera.position, terrainMesh: terrain.mesh)
+                let objectModel = ObjectModel(mesh: objectSphere, shaderName: "objectShader", texture: nil, position: camera.position, terrainMesh: terrain.mesh)
                 models.append(objectModel)
             }
         }

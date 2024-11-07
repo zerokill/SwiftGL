@@ -29,6 +29,8 @@ class Renderer {
     }
 
     func setupOpenGL() {
+        glEnable(GLenum(GL_BLEND))
+        glBlendFunc(GLenum(GL_SRC_ALPHA), GLenum(GL_ONE_MINUS_SRC_ALPHA))
         glEnable(GLenum(GL_DEPTH_TEST))
         glEnable(GLenum(GL_MULTISAMPLE));
         glEnable(GLenum(GL_CULL_FACE))
@@ -57,10 +59,32 @@ class Renderer {
         }
         scene.terrain.draw()
 
+        shaderManager.use(shaderName: "waterShader")
+        shaderManager.setUniform("model", value: scene.water.modelMatrix)
+        shaderManager.setUniform("view", value: camera.viewMatrix)
+        shaderManager.setUniform("proj", value: camera.projectionMatrix)
+        shaderManager.setUniform("visualizeNormals", value: inputManager.toggleNormal)
+        shaderManager.setUniform("objectColor", value: SIMD3<Float>(1.0, 0.5, 0.31));
+        shaderManager.setUniform("lightColor",  value: SIMD3<Float>(1.0, 1.0, 1.0));
+        shaderManager.setUniform("cameraPos", value: camera.position)
+        shaderManager.setUniform("time", value: Float(glfwGetTime()))
+        if let light = scene.light {
+            let position = SIMD3<Float>(
+                light.modelMatrix.columns.3.x,
+                light.modelMatrix.columns.3.y,
+                light.modelMatrix.columns.3.z
+            )
+            shaderManager.setUniform("lightPos",    value: position)
+        }
+        scene.water.draw()
+
         for model in scene.models {
             shaderManager.use(shaderName: model.shaderName)
             if let lightModel = model as? LightModel {
                 shaderManager.setUniform("model", value: lightModel.modelMatrix)
+            }
+            if let objectModel = model as? ObjectModel {
+                shaderManager.setUniform("model", value: objectModel.modelMatrix)
             }
             shaderManager.setUniform("view", value: camera.viewMatrix)
             shaderManager.setUniform("proj", value: camera.projectionMatrix)
@@ -106,11 +130,11 @@ class Renderer {
             scene.light?.draw()
         }
 
-        shaderManager.use(shaderName: "infiniteGridShader")
-        shaderManager.setUniform("view", value: camera.viewMatrix)
-        shaderManager.setUniform("proj", value: camera.projectionMatrix)
-        shaderManager.setUniform("cameraPos", value: camera.position)
-        scene.grid?.draw2()
+//        shaderManager.use(shaderName: "infiniteGridShader")
+//        shaderManager.setUniform("view", value: camera.viewMatrix)
+//        shaderManager.setUniform("proj", value: camera.projectionMatrix)
+//        shaderManager.setUniform("cameraPos", value: camera.position)
+//        scene.grid?.draw2()
 
         let viewMatrix = getViewMatrixWithoutTranslation(from: camera.viewMatrix)
         shaderManager.use(shaderName: "skyboxShader")

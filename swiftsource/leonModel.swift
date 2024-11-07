@@ -93,7 +93,8 @@ class LeonModel: BaseModel {
             // Update translation based on velocity and delta time
 
             if let leonMesh = mesh as? LeonMesh {
-                if (instances[i].velocity.y < 0 ) {
+//                if (instances[i].velocity.y < 0 ) {
+                    // TODO: collision detection now only works if the ball is dropping
                     if ((position.y < heightNormal.height + leonMesh.sphereParameters.radius)) {
                         instances[i].velocity = reflect(instances[i].velocity, over: heightNormal.normal) * dampingFactor
                         instances[i].positionMatrix.columns.3.y = heightNormal.height + leonMesh.sphereParameters.radius;
@@ -102,7 +103,7 @@ class LeonModel: BaseModel {
                         instances[i].velocity *= dampingFactor
                         instances[i].positionMatrix.columns.3.y = leonMesh.sphereParameters.radius;
                     }
-                }
+//                }
 
                 // Naive gravity
                 instances[i].velocity.y -= 0.001;
