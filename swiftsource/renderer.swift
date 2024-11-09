@@ -18,7 +18,7 @@ class Renderer {
     var rotation_y: Float = 0.0
 
     init(width: Int32, height: Int32, scene: Scene) {
-        camera = Camera(position: SIMD3(0.0, 10.0, 0.0), target: SIMD3(0.0, 0.0, 0.0), worldUp: SIMD3(0.0, 1.0, 0.0))
+        camera = Camera(position: SIMD3(0.0, 1.0, 0.0), target: SIMD3(0.0, 0.0, 0.0), worldUp: SIMD3(0.0, 1.0, 0.0))
         inputManager = InputManager()
         shaderManager = ShaderManager()
         self.width = width
@@ -37,12 +37,18 @@ class Renderer {
         glEnable(GLenum(GL_CULL_FACE))
         glCullFace(GLenum(GL_BACK))
         glFrontFace(GLenum(GL_CCW))
+        glEnable(GLenum(GL_CLIP_DISTANCE0))
+
+        var maxTextureUnits: GLuint = 0
+
+        glGetIntegerv(GLenum(GL_MAX_TEXTURE_IMAGE_UNITS), &maxTextureUnits);
+        print("Maximum texture units supported: ", maxTextureUnits);
     }
 
     func render() {
         renderReflection()
         renderRefraction()
-        renderScene()
+        renderScene(plane: SIMD4<Float>(0.0, 1.0, 0.0, 10000))
         renderWater()
         renderLight()
 
@@ -52,8 +58,19 @@ class Renderer {
     func renderReflection() {
         self.scene.water.reflectionBuffer.bindFramebuffer()
 
-        renderScene()
+        let cameraPos = camera.position
+
+        let distance = cameraPos.y * 2
+        camera.position.y -= distance
+        camera.rotate(yaw: inputManager.deltaYaw, pitch: -inputManager.deltaPitch)
+        camera.updateViewMatrix()
+
+        renderScene(plane: SIMD4<Float>(0.0, 1.0, 0.0, 0.0))
         renderLight()
+
+        camera.position = cameraPos
+        camera.rotate(yaw: inputManager.deltaYaw, pitch: inputManager.deltaPitch)
+        camera.updateViewMatrix()
 
         self.scene.water.reflectionBuffer.unbindFramebuffer(displayWidth: width, displayHeight: height)
     }
@@ -61,7 +78,9 @@ class Renderer {
     func renderRefraction() {
         self.scene.water.refractionBuffer.bindFramebuffer()
 
-        renderScene()
+        shaderManager.setUniform("plane",       value: SIMD4<Float>(0.0, -1.0, 0.0, 0.0));
+
+        renderScene(plane: SIMD4<Float>(0.0, -1.0, 0.0, 0.0))
         renderLight()
 
         self.scene.water.refractionBuffer.unbindFramebuffer(displayWidth: width, displayHeight: height)
@@ -72,23 +91,12 @@ class Renderer {
         shaderManager.setUniform("model", value: scene.water.modelMatrix)
         shaderManager.setUniform("view", value: camera.viewMatrix)
         shaderManager.setUniform("proj", value: camera.projectionMatrix)
-        shaderManager.setUniform("visualizeNormals", value: inputManager.toggleNormal)
-        shaderManager.setUniform("objectColor", value: SIMD3<Float>(1.0, 0.5, 0.31));
-        shaderManager.setUniform("lightColor",  value: SIMD3<Float>(1.0, 1.0, 1.0));
-        shaderManager.setUniform("cameraPos", value: camera.position)
-        shaderManager.setUniform("time", value: Float(glfwGetTime()))
-        if let light = scene.light {
-            let position = SIMD3<Float>(
-                light.modelMatrix.columns.3.x,
-                light.modelMatrix.columns.3.y,
-                light.modelMatrix.columns.3.z
-            )
-            shaderManager.setUniform("lightPos",    value: position)
-        }
+        shaderManager.setUniform("tex0", value: Int32(0))
+        shaderManager.setUniform("tex1", value: Int32(1))
         scene.water.draw()
     }
 
-    func renderScene() {
+    func renderScene(plane: SIMD4<Float>) {
         // Clear the color and depth buffers
         glClearColor(0.07, 0.13, 0.17, 1.0)
         glClear(GLbitfield(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT))
@@ -107,6 +115,7 @@ class Renderer {
             )
             shaderManager.setUniform("lightPos",    value: position)
         }
+        shaderManager.setUniform("plane", value: plane)
         scene.terrain.draw()
 
         for model in scene.models {
@@ -133,6 +142,7 @@ class Renderer {
             }
             shaderManager.setUniform("rotation_x", value: self.rotation_x)
             shaderManager.setUniform("rotation_y", value: self.rotation_y)
+            shaderManager.setUniform("plane", value: plane)
             model.draw()
         }
 

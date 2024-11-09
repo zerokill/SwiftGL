@@ -7,8 +7,8 @@ class Framebuffer {
     var framebuffer: GLuint = 0
     var texture: texture_t = texture_t()
     var depthBuffer: GLuint = 0
-    let width: GLsizei = 1024
-    let height: GLsizei = 1024
+    let width: GLsizei = 1280
+    let height: GLsizei = 720
 
     init() {
         glGenFramebuffers(1, &framebuffer)
@@ -42,12 +42,12 @@ class Framebuffer {
 
     func bindFramebuffer() {
         glBindFramebuffer(GLenum(GL_FRAMEBUFFER), self.framebuffer)
-//        glViewport(0, 0, self.width, self.height)
+        glViewport(0, 0, self.width, self.height)
     }
 
     func unbindFramebuffer(displayWidth: Int32, displayHeight: Int32) {
         glBindFramebuffer(GLenum(GL_FRAMEBUFFER), 0)
-//        glViewport(0, 0, displayWidth, displayHeight)
+        glViewport(0, 0, displayWidth*2, displayHeight*2)
     }
 
 }

@@ -8,6 +8,7 @@ class GuiModel: BaseModel {
 
     override func draw() {
         if let texture = self.texture {
+            glActiveTexture(GLenum(GL_TEXTURE0))
             glBindTexture(texture.type, texture.ID)
         }
         mesh.draw()

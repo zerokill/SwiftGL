@@ -15,8 +15,6 @@ class GuiMesh: Mesh {
         vertices.append(Vertex( position: SIMD3<Float>(x + width, y,          0.0), normal: SIMD3<Float>(), texCoords: SIMD2<Float>(1, 0)))
         vertices.append(Vertex( position: SIMD3<Float>(x + width, y + height, 0.0), normal: SIMD3<Float>(), texCoords: SIMD2<Float>(1, 1)))
 
-        Logger.info("gui: ", vertices)
-
         // Define the indices for the cube (two triangles per face)
         var indices: [GLuint] = []
 

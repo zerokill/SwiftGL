@@ -13,8 +13,12 @@ class WaterModel: BaseModel {
     }
 
     override func draw() {
+        glActiveTexture(GLenum(GL_TEXTURE0))
         glBindTexture(self.reflectionBuffer.texture.type, self.reflectionBuffer.texture.ID)
+        glActiveTexture(GLenum(GL_TEXTURE0 + 1))
+        glBindTexture(self.refractionBuffer.texture.type, self.refractionBuffer.texture.ID)
         mesh.draw()
+        glActiveTexture(GLenum(GL_TEXTURE0))
     }
 }
 

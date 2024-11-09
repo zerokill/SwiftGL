@@ -15,6 +15,7 @@ uniform mat4 view;
 uniform mat4 proj;
 uniform float rotation_x;
 uniform float rotation_y;
+uniform vec4 plane;
 
 void main()
 {
@@ -37,7 +38,9 @@ void main()
     // Apply rotation to the instance model matrix
     mat4 transformedModel = instanceModel * rotationY * rotationX;
 
-    gl_Position = proj * view * transformedModel * vec4(aPos, 1.0);
+    vec4 worldPosition = transformedModel * vec4(aPos, 1.0);
+    gl_Position = proj * view * worldPosition;
+    gl_ClipDistance[0] = dot(worldPosition, plane);
 
     normal = mat3(transpose(inverse(transformedModel))) * aNormal;
     texCoord = aTex;
