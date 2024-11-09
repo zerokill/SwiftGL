@@ -10,14 +10,12 @@ class Scene {
 
     var terrain: TerrainModel
     var water: WaterModel
-    var gui: GuiModel
 
-    init(terrain: TerrainModel, water: WaterModel, gui: GuiModel) {
+    init(terrain: TerrainModel, water: WaterModel) {
         Logger.info("scene init");
 
         self.terrain = terrain
         self.water = water
-        self.gui = gui
 
         if let model = ResourceManager.shared.getModel(name: "liviaModel") {
             Logger.info("liviaModel loaded");

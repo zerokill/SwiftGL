@@ -12,6 +12,7 @@ class Renderer {
     var height: Int32
 
     var scene: Scene
+    var guiElements: [GuiModel] = []
 
     var rotation_x: Float = 0.0
     var rotation_y: Float = 0.0
@@ -39,6 +40,55 @@ class Renderer {
     }
 
     func render() {
+        renderReflection()
+        renderRefraction()
+        renderScene()
+        renderWater()
+        renderLight()
+
+        renderGui()
+    }
+
+    func renderReflection() {
+        self.scene.water.reflectionBuffer.bindFramebuffer()
+
+        renderScene()
+        renderLight()
+
+        self.scene.water.reflectionBuffer.unbindFramebuffer(displayWidth: width, displayHeight: height)
+    }
+
+    func renderRefraction() {
+        self.scene.water.refractionBuffer.bindFramebuffer()
+
+        renderScene()
+        renderLight()
+
+        self.scene.water.refractionBuffer.unbindFramebuffer(displayWidth: width, displayHeight: height)
+    }
+
+    func renderWater() {
+        shaderManager.use(shaderName: "waterShader")
+        shaderManager.setUniform("model", value: scene.water.modelMatrix)
+        shaderManager.setUniform("view", value: camera.viewMatrix)
+        shaderManager.setUniform("proj", value: camera.projectionMatrix)
+        shaderManager.setUniform("visualizeNormals", value: inputManager.toggleNormal)
+        shaderManager.setUniform("objectColor", value: SIMD3<Float>(1.0, 0.5, 0.31));
+        shaderManager.setUniform("lightColor",  value: SIMD3<Float>(1.0, 1.0, 1.0));
+        shaderManager.setUniform("cameraPos", value: camera.position)
+        shaderManager.setUniform("time", value: Float(glfwGetTime()))
+        if let light = scene.light {
+            let position = SIMD3<Float>(
+                light.modelMatrix.columns.3.x,
+                light.modelMatrix.columns.3.y,
+                light.modelMatrix.columns.3.z
+            )
+            shaderManager.setUniform("lightPos",    value: position)
+        }
+        scene.water.draw()
+    }
+
+    func renderScene() {
         // Clear the color and depth buffers
         glClearColor(0.07, 0.13, 0.17, 1.0)
         glClear(GLbitfield(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT))
@@ -59,25 +109,6 @@ class Renderer {
         }
         scene.terrain.draw()
 
-        shaderManager.use(shaderName: "waterShader")
-        shaderManager.setUniform("model", value: scene.water.modelMatrix)
-        shaderManager.setUniform("view", value: camera.viewMatrix)
-        shaderManager.setUniform("proj", value: camera.projectionMatrix)
-        shaderManager.setUniform("visualizeNormals", value: inputManager.toggleNormal)
-        shaderManager.setUniform("objectColor", value: SIMD3<Float>(1.0, 0.5, 0.31));
-        shaderManager.setUniform("lightColor",  value: SIMD3<Float>(1.0, 1.0, 1.0));
-        shaderManager.setUniform("cameraPos", value: camera.position)
-        shaderManager.setUniform("time", value: Float(glfwGetTime()))
-        if let light = scene.light {
-            let position = SIMD3<Float>(
-                light.modelMatrix.columns.3.x,
-                light.modelMatrix.columns.3.y,
-                light.modelMatrix.columns.3.z
-            )
-            shaderManager.setUniform("lightPos",    value: position)
-        }
-        scene.water.draw()
-
         for model in scene.models {
             shaderManager.use(shaderName: model.shaderName)
             if let lightModel = model as? LightModel {
@@ -88,9 +119,7 @@ class Renderer {
             }
             shaderManager.setUniform("view", value: camera.viewMatrix)
             shaderManager.setUniform("proj", value: camera.projectionMatrix)
-            if let texture = model.texture {
-                shaderManager.setUniform("texture", value: texture.ID)
-            }
+            shaderManager.setUniform("tex0", value: GLuint(0))
             shaderManager.setUniform("visualizeNormals", value: inputManager.toggleNormal)
             shaderManager.setUniform("lightColor",  value: SIMD3<Float>(1.0, 1.0, 1.0));
             shaderManager.setUniform("cameraPos", value: camera.position)
@@ -107,15 +136,6 @@ class Renderer {
             model.draw()
         }
 
-        if let light = scene.light {
-            shaderManager.use(shaderName: light.shaderName)
-            shaderManager.setUniform("model", value: light.modelMatrix)
-            shaderManager.setUniform("view", value: camera.viewMatrix)
-            shaderManager.setUniform("proj", value: camera.projectionMatrix)
-            shaderManager.setUniform("lightColor",  value: SIMD3<Float>(1.0, 1.0, 1.0));
-            scene.light?.draw()
-        }
-
         if (inputManager.toggleNormal) {
             shaderManager.use(shaderName: "normalShader")
             shaderManager.setUniform("view", value: camera.viewMatrix)
@@ -126,8 +146,6 @@ class Renderer {
             for model in scene.models {
                 model.draw()
             }
-
-            scene.light?.draw()
         }
 
 //        shaderManager.use(shaderName: "infiniteGridShader")
@@ -141,14 +159,25 @@ class Renderer {
         shaderManager.setUniform("view", value: viewMatrix)
         shaderManager.setUniform("proj", value: camera.projectionMatrix)
         scene.skybox?.draw()
+    }
 
-        glDisable(GLenum(GL_DEPTH_TEST))
-        shaderManager.use(shaderName: "guiShader")
-        if let texture = scene.gui.texture {
-            shaderManager.setUniform("texture", value: texture.ID)
+    func renderLight() {
+        if let light = scene.light {
+            shaderManager.use(shaderName: light.shaderName)
+            shaderManager.setUniform("model", value: light.modelMatrix)
+            shaderManager.setUniform("view", value: camera.viewMatrix)
+            shaderManager.setUniform("proj", value: camera.projectionMatrix)
+            shaderManager.setUniform("lightColor",  value: SIMD3<Float>(1.0, 1.0, 1.0));
+            scene.light?.draw()
         }
-        scene.gui.draw()
-        glEnable(GLenum(GL_DEPTH_TEST))
+    }
+
+    func renderGui() {
+        for gui in guiElements {
+            shaderManager.use(shaderName: gui.shaderName)
+            gui.draw()
+        }
+
     }
 
     func update(deltaTime: Float) {

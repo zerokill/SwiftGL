@@ -9,7 +9,8 @@ uniform vec3 lightPos;
 uniform float time;
 
 uniform vec3 cameraPos;
-uniform samplerCube skybox;
+//uniform samplerCube skybox;
+uniform sampler2D tex0;
 
 in vec2 texCoord;
 in vec3 fragPos;
@@ -70,7 +71,7 @@ void main()
     vec3 reflectedVector = reflect(viewVector, normalize(normal));
 
     // Sample the skybox texture using the reflected vector
-    vec3 reflectionColor = texture(skybox, reflectedVector).rgb;
+    vec3 reflectionColor = texture(tex0, texCoord).rgb;
 
     // Optional: Apply Fresnel effect
     float fresnelFactor = pow(1.0 - dot(normalize(normal), -viewVector), 3.0);

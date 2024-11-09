@@ -20,6 +20,7 @@ class ResourceManager {
     }
 
     func loadTexture(name: String, texture: texture_t) {
+        Logger.info("Texture: ", name, texture.ID)
         textures[name] = texture
     }
 
