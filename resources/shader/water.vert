@@ -7,12 +7,14 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 proj;
 uniform vec3 cameraPos;
+uniform vec3 lightPos;
 
 out vec4 clipSpace;
 out vec2 texCoord;
 out vec3 toCameraVector;
+out vec3 fromLightVector;
 
-const float tiling = 3.0;
+const float tiling = 1.0;
 
 void main()
 {
@@ -21,4 +23,5 @@ void main()
     gl_Position = clipSpace;
     texCoord = vec2(aPos.x/2.0 + 0.5, aPos.z/2.0 + 0.5) * tiling;
     toCameraVector = cameraPos - worldPosition.xyz;
+    fromLightVector = worldPosition.xyz - lightPos;
 }

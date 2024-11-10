@@ -94,8 +94,18 @@ class Renderer {
         shaderManager.setUniform("reflectionTexture", value: Int32(0))
         shaderManager.setUniform("refractionTexture", value: Int32(1))
         shaderManager.setUniform("dudvMap",           value: Int32(2))
+        shaderManager.setUniform("normalMap",         value: Int32(3))
         shaderManager.setUniform("moveFactor",        value: scene.water.moveFactor)
         shaderManager.setUniform("cameraPos",         value: camera.position)
+        shaderManager.setUniform("lightColor",        value: SIMD3<Float>(1.0, 1.0, 1.0));
+        if let light = scene.light {
+            let position = SIMD3<Float>(
+                light.modelMatrix.columns.3.x,
+                light.modelMatrix.columns.3.y,
+                light.modelMatrix.columns.3.z
+            )
+            shaderManager.setUniform("lightPos",    value: position)
+        }
         scene.water.draw()
     }
 
