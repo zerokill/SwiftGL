@@ -58,5 +58,8 @@ class Scene {
         }
 
         light?.updateMove(deltaTime: deltaTime)
+
+        water.moveFactor += water.WAVE_SPEED * deltaTime;
+
     }
 }

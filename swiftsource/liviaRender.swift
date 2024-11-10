@@ -39,8 +39,9 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     let terrainMesh = TerrainMesh(width: 1000, depth: 1000, scale: 10, octaves: 4, persistence: 0.5, seed: 1)
     let terrainModel = TerrainModel(mesh: terrainMesh, shaderName: "terrainShader", texture: nil)
 
+    let dudvMap = texture("resources/waterDUDV.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGB), GLenum(GL_UNSIGNED_BYTE))
     let waterMesh = WaterMesh(width: 1000, depth: 1000, scale: 10, octaves: 4, persistence: 0.5, seed: 1)
-    let waterModel = WaterModel(mesh: waterMesh, shaderName: "waterShader")
+    let waterModel = WaterModel(mesh: waterMesh, shaderName: "waterShader", dudvMap: dudvMap)
 
     if let texture = ResourceManager.shared.getTexture(name: "leonTexture") {
         let leonSpereParameters = SphereParameters(radius: 0.2, latitudeBands: 20, longitudeBands: 20)
@@ -93,13 +94,13 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     renderer.shaderManager.loadShader(name: "waterShader", vertexPath: "resources/shader/water.vert", geometryPath: nil, fragmentPath: "resources/shader/water.frag")
     renderer.shaderManager.loadShader(name: "guiShader", vertexPath: "resources/shader/gui.vert", geometryPath: nil, fragmentPath: "resources/shader/gui.frag")
 
-    let reflectionGuiMesh = GuiMesh(x: 0.0, y: 0.0, width: 0.5, height: 0.5)
-    let reflectionGuiModel = GuiModel(mesh: reflectionGuiMesh, shaderName: "guiShader", texture: scene.water.reflectionBuffer.texture)
-    renderer.guiElements.append(reflectionGuiModel)
-
-    let refractionGuiMesh = GuiMesh(x: 0.0, y: 0.5, width: 0.5, height: 0.5)
-    let refractionGuiModel = GuiModel(mesh: refractionGuiMesh, shaderName: "guiShader", texture: scene.water.refractionBuffer.texture)
-    renderer.guiElements.append(refractionGuiModel)
+//    let reflectionGuiMesh = GuiMesh(x: 0.0, y: 0.0, width: 0.5, height: 0.5)
+//    let reflectionGuiModel = GuiModel(mesh: reflectionGuiMesh, shaderName: "guiShader", texture: scene.water.reflectionBuffer.texture)
+//    renderer.guiElements.append(reflectionGuiModel)
+//
+//    let refractionGuiMesh = GuiMesh(x: 0.0, y: 0.5, width: 0.5, height: 0.5)
+//    let refractionGuiModel = GuiModel(mesh: refractionGuiMesh, shaderName: "guiShader", texture: scene.water.refractionBuffer.texture)
+//    renderer.guiElements.append(refractionGuiModel)
 
     var totalFrames: Int = 0
     let TARGET_FPS: Float = 60.0

@@ -3,7 +3,7 @@
 uniform mat4 view;
 uniform mat4 proj;
 uniform float gGridSize = 100.0;
-uniform vec3 gCameraWorldPos;
+uniform vec3 cameraPos;
 
 out vec3 WorldPos;
 
@@ -22,8 +22,8 @@ void main()
     int Index = Indices[gl_VertexID];
     vec3 vPos3 = Pos[Index] * gGridSize;
 
-    vPos3.x += gCameraWorldPos.x;
-    vPos3.z += gCameraWorldPos.z;
+    vPos3.x += cameraPos.x;
+    vPos3.z += cameraPos.z;
 
     vec4 vPos4 = vec4(vPos3, 1.0);
 

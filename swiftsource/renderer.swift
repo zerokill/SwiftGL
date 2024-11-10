@@ -91,8 +91,11 @@ class Renderer {
         shaderManager.setUniform("model", value: scene.water.modelMatrix)
         shaderManager.setUniform("view", value: camera.viewMatrix)
         shaderManager.setUniform("proj", value: camera.projectionMatrix)
-        shaderManager.setUniform("tex0", value: Int32(0))
-        shaderManager.setUniform("tex1", value: Int32(1))
+        shaderManager.setUniform("reflectionTexture", value: Int32(0))
+        shaderManager.setUniform("refractionTexture", value: Int32(1))
+        shaderManager.setUniform("dudvMap",           value: Int32(2))
+        shaderManager.setUniform("moveFactor",        value: scene.water.moveFactor)
+        shaderManager.setUniform("cameraPos",         value: camera.position)
         scene.water.draw()
     }
 
