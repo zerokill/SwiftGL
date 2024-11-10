@@ -36,7 +36,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     ResourceManager.shared.loadTexture(name: "sheepTexture", texture: sheepTexture)
     ResourceManager.shared.loadTexture(name: "skyboxTexture", texture: skyTexture)
 
-    let terrainMesh = TerrainMesh(width: 1000, depth: 1000, scale: 10, octaves: 4, persistence: 0.5, seed: 1)
+    let terrainMesh = TerrainMesh(width: 1000, depth: 1000, scale: 6, octaves: 4, persistence: 0.5, seed: 1)
     let terrainModel = TerrainModel(mesh: terrainMesh, shaderName: "terrainShader", texture: nil)
 
     let dudvMap = texture("resources/waterDUDV.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGB), GLenum(GL_UNSIGNED_BYTE))

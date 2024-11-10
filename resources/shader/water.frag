@@ -15,9 +15,9 @@ in vec2 texCoord;
 in vec3 toCameraVector;
 in vec3 fromLightVector;
 
-const float waveStrength = 0.02;
+const float waveStrength = 0.04;
 const float shineDamper = 20.0;
-const float reflectivity = 0.6;
+const float reflectivity = 0.8;
 
 void main()
 {

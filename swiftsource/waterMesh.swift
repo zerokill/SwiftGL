@@ -15,9 +15,11 @@ class WaterMesh: Mesh {
 
         for z in 0..<depth {
             for x in 0..<width {
-                vertices.append(Vertex( position: SIMD3<Float>(Float(x) * worldScale, 0.0, Float(z) * worldScale), normal: SIMD3<Float>(), texCoords: SIMD2<Float>(Float(x), Float(z))))
+                vertices.append(Vertex( position: SIMD3<Float>((Float(x)-0.5) * worldScale, 0.0, (Float(z)-0.5) * worldScale), normal: SIMD3<Float>(), texCoords: SIMD2<Float>(Float(x), Float(z))))
             }
         }
+
+        Logger.info("WaterMesh: ", vertices)
 
         // Define the indices for the cube (two triangles per face)
         var indices: [GLuint] = []

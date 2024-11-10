@@ -5,8 +5,8 @@ struct Options {
     var graphics: Bool = false
     var fullscreen: Bool = false
     var program: Int? = nil
-    var width: Int32 = 800
-    var height: Int32 = 600
+    var width: Int32 = 1280
+    var height: Int32 = 720
 }
 
 enum ArgumentError: Error, CustomStringConvertible {
@@ -32,8 +32,8 @@ func printUsage() {
       -g, --graphics            Enable graphics mode.
       -f, --fullscreen          Enable fullscreen mode (requires --graphics).
       -p, --program <number>    Specify the program numerical identifier.
-      -w, --width <number>      Specify the width. Default: 800
-      -h, --height <number>     Specify the height. Default: 600
+      -w, --width <number>      Specify the width. Default: 1280
+      -h, --height <number>     Specify the height. Default: 720
       -h, --help                Show this help message.
     """
     print(usage)
