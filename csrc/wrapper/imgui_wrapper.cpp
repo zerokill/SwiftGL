@@ -36,17 +36,21 @@ void ImGuiWrapper_RenderStart() {
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
     ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
     ImGui::Begin("Example: Simple overlay", NULL, window_flags);
-//    {
-//        ImGui::Text("Simple overlay\n");
-//        ImGui::Separator();
-//        ImGui::Text("Num Livia: %0d", stats.numLivia);
-//        ImGui::Text("Num Leon: %0d", stats.numLeon);
-//        ImGui::Text("fps: %.1f", stats.fps);
-//        ImGui::Text("updateTime: %f", stats.updateTime);
-//        ImGui::Text("renderTime: %f", stats.renderTime);
-//        ImGui::Text("updateTimeHigh: %f", stats.updateTimeHigh);
-//        ImGui::Text("renderTimeHigh: %f", stats.renderTimeHigh);
-//    }
+}
+
+config_t ImGuiWrapper_Config() {
+    config_t config;
+    static float scale = 4.0;
+    ImGui::SliderFloat("scale", &scale, 1.0f, 100.0f, "ratio = %.3f");
+    static int octaves = 9;
+    ImGui::SliderInt("octaves", &octaves, 1, 16);
+    static float persistence = 0.5;
+    ImGui::SliderFloat("persistence", &persistence, 0.0f, 1.0f, "ratio = %.3f");
+
+    config.scale = scale;
+    config.octaves = octaves;
+    config.persistence = persistence;
+    return config;
 }
 
 void ImGuiWrapper_RenderEnd() {

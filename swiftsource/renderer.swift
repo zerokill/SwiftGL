@@ -3,6 +3,7 @@ import OpenGL.GL3
 
 import TextureModule
 import ShaderModule
+import ImguiModule
 
 class Renderer {
     var shaderManager: ShaderManager
@@ -38,11 +39,6 @@ class Renderer {
         glCullFace(GLenum(GL_BACK))
         glFrontFace(GLenum(GL_CCW))
         glEnable(GLenum(GL_CLIP_DISTANCE0))
-
-        var maxTextureUnits: GLuint = 0
-
-        glGetIntegerv(GLenum(GL_MAX_TEXTURE_IMAGE_UNITS), &maxTextureUnits);
-        print("Maximum texture units supported: ", maxTextureUnits);
     }
 
     func render() {
@@ -203,12 +199,12 @@ class Renderer {
 
     }
 
-    func update(deltaTime: Float) {
+    func update(deltaTime: Float, config: config_t) {
         // Update rotations based on user input
         rotation_x += deltaTime
         rotation_y += deltaTime
 
-        scene.update(deltaTime: deltaTime, input: inputManager, camera: camera)
+        scene.update(deltaTime: deltaTime, input: inputManager, camera: camera, config: config)
 
         camera.move(delta: inputManager.deltaPosition)
         camera.rotate(yaw: inputManager.deltaYaw, pitch: inputManager.deltaPitch)

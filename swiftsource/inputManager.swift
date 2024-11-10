@@ -12,6 +12,9 @@ class InputManager {
     var addLight: Bool = false
     var addedLight: Bool = false
 
+    var increaseTerain: Bool = false
+    var decreaseTerrain: Bool = false
+
     var toggleNormal: Bool = false
 
     var deltaPosition: SIMD3<Float>
@@ -37,6 +40,9 @@ class InputManager {
         if (glfwGetKey(window, Int32(GLFW_KEY_2)) == GLFW_PRESS) {
             glPolygonMode(GLenum(GL_FRONT_AND_BACK), GLenum(GL_FILL))
         }
+
+        decreaseTerrain = (glfwGetKey(window, Int32(GLFW_KEY_3)) == GLFW_PRESS)
+        increaseTerain = (glfwGetKey(window, Int32(GLFW_KEY_4)) == GLFW_PRESS)
 
         addedObject = addObject
         addObject = (glfwGetKey(window, Int32(GLFW_KEY_7)) == GLFW_PRESS)

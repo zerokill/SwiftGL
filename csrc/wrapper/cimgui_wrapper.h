@@ -19,6 +19,13 @@ typedef struct
     float renderTimeHigh;
 } stats_t;
 
+typedef struct
+{
+    double scale;
+    int octaves;
+    double persistence;
+} config_t;
+
 
 // Render ImGui frame
 //void ImGuiWrapper_Render(stats_t stats);
@@ -36,3 +43,4 @@ void ImGuiWrapper_SwapBuffers(GLFWwindow* window);
 void ImGuiWrapper_RenderStart();
 void ImGuiWrapper_RenderEnd();
 void ImGuiWrapper_Text(const char* text);
+config_t ImGuiWrapper_Config();

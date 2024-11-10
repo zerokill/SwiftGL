@@ -1,4 +1,5 @@
 import TextureModule
+import ImguiModule
 
 class Scene {
     var models: [BaseModel] = []
@@ -10,6 +11,9 @@ class Scene {
 
     var terrain: TerrainModel
     var water: WaterModel
+
+    var octaves: Int = 4
+    var previousConfig: config_t = config_t()
 
     init(terrain: TerrainModel, water: WaterModel) {
         Logger.info("scene init");
@@ -27,7 +31,12 @@ class Scene {
         }
     }
 
-    func update(deltaTime: Float, input: InputManager, camera: Camera) {
+    func update(deltaTime: Float, input: InputManager, camera: Camera, config: config_t) {
+        if (config.scale != previousConfig.scale || config.octaves != previousConfig.octaves || config.persistence != previousConfig.persistence) {
+            terrain.mesh = TerrainMesh(width: 1000, depth: 1000, scale: config.scale, octaves: Int(config.octaves), persistence: config.persistence, seed: 1)
+            previousConfig = config
+        }
+
         if (input.addLight && !input.addedLight) {
             if let lightSphere = ResourceManager.shared.getModel(name: "leonModel")?.mesh {
                 let lightModel = LightModel(mesh: lightSphere, shaderName: "lightShader", texture: nil, position: camera.position, terrainMesh: terrain.mesh)

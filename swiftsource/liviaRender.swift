@@ -36,7 +36,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     ResourceManager.shared.loadTexture(name: "sheepTexture", texture: sheepTexture)
     ResourceManager.shared.loadTexture(name: "skyboxTexture", texture: skyTexture)
 
-    let terrainMesh = TerrainMesh(width: 1000, depth: 1000, scale: 6, octaves: 4, persistence: 0.5, seed: 1)
+    let terrainMesh = TerrainMesh(width: 1000, depth: 1000, scale: 5, octaves: 9, persistence: 0.5, seed: 1)
     let terrainModel = TerrainModel(mesh: terrainMesh, shaderName: "terrainShader", texture: nil)
 
     let dudvMap = texture("resources/waterDUDV.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGB), GLenum(GL_UNSIGNED_BYTE))
@@ -115,12 +115,13 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     }
 
     var stats: stats_t = stats_t(numLivia: 0, numLeon: 0, fps: 0.0, updateTime: 0.0, renderTime: 0.0, updateTimeHigh: 0.0, renderTimeHigh: 0.0)
+    var config: config_t = config_t()
 
     // Main render loop
     while glfwWindowShouldClose(window) == 0 {
         startTime = Float(glfwGetTime())
         renderer.inputManager.processInput(window: window)
-        renderer.update(deltaTime: dt)
+        renderer.update(deltaTime: dt, config: config)
         updateTime = Float(glfwGetTime())
         renderer.render()
         renderTime = Float(glfwGetTime())
@@ -145,6 +146,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
         stats.renderTimeHigh = stats.renderTimeHigh > stats.renderTime ? stats.renderTimeHigh : stats.renderTime
 
         ImGuiWrapper_RenderStart()
+        config = ImGuiWrapper_Config()
         ImGuiWrapper_Text(String(format: "FPS: %-4.0f",             1.0/dt))
         ImGuiWrapper_Text(String(format: "numLeon: %0d",            stats.numLeon))
         ImGuiWrapper_Text(String(format: "numLivia: %0d",           stats.numLivia))
