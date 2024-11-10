@@ -8,7 +8,8 @@ class LeonModel: BaseModel {
     var terrainMesh: TerrainMesh
 
     var instances: [InstanceData] = []
-    var activeInstances: Int = 0
+    var instancesActive: Int = 0
+    var instancesIndex: Int = 0
 
     let dampingFactor: Float = 0.8
 
@@ -29,19 +30,26 @@ class LeonModel: BaseModel {
 
     func shootInstance(position: SIMD3<Float>, direction: SIMD3<Float>, enableExplode: Bool) {
 //        Logger.debug("shootInstance", position, direction)
-        instances[activeInstances].enable = true
-        instances[activeInstances].enableExplode = enableExplode
-        instances[activeInstances].modelMatrix = float4x4.translation(position)
-        instances[activeInstances].velocity = direction * 0.10
+        instances[instancesIndex].enable = true
+        instances[instancesIndex].enableExplode = enableExplode
+        instances[instancesIndex].modelMatrix = float4x4.translation(position)
+        instances[instancesIndex].velocity = direction * 0.10
 
-        instances[activeInstances].positionMatrix = float4x4.translation(position)
+        instances[instancesIndex].positionMatrix = float4x4.translation(position)
 
         // Random initial rotation
         let rotationXMatrix = float4x4(rotationAngle: radians(fromDegrees: Float.random(in: 1..<360)), axis: SIMD3<Float>(0, 1, 0))
         let rotationYMatrix = float4x4(rotationAngle: radians(fromDegrees: Float.random(in: 1..<360)), axis: SIMD3<Float>(1, 0, 0))
-        instances[activeInstances].rotationMatrix = rotationXMatrix * rotationYMatrix
-        instances[activeInstances].timeAlive = 0
-        activeInstances += 1
+        instances[instancesIndex].rotationMatrix = rotationXMatrix * rotationYMatrix
+        instances[instancesIndex].timeAlive = 0
+        if instancesIndex < self.mesh.maxInstanceCount-1 {
+            instancesIndex += 1
+        } else {
+            instancesIndex = 0;
+        }
+        if instancesActive < self.mesh.maxInstanceCount {
+            instancesActive += 1;
+        }
     }
 
     func getGroundHeight(atX x: Double, z: Double, terrainScale: Double, terrainVerticalScale: Double) -> (height: Float, normal: SIMD3<Float>) {
@@ -130,8 +138,8 @@ class LeonModel: BaseModel {
                     }
                 }
 
-                activeInstances -= 1
-                instances.swapAt(i, activeInstances)    // Efficient removal. Swap is simpler then delete (O(n))
+//                instancesActive -= 1
+//                instances.swapAt(i, instancesActive)    // Efficient removal. Swap is simpler then delete (O(n))
             }
         }
         mesh.updateInstanceData(instances)
@@ -158,7 +166,7 @@ class LeonModel: BaseModel {
         if let texture = self.texture {
             glBindTexture(texture.type, texture.ID)
         }
-        mesh.drawInstances(count: activeInstances)
+        mesh.drawInstances(count: instancesActive)
     }
 }
 

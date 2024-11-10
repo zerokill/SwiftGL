@@ -129,7 +129,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
         stats.numLivia = 0
         for model in renderer.scene.models {
             if let leonModel = model as? LeonModel {
-                stats.numLeon += Int32(leonModel.activeInstances)
+                stats.numLeon += Int32(leonModel.instancesActive)
             }
             if model as? ObjectModel != nil {
                 stats.numLeon += 1
