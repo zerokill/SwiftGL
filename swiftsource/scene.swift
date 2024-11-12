@@ -32,9 +32,17 @@ class Scene {
     }
 
     func update(deltaTime: Float, input: InputManager, camera: Camera, config: config_t) {
-        if (config.scale != previousConfig.scale || config.octaves != previousConfig.octaves || config.persistence != previousConfig.persistence) {
-            terrain.mesh = TerrainMesh(width: 1000, depth: 1000, scale: config.scale, octaves: Int(config.octaves), persistence: config.persistence, seed: 1)
+        if (config.updated) {
+            terrain.mesh = TerrainMesh(width: 1000, width_offset: Int(config.x_offset), depth: 1000, depth_offset: Int(config.y_offset), scale: Double(config.scale), octaves: Int(config.octaves), persistence: Double(config.persistence), exponent: Double(config.exponent), height: Double(config.height), seed: 1)
             previousConfig = config
+            for model in models {
+                if let leonModel = model as? LeonModel {
+                    leonModel.terrainMesh = terrain.mesh
+                }
+                if let objectModel = model as? ObjectModel {
+                    objectModel.terrainMesh = terrain.mesh
+                }
+            }
         }
 
         if (input.addLight && !input.addedLight) {

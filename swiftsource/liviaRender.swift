@@ -36,12 +36,12 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     ResourceManager.shared.loadTexture(name: "sheepTexture", texture: sheepTexture)
     ResourceManager.shared.loadTexture(name: "skyboxTexture", texture: skyTexture)
 
-    let terrainMesh = TerrainMesh(width: 1000, depth: 1000, scale: 5, octaves: 9, persistence: 0.5, seed: 1)
+    let terrainMesh = TerrainMesh(width: 1000, width_offset: 0, depth: 1000, depth_offset: 0, scale: 5, octaves: 9, persistence: 0.5, exponent: 0.0, height: 1.0, seed: 1)
     let terrainModel = TerrainModel(mesh: terrainMesh, shaderName: "terrainShader", texture: nil)
 
     let dudvMap = texture("resources/waterDUDV.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGB), GLenum(GL_UNSIGNED_BYTE))
     let normalMap = texture("resources/normalMap.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGB), GLenum(GL_UNSIGNED_BYTE))
-    let waterMesh = WaterMesh(width: 1000, depth: 1000, scale: 10, octaves: 4, persistence: 0.5, seed: 1)
+    let waterMesh = WaterMesh(width: 1000, depth: 1000)
     let waterModel = WaterModel(mesh: waterMesh, shaderName: "waterShader", dudvMap: dudvMap, normalMap: normalMap)
 
     if let texture = ResourceManager.shared.getTexture(name: "leonTexture") {

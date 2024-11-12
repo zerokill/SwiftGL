@@ -5,7 +5,7 @@ import simd
 import TextureModule
 
 class LeonModel: BaseModel {
-    var terrainMesh: TerrainMesh
+    var terrainMesh: Mesh
 
     var instances: [InstanceData] = []
     var instancesActive: Int = 0

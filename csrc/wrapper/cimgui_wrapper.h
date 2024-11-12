@@ -21,9 +21,14 @@ typedef struct
 
 typedef struct
 {
-    double scale;
+    float scale;
     int octaves;
-    double persistence;
+    float persistence;
+    float exponent;
+    float height;
+    int x_offset;
+    int y_offset;
+    bool updated;
 } config_t;
 
 

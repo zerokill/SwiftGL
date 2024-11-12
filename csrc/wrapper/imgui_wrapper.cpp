@@ -40,16 +40,51 @@ void ImGuiWrapper_RenderStart() {
 
 config_t ImGuiWrapper_Config() {
     config_t config;
+    config.updated = false;
+
     static float scale = 4.0;
-    ImGui::SliderFloat("scale", &scale, 1.0f, 100.0f, "ratio = %.3f");
+    ImGui::SliderFloat("scale", &scale, 0.0f, 20.0f, "%.3f");
     static int octaves = 9;
     ImGui::SliderInt("octaves", &octaves, 1, 16);
     static float persistence = 0.5;
-    ImGui::SliderFloat("persistence", &persistence, 0.0f, 1.0f, "ratio = %.3f");
+    ImGui::SliderFloat("persistence", &persistence, 0.0f, 1.0f, "%.3f");
+    static float exponent = 1.0;
+    ImGui::SliderFloat("exponent", &exponent, 1.0f, 5.0f, "%.3f");
+    static float height = 0.0;
+    ImGui::SliderFloat("height", &height, -10.0f, 10.0f, "%.3f");
+    static int x_offset = 0;
+    ImGui::SliderInt("x_offset", &x_offset, 0, 1000);
+    static int y_offset = 0;
+    ImGui::SliderInt("y_offset", &y_offset, 0, 1000);
 
-    config.scale = scale;
-    config.octaves = octaves;
-    config.persistence = persistence;
+    if (config.scale != scale) {
+        config.scale = scale;
+        config.updated = true;
+    }
+    if (config.octaves != octaves) {
+        config.octaves = octaves;
+        config.updated = true;
+    }
+    if (config.persistence != persistence) {
+        config.persistence = persistence;
+        config.updated = true;
+    }
+    if (config.exponent != exponent) {
+        config.exponent = exponent;
+        config.updated = true;
+    }
+    if (config.height != height) {
+        config.height = height;
+        config.updated = true;
+    }
+    if (config.x_offset != x_offset) {
+        config.x_offset = x_offset;
+        config.updated = true;
+    }
+    if (config.y_offset != y_offset) {
+        config.y_offset = y_offset;
+        config.updated = true;
+    }
     return config;
 }
 

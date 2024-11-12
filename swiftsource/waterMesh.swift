@@ -2,7 +2,7 @@ import simd
 import OpenGL.GL3
 
 class WaterMesh: Mesh {
-    init(width: Int, depth: Int, scale: Double, octaves: Int, persistence: Double, seed: UInt64) {
+    init(width: Int, depth: Int) {
         let (vertices, indices) = WaterMesh.createPlane(width: 2, depth: 2)
         super.init(vertices: vertices, indices: indices, maxInstanceCount: 1)
     }

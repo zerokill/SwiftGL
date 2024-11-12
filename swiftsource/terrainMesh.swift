@@ -4,32 +4,33 @@ import OpenGL.GL3
 class TerrainMesh: Mesh {
     var noiseArray: [[Double]]
 
-    init(width: Int, depth: Int, scale: Double, octaves: Int, persistence: Double, seed: UInt64) {
+    init(width: Int, width_offset: Int, depth: Int, depth_offset: Int, scale: Double, octaves: Int, persistence: Double, exponent: Double, height: Double, seed: UInt64) {
         noiseArray = generateFractalPerlinNoise2D(
             width: width,
+            width_offset: width_offset,
             height: depth,
+            height_offset: depth_offset,
             scale: scale,
             octaves: octaves,
             persistence: persistence,
             seed: seed
         )
 
-        let (vertices, indices) = TerrainMesh.generateTerrain(width: width, depth: depth, noiseArray: noiseArray)
+        let (vertices, indices) = TerrainMesh.generateTerrain(width: width, depth: depth, noiseArray: noiseArray, exponent: exponent, height: height)
         super.init(vertices: vertices, indices: indices, maxInstanceCount: 1)
     }
 
-    private static func generateTerrain(width: Int, depth: Int, noiseArray: [[Double]]) -> (vertices: [Vertex], indices: [GLuint]) {
+    private static func generateTerrain(width: Int, depth: Int, noiseArray: [[Double]], exponent: Double, height: Double) -> (vertices: [Vertex], indices: [GLuint]) {
         let worldScale: Float = 0.1
 
         var vertices: [Vertex] = []
 
-        let maxHeight = 10.0
 
         for z in 0..<depth {
             for x in 0..<width {
-                //let normalizedValue = (noiseArray[x][z] + 1) / 2
-                let normalizedValue = noiseArray[x][z]
-                let heightValue = normalizedValue * maxHeight
+                let normalizedValue = (noiseArray[x][z] + 1) / 2
+                //let normalizedValue = noiseArray[x][z]
+                let heightValue = pow(normalizedValue * 4, exponent) - height
                 vertices.append(Vertex( position: SIMD3<Float>(Float(x - (width/2)) * worldScale, Float(heightValue), Float(z - (depth/2)) * worldScale), normal: SIMD3<Float>(), texCoords: SIMD2<Float>()))
             }
         }
