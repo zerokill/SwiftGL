@@ -31,6 +31,16 @@ extension simd_float4x4 {
         return matrix
     }
 
+    static func scale(_ t: SIMD3<Float>) -> simd_float4x4 {
+        var result = matrix_identity_float4x4
+        result.columns.0 = SIMD4<Float>(t.x,    0,      0,      0)
+        result.columns.1 = SIMD4<Float>(0,      t.y,    0,      0)
+        result.columns.2 = SIMD4<Float>(0,      0,      t.z,    0)
+        result.columns.3 = SIMD4<Float>(0,      0,      0,      1)
+        return result
+    }
+
+
     static func lookAt(eye: SIMD3<Float>, center: SIMD3<Float>, up: SIMD3<Float>) -> simd_float4x4 {
         let f = normalize(center - eye)
         let s = normalize(cross(f, up))

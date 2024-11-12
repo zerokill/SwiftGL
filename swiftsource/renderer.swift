@@ -19,7 +19,7 @@ class Renderer {
     var rotation_y: Float = 0.0
 
     init(width: Int32, height: Int32, scene: Scene) {
-        camera = Camera(position: SIMD3(0.0, 1.0, 0.0), target: SIMD3(0.0, 0.0, 0.0), worldUp: SIMD3(0.0, 1.0, 0.0))
+        camera = Camera(position: SIMD3(0.0, 10.0, 0.0), target: SIMD3(0.0, 0.0, 0.0), worldUp: SIMD3(0.0, 1.0, 0.0))
         inputManager = InputManager()
         shaderManager = ShaderManager()
         self.width = width
@@ -93,14 +93,14 @@ class Renderer {
         shaderManager.setUniform("normalMap",         value: Int32(3))
         shaderManager.setUniform("moveFactor",        value: scene.water.moveFactor)
         shaderManager.setUniform("cameraPos",         value: camera.position)
-        shaderManager.setUniform("lightColor",        value: SIMD3<Float>(1.0, 1.0, 1.0));
         if let light = scene.light {
             let position = SIMD3<Float>(
                 light.modelMatrix.columns.3.x,
                 light.modelMatrix.columns.3.y,
                 light.modelMatrix.columns.3.z
             )
-            shaderManager.setUniform("lightPos",    value: position)
+            shaderManager.setUniform("lightPos",      value: position)
+            shaderManager.setUniform("lightColor",    value: light.lightColor)
         }
         scene.water.draw()
     }
@@ -115,7 +115,6 @@ class Renderer {
         shaderManager.setUniform("proj", value: camera.projectionMatrix)
         shaderManager.setUniform("visualizeNormals", value: inputManager.toggleNormal)
         shaderManager.setUniform("objectColor", value: SIMD3<Float>(1.0, 0.5, 0.31));
-        shaderManager.setUniform("lightColor",  value: SIMD3<Float>(1.0, 1.0, 1.0));
         if let light = scene.light {
             let position = SIMD3<Float>(
                 light.modelMatrix.columns.3.x,
@@ -123,6 +122,7 @@ class Renderer {
                 light.modelMatrix.columns.3.z
             )
             shaderManager.setUniform("lightPos",    value: position)
+            shaderManager.setUniform("lightColor",  value: light.lightColor)
         }
         shaderManager.setUniform("plane", value: plane)
         scene.terrain.draw()
@@ -139,7 +139,6 @@ class Renderer {
             shaderManager.setUniform("proj", value: camera.projectionMatrix)
             shaderManager.setUniform("tex0", value: GLuint(0))
             shaderManager.setUniform("visualizeNormals", value: inputManager.toggleNormal)
-            shaderManager.setUniform("lightColor",  value: SIMD3<Float>(1.0, 1.0, 1.0));
             shaderManager.setUniform("cameraPos", value: camera.position)
             if let light = scene.light {
                 let position = SIMD3<Float>(
@@ -148,6 +147,7 @@ class Renderer {
                     light.modelMatrix.columns.3.z
                 )
                 shaderManager.setUniform("lightPos",    value: position)
+                shaderManager.setUniform("lightColor",  value: light.lightColor)
             }
             shaderManager.setUniform("rotation_x", value: self.rotation_x)
             shaderManager.setUniform("rotation_y", value: self.rotation_y)
@@ -183,10 +183,10 @@ class Renderer {
     func renderLight() {
         if let light = scene.light {
             shaderManager.use(shaderName: light.shaderName)
-            shaderManager.setUniform("model", value: light.modelMatrix)
-            shaderManager.setUniform("view", value: camera.viewMatrix)
-            shaderManager.setUniform("proj", value: camera.projectionMatrix)
-            shaderManager.setUniform("lightColor",  value: SIMD3<Float>(1.0, 1.0, 1.0));
+            shaderManager.setUniform("model",       value: light.modelMatrix)
+            shaderManager.setUniform("view",        value: camera.viewMatrix)
+            shaderManager.setUniform("proj",        value: camera.projectionMatrix)
+            shaderManager.setUniform("lightColor",  value: light.lightColor)
             scene.light?.draw()
         }
     }
