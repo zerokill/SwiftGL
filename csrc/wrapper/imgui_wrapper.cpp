@@ -48,7 +48,7 @@ config_t ImGuiWrapper_Config() {
     ImGui::SliderInt("octaves", &octaves, 1, 16);
     static float persistence = 0.5;
     ImGui::SliderFloat("persistence", &persistence, 0.0f, 1.0f, "%.3f");
-    static float exponent = 1.5;
+    static float exponent = 2.5;
     ImGui::SliderFloat("exponent", &exponent, 1.0f, 5.0f, "%.3f");
     static float height = 2.0;
     ImGui::SliderFloat("height", &height, -10.0f, 10.0f, "%.3f");

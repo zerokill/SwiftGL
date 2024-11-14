@@ -10,7 +10,7 @@ class Framebuffer {
     let width: GLsizei = 1280
     let height: GLsizei = 720
 
-    init() {
+    init(internalFormat: Int32 = GL_RGBA16F) {
         glGenFramebuffers(1, &framebuffer)
         glBindFramebuffer(GLenum(GL_FRAMEBUFFER), framebuffer)
 
@@ -19,7 +19,7 @@ class Framebuffer {
         // Create texture to render to
         glGenTextures(1, &texture.ID)
         glBindTexture(texture.type, texture.ID)
-        glTexImage2D(texture.type, 0, GL_RGB, width, height, 0, GLenum(GL_RGB), GLenum(GL_UNSIGNED_BYTE), nil)
+        glTexImage2D(texture.type, 0, internalFormat, width, height, 0, GLenum(GL_RGB), GLenum(GL_UNSIGNED_BYTE), nil)
         glTexParameteri(texture.type, GLenum(GL_TEXTURE_MIN_FILTER), GL_LINEAR)
         glTexParameteri(texture.type, GLenum(GL_TEXTURE_MAG_FILTER), GL_LINEAR)
         glFramebufferTexture2D(GLenum(GL_FRAMEBUFFER), GLenum(GL_COLOR_ATTACHMENT0), texture.type, texture.ID, 0)

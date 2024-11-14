@@ -15,7 +15,7 @@ class LeonMesh: Mesh {
     init(sphere: SphereParameters) {
         let (vertices, indices) = LeonMesh.generateSphere(parameters: sphere)
         self.sphereParameters = sphere;
-        super.init(vertices: vertices, indices: indices, maxInstanceCount: 10000)
+        super.init(vertices: vertices, indices: indices, maxInstanceCount: 5000)
     }
 
     private static func generateSphere(parameters: SphereParameters) -> ([Vertex], [GLuint]) {

@@ -39,11 +39,15 @@ class Renderer {
         glCullFace(GLenum(GL_BACK))
         glFrontFace(GLenum(GL_CCW))
         glEnable(GLenum(GL_CLIP_DISTANCE0))
+
+        // FIXME: Trying to disable washed out look
+        glDisable(GLenum(GL_FRAMEBUFFER_SRGB))
     }
 
     func render() {
         renderReflection()
         renderRefraction()
+        renderHdr()
         renderScene(plane: SIMD4<Float>(0.0, 1.0, 0.0, 10000))
         renderWater()
         renderLight()
@@ -53,6 +57,9 @@ class Renderer {
 
     func renderReflection() {
         self.scene.water.reflectionBuffer.bindFramebuffer()
+        // Clear the color and depth buffers
+        glClearColor(0.07, 0.13, 0.17, 1.0)
+        glClear(GLbitfield(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT))
 
         let cameraPos = camera.position
 
@@ -73,6 +80,9 @@ class Renderer {
 
     func renderRefraction() {
         self.scene.water.refractionBuffer.bindFramebuffer()
+        // Clear the color and depth buffers
+        glClearColor(0.07, 0.13, 0.17, 1.0)
+        glClear(GLbitfield(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT))
 
         shaderManager.setUniform("plane",       value: SIMD4<Float>(0.0, -1.0, 0.0, 0.0));
 
@@ -80,6 +90,20 @@ class Renderer {
         renderLight()
 
         self.scene.water.refractionBuffer.unbindFramebuffer(displayWidth: width, displayHeight: height)
+    }
+
+    func renderHdr() {
+        self.scene.hdrFramebuffer.bindFramebuffer()
+        // Clear the color and depth buffers
+        glClearColor(0.07, 0.13, 0.17, 1.0)
+        glClear(GLbitfield(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT))
+        glDisable(GLenum(GL_BLEND))
+
+        renderScene(plane: SIMD4<Float>(0.0, 1.0, 0.0, 10000))
+        renderLight()
+        renderWater()
+
+        self.scene.hdrFramebuffer.unbindFramebuffer(displayWidth: width, displayHeight: height)
     }
 
     func renderWater() {

@@ -95,6 +95,10 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     renderer.shaderManager.loadShader(name: "waterShader", vertexPath: "resources/shader/water.vert", geometryPath: nil, fragmentPath: "resources/shader/water.frag")
     renderer.shaderManager.loadShader(name: "guiShader", vertexPath: "resources/shader/gui.vert", geometryPath: nil, fragmentPath: "resources/shader/gui.frag")
 
+    let hdrGuiMesh = GuiMesh(x: -1.0, y: -1.0, width: 2.0, height: 2.0)
+    let hdrGuiModel = GuiModel(mesh: hdrGuiMesh, shaderName: "guiShader", texture: scene.hdrFramebuffer.texture)
+    renderer.guiElements.append(hdrGuiModel)
+
 //    let reflectionGuiMesh = GuiMesh(x: 0.0, y: 0.0, width: 0.5, height: 0.5)
 //    let reflectionGuiModel = GuiModel(mesh: reflectionGuiMesh, shaderName: "guiShader", texture: scene.water.reflectionBuffer.texture)
 //    renderer.guiElements.append(reflectionGuiModel)
@@ -119,6 +123,16 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
 
     // Main render loop
     while glfwWindowShouldClose(window) == 0 {
+        ImGuiWrapper_RenderStart()
+        config = ImGuiWrapper_Config()
+        ImGuiWrapper_Text(String(format: "FPS: %-4.0f",             1.0/dt))
+        ImGuiWrapper_Text(String(format: "numLeon: %0d",            stats.numLeon))
+        ImGuiWrapper_Text(String(format: "numLivia: %0d",           stats.numLivia))
+        ImGuiWrapper_Text(String(format: "updateTime: %.4f",        stats.updateTime))
+        ImGuiWrapper_Text(String(format: "updateTimeHigh: %.4f",    stats.updateTimeHigh))
+        ImGuiWrapper_Text(String(format: "renderTime: %.4f",        stats.renderTime))
+        ImGuiWrapper_Text(String(format: "renderTimeHigh: %.4f",    stats.renderTimeHigh))
+
         startTime = Float(glfwGetTime())
         renderer.inputManager.processInput(window: window)
         renderer.update(deltaTime: dt, config: config)
@@ -145,15 +159,6 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
         stats.renderTime = renderTime - updateTime
         stats.renderTimeHigh = stats.renderTimeHigh > stats.renderTime ? stats.renderTimeHigh : stats.renderTime
 
-        ImGuiWrapper_RenderStart()
-        config = ImGuiWrapper_Config()
-        ImGuiWrapper_Text(String(format: "FPS: %-4.0f",             1.0/dt))
-        ImGuiWrapper_Text(String(format: "numLeon: %0d",            stats.numLeon))
-        ImGuiWrapper_Text(String(format: "numLivia: %0d",           stats.numLivia))
-        ImGuiWrapper_Text(String(format: "updateTime: %.4f",        stats.updateTime))
-        ImGuiWrapper_Text(String(format: "updateTimeHigh: %.4f",    stats.updateTimeHigh))
-        ImGuiWrapper_Text(String(format: "renderTime: %.4f",        stats.renderTime))
-        ImGuiWrapper_Text(String(format: "renderTimeHigh: %.4f",    stats.renderTimeHigh))
         ImGuiWrapper_RenderEnd()
 
         // Swap buffers and poll events

@@ -101,17 +101,15 @@ class LeonModel: BaseModel {
             // Update translation based on velocity and delta time
 
             if let leonMesh = mesh as? LeonMesh {
-//                if (instances[i].velocity.y < 0 ) {
-                    // TODO: collision detection now only works if the ball is dropping
-                    if ((position.y < heightNormal.height + leonMesh.sphereParameters.radius)) {
-                        instances[i].velocity = reflect(instances[i].velocity, over: heightNormal.normal) * dampingFactor
-                        instances[i].positionMatrix.columns.3.y = heightNormal.height + leonMesh.sphereParameters.radius;
-                    } else if (position.y < leonMesh.sphereParameters.radius) {
-                        instances[i].velocity.y = -instances[i].velocity.y;
-                        instances[i].velocity *= dampingFactor
-                        instances[i].positionMatrix.columns.3.y = leonMesh.sphereParameters.radius;
-                    }
-//                }
+                // TODO: collision detection now only works if the ball is dropping
+                if ((position.y < heightNormal.height + leonMesh.sphereParameters.radius)) {
+                    instances[i].velocity = reflect(instances[i].velocity, over: heightNormal.normal) * dampingFactor
+                    instances[i].positionMatrix.columns.3.y = heightNormal.height + leonMesh.sphereParameters.radius;
+                } else if (position.y < leonMesh.sphereParameters.radius) {
+                    instances[i].velocity.y = -instances[i].velocity.y;
+                    instances[i].velocity *= dampingFactor
+                    instances[i].positionMatrix.columns.3.y = leonMesh.sphereParameters.radius;
+                }
 
                 // Naive gravity
                 instances[i].velocity.y -= 0.001;
@@ -137,9 +135,6 @@ class LeonModel: BaseModel {
                         shootInstance(position: position, direction: direction, enableExplode: false)
                     }
                 }
-
-//                instancesActive -= 1
-//                instances.swapAt(i, instancesActive)    // Efficient removal. Swap is simpler then delete (O(n))
             }
         }
         mesh.updateInstanceData(instances)

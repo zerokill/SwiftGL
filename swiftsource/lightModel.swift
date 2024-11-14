@@ -22,14 +22,23 @@ class LightModel: BaseModel {
     }
 
     func interpolateSunlightColor(position: Float) -> SIMD3<Float> {
-        // Define the colors at midday and sunset using SIMD3<Float>
-        let middayColor = SIMD3<Float>(1.0, 1.0, 0.9)    // Bright white light
-        let sunsetColor = SIMD3<Float>(1.0, 0.5, 0.0)    // Orange light
+        let nightColor   = SIMD3<Float>(0.05, 0.05, 0.2)          // Dark blue
+        let sunriseColor = SIMD3<Float>(1.0, 0.5, 0.0)   * 2.0    // Orange
+        let dayColor     = SIMD3<Float>(1.0, 1.0, 1.0)   * 0.9    // White
 
-        // Interpolate between the two colors
-        let interpolatedColor = mix(sunsetColor, middayColor, t: position)
+        var color = SIMD3<Float>()
 
-        return interpolatedColor
+        if position < 0.5 {
+            // Night to Sunrise
+            let t = position / 0.5
+            color = mix(nightColor, sunriseColor, t: t)
+        } else {
+            // Sunset to Night
+            let t = (position - 0.5) / 0.5
+            color = mix(sunriseColor, dayColor, t: t)
+        }
+
+        return color
     }
 
     override func updateMove(deltaTime: Float) {
@@ -40,7 +49,7 @@ class LightModel: BaseModel {
         modelMatrix = positionMatrix * rotationMatrix * float4x4.translation(translation) * float4x4.scale(scale)
 
         let maxSunHeight: Float = 100.0  // Maximum height of the sun
-        let minSunHeight: Float = 0.0    // Minimum height of the sun
+        let minSunHeight: Float = -100.0 // Minimum height of the sun
 
         let position = SIMD3<Float>(
             modelMatrix.columns.3.x,

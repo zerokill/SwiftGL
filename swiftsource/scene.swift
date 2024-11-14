@@ -15,8 +15,12 @@ class Scene {
     var octaves: Int = 4
     var previousConfig: config_t = config_t()
 
+    var hdrFramebuffer: Framebuffer
+
     init(terrain: TerrainModel, water: WaterModel) {
         Logger.info("scene init");
+
+        self.hdrFramebuffer = Framebuffer(internalFormat: GL_RGBA16F)
 
         self.terrain = terrain
         self.water = water
