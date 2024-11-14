@@ -18,8 +18,8 @@ const vec3 rockColor = vec3(0.5, 0.5, 0.5);
 const vec3 snowColor = vec3(1.0, 1.0, 1.0);
 const float sandHeight = 0.5;
 const float grassHeight = 2.0;
-const float rockHeight = 4.0;
-const float snowHeight = 5.0;
+const float rockHeight = 5.0;
+const float snowHeight = 6.0;
 
 void main()
 {

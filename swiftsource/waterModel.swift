@@ -26,6 +26,9 @@ class WaterModel: BaseModel {
     }
 
     override func draw() {
+        glEnable(GLenum(GL_BLEND))
+        glBlendFunc(GLenum(GL_SRC_ALPHA), GLenum(GL_ONE_MINUS_SRC_ALPHA))
+
         glActiveTexture(GLenum(GL_TEXTURE0))
         glBindTexture(self.reflectionBuffer.texture.type, self.reflectionBuffer.texture.ID)
         glActiveTexture(GLenum(GL_TEXTURE0 + 1))
@@ -34,8 +37,11 @@ class WaterModel: BaseModel {
         glBindTexture(self.dudvMap.type, self.dudvMap.ID)
         glActiveTexture(GLenum(GL_TEXTURE0 + 3))
         glBindTexture(self.normalMap.type, self.normalMap.ID)
+
         mesh.draw()
+
         glActiveTexture(GLenum(GL_TEXTURE0))
+        glDisable(GLenum(GL_BLEND))
     }
 }
 
