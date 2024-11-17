@@ -60,6 +60,10 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
         ResourceManager.shared.loadModel(name: "liviaModel", model: liviaModel)
     }
 
+    let cloudMesh = CloudMesh()
+    let cloudModel = CloudModel(mesh: cloudMesh, shaderName: "cloudShader")
+    ResourceManager.shared.loadModel(name: "cloudModel", model: cloudModel)
+
     let objectSpereParameters = SphereParameters(radius: 0.2, latitudeBands: 20, longitudeBands: 20)
     let objectSphere = LeonMesh(sphere: objectSpereParameters)
     ResourceManager.shared.loadMesh(name: "objectSphere", mesh: objectSphere)
@@ -94,6 +98,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     renderer.shaderManager.loadShader(name: "terrainShader", vertexPath: "resources/shader/terrain.vert", geometryPath: nil, fragmentPath: "resources/shader/terrain.frag")
     renderer.shaderManager.loadShader(name: "waterShader", vertexPath: "resources/shader/water.vert", geometryPath: nil, fragmentPath: "resources/shader/water.frag")
     renderer.shaderManager.loadShader(name: "guiShader", vertexPath: "resources/shader/gui.vert", geometryPath: nil, fragmentPath: "resources/shader/gui.frag")
+    renderer.shaderManager.loadShader(name: "cloudShader", vertexPath: "resources/shader/cloud.vert", geometryPath: nil, fragmentPath: "resources/shader/cloud.frag")
 
     let hdrGuiMesh = GuiMesh(x: -1.0, y: -1.0, width: 2.0, height: 2.0)
     let hdrGuiModel = GuiModel(mesh: hdrGuiMesh, shaderName: "guiShader", texture: scene.hdrFramebuffer.texture)

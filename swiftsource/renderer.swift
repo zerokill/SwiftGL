@@ -43,14 +43,15 @@ class Renderer {
     }
 
     func render() {
+        ImGuiWrapper_Text(String(format: "test"))
         renderReflection()
         renderRefraction()
-        renderHdr()
+//        renderHdr()
         renderScene(plane: SIMD4<Float>(0.0, 1.0, 0.0, 10000))
         renderWater()
         renderLight()
 
-        renderGui()
+//        renderGui()
     }
 
     func renderReflection() {
@@ -156,6 +157,9 @@ class Renderer {
             }
             if let objectModel = model as? ObjectModel {
                 shaderManager.setUniform("model", value: objectModel.modelMatrix)
+            }
+            if let cloudModel = model as? CloudModel {
+                shaderManager.setUniform("model", value: cloudModel.modelMatrix)
             }
             shaderManager.setUniform("view", value: camera.viewMatrix)
             shaderManager.setUniform("proj", value: camera.projectionMatrix)

@@ -33,6 +33,10 @@ class Scene {
             Logger.info("leonModel loaded");
             models.append(model);
         }
+        if let model = ResourceManager.shared.getModel(name: "cloudModel") {
+            Logger.info("cloudModel loaded");
+            models.append(model);
+        }
     }
 
     func update(deltaTime: Float, input: InputManager, camera: Camera, config: config_t) {

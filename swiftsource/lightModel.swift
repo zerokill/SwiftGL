@@ -2,6 +2,7 @@ import os
 import OpenGL.GL3
 import simd
 
+import ImguiModule
 import TextureModule
 
 class LightModel: BaseModel {
@@ -12,12 +13,10 @@ class LightModel: BaseModel {
     var velocity: SIMD3<Float> = SIMD3<Float>()
     var lightColor: SIMD3<Float> = SIMD3<Float>()
 
-    let dampingFactor: Float = 0.9
-
     init(mesh: Mesh, shaderName: String, texture: texture_t?, position: SIMD3<Float>, terrainMesh: Mesh) {
         self.terrainMesh = terrainMesh
         modelMatrix = float4x4.translation(position)
-        positionMatrix = float4x4.translation(position)
+        positionMatrix = float4x4.translation(SIMD3<Float>(0.0, 100.0, 0.0))//float4x4.translation(position)
         super.init(mesh: mesh, shaderName: shaderName, texture: texture)
     }
 
@@ -27,6 +26,8 @@ class LightModel: BaseModel {
         let dayColor     = SIMD3<Float>(1.0, 1.0, 1.0)   * 0.9    // White
 
         var color = SIMD3<Float>()
+
+        ImGuiWrapper_Text(String(format: "lightPosition %f", position))
 
         if position < 0.5 {
             // Night to Sunrise
@@ -45,7 +46,7 @@ class LightModel: BaseModel {
         let translation = SIMD3<Float>(100.0, 0.0, 0.0)
         let scale = SIMD3<Float>(10.0, 10.0, 10.0)
         let rotationZMatrix = float4x4(rotationAngle: radians(fromDegrees: -deltaTime*10), axis: SIMD3<Float>(0, 0, 1))
-        rotationMatrix *= rotationZMatrix
+//        rotationMatrix *= rotationZMatrix
         modelMatrix = positionMatrix * rotationMatrix * float4x4.translation(translation) * float4x4.scale(scale)
 
         let maxSunHeight: Float = 100.0  // Maximum height of the sun
