@@ -7,63 +7,35 @@ class CloudMesh: Mesh {
     }
 
     private static func generateCube() -> (vertices: [Vertex], indices: [GLuint]) {
-        // Define the size of the cube
-        let size: Float = 1.0
-        let halfSize = size
-        
-        // Define the 6 faces of the cube
-        // Each face has 4 vertices (positions, normals, texCoords)
+
+        //unit cube vertices
         let vertices: [Vertex] = [
-            // Front face
-            Vertex( position: SIMD3<Float>(-halfSize, -halfSize,  halfSize), normal: SIMD3<Float>(0.0, 0.0, 1.0), texCoords: SIMD2<Float>(0.0, 0.0)),
-            Vertex( position: SIMD3<Float>( halfSize, -halfSize,  halfSize), normal: SIMD3<Float>(0.0, 0.0, 1.0), texCoords: SIMD2<Float>(1.0, 0.0)),
-            Vertex( position: SIMD3<Float>( halfSize,  halfSize,  halfSize), normal: SIMD3<Float>(0.0, 0.0, 1.0), texCoords: SIMD2<Float>(1.0, 1.0)),
-            Vertex( position: SIMD3<Float>(-halfSize,  halfSize,  halfSize), normal: SIMD3<Float>(0.0, 0.0, 1.0), texCoords: SIMD2<Float>(0.0, 1.0)),
-            
-            // Back face
-            Vertex( position: SIMD3<Float>( halfSize, -halfSize, -halfSize), normal: SIMD3<Float>(0.0, 0.0, -1.0), texCoords: SIMD2<Float>(0.0, 0.0)),
-            Vertex( position: SIMD3<Float>(-halfSize, -halfSize, -halfSize), normal: SIMD3<Float>(0.0, 0.0, -1.0), texCoords: SIMD2<Float>(1.0, 0.0)),
-            Vertex( position: SIMD3<Float>(-halfSize,  halfSize, -halfSize), normal: SIMD3<Float>(0.0, 0.0, -1.0), texCoords: SIMD2<Float>(1.0, 1.0)),
-            Vertex( position: SIMD3<Float>( halfSize,  halfSize, -halfSize), normal: SIMD3<Float>(0.0, 0.0, -1.0), texCoords: SIMD2<Float>(0.0, 1.0)),
-            
-            // Left face
-            Vertex( position: SIMD3<Float>(-halfSize, -halfSize, -halfSize), normal: SIMD3<Float>(-1.0, 0.0, 0.0), texCoords: SIMD2<Float>(0.0, 0.0)),
-            Vertex( position: SIMD3<Float>(-halfSize, -halfSize,  halfSize), normal: SIMD3<Float>(-1.0, 0.0, 0.0), texCoords: SIMD2<Float>(1.0, 0.0)),
-            Vertex( position: SIMD3<Float>(-halfSize,  halfSize,  halfSize), normal: SIMD3<Float>(-1.0, 0.0, 0.0), texCoords: SIMD2<Float>(1.0, 1.0)),
-            Vertex( position: SIMD3<Float>(-halfSize,  halfSize, -halfSize), normal: SIMD3<Float>(-1.0, 0.0, 0.0), texCoords: SIMD2<Float>(0.0, 1.0)),
-            
-            // Right face
-            Vertex( position: SIMD3<Float>( halfSize, -halfSize,  halfSize), normal: SIMD3<Float>(1.0, 0.0, 0.0), texCoords: SIMD2<Float>(0.0, 0.0)),
-            Vertex( position: SIMD3<Float>( halfSize, -halfSize, -halfSize), normal: SIMD3<Float>(1.0, 0.0, 0.0), texCoords: SIMD2<Float>(1.0, 0.0)),
-            Vertex( position: SIMD3<Float>( halfSize,  halfSize, -halfSize), normal: SIMD3<Float>(1.0, 0.0, 0.0), texCoords: SIMD2<Float>(1.0, 1.0)),
-            Vertex( position: SIMD3<Float>( halfSize,  halfSize,  halfSize), normal: SIMD3<Float>(1.0, 0.0, 0.0), texCoords: SIMD2<Float>(0.0, 1.0)),
-            
-            // Top face
-            Vertex( position: SIMD3<Float>(-halfSize,  halfSize,  halfSize), normal: SIMD3<Float>(0.0, 1.0, 0.0), texCoords: SIMD2<Float>(0.0, 0.0)),
-            Vertex( position: SIMD3<Float>( halfSize,  halfSize,  halfSize), normal: SIMD3<Float>(0.0, 1.0, 0.0), texCoords: SIMD2<Float>(1.0, 0.0)),
-            Vertex( position: SIMD3<Float>( halfSize,  halfSize, -halfSize), normal: SIMD3<Float>(0.0, 1.0, 0.0), texCoords: SIMD2<Float>(1.0, 1.0)),
-            Vertex( position: SIMD3<Float>(-halfSize,  halfSize, -halfSize), normal: SIMD3<Float>(0.0, 1.0, 0.0), texCoords: SIMD2<Float>(0.0, 1.0)),
-            
-            // Bottom face
-            Vertex( position: SIMD3<Float>(-halfSize, -halfSize, -halfSize), normal: SIMD3<Float>(0.0, -1.0, 0.0), texCoords: SIMD2<Float>(0.0, 0.0)),
-            Vertex( position: SIMD3<Float>( halfSize, -halfSize, -halfSize), normal: SIMD3<Float>(0.0, -1.0, 0.0), texCoords: SIMD2<Float>(1.0, 0.0)),
-            Vertex( position: SIMD3<Float>( halfSize, -halfSize,  halfSize), normal: SIMD3<Float>(0.0, -1.0, 0.0), texCoords: SIMD2<Float>(1.0, 1.0)),
-            Vertex( position: SIMD3<Float>(-halfSize, -halfSize,  halfSize), normal: SIMD3<Float>(0.0, -1.0, 0.0), texCoords: SIMD2<Float>(0.0, 1.0))
-        ]
-        
-        // Define the indices for the cube (two triangles per face)
-        var indices: [GLuint] = []
-        
-        for face in 0..<6 {
-            let start = face * 4
-            indices += [
-                GLuint(start), GLuint(start + 2), GLuint(start + 1),
-                GLuint(start), GLuint(start + 3), GLuint(start + 2)
-            ]
-        }
+                                Vertex( position: SIMD3<Float>(-0.5,-0.5,-0.5), normal: SIMD3<Float>(), texCoords: SIMD2<Float>()),
+                                Vertex( position: SIMD3<Float>( 0.5,-0.5,-0.5), normal: SIMD3<Float>(), texCoords: SIMD2<Float>()),
+                                Vertex( position: SIMD3<Float>( 0.5, 0.5,-0.5), normal: SIMD3<Float>(), texCoords: SIMD2<Float>()),
+                                Vertex( position: SIMD3<Float>(-0.5, 0.5,-0.5), normal: SIMD3<Float>(), texCoords: SIMD2<Float>()),
+                                Vertex( position: SIMD3<Float>(-0.5,-0.5, 0.5), normal: SIMD3<Float>(), texCoords: SIMD2<Float>()),
+                                Vertex( position: SIMD3<Float>( 0.5,-0.5, 0.5), normal: SIMD3<Float>(), texCoords: SIMD2<Float>()),
+                                Vertex( position: SIMD3<Float>( 0.5, 0.5, 0.5), normal: SIMD3<Float>(), texCoords: SIMD2<Float>()),
+                                Vertex( position: SIMD3<Float>(-0.5, 0.5, 0.5), normal: SIMD3<Float>(), texCoords: SIMD2<Float>())
+                                ]
+
+        //unit cube indices
+        var indices: [GLuint] =  [0,5,4,
+                                  5,0,1,
+                                  3,7,6,
+                                  3,6,2,
+                                  7,4,6,
+                                  6,4,5,
+                                  2,1,3,
+                                  3,1,0,
+                                  3,0,7,
+                                  7,0,4,
+                                  6,5,2,
+                                  2,5,1]
 
         Logger.info(indices)
-        
+
         return (vertices, indices)
     }
 }

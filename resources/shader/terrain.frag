@@ -6,8 +6,6 @@ uniform bool visualizeNormals; // Toggle for normal visualization
 uniform vec3 lightColor;
 uniform vec3 lightPos;
 
-uniform vec3 cameraPos;
-
 in vec3 fragPos;
 in vec3 normal;
 

@@ -62,7 +62,6 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
 
     let cloudMesh = CloudMesh()
     let cloudModel = CloudModel(mesh: cloudMesh, shaderName: "cloudShader")
-    ResourceManager.shared.loadModel(name: "cloudModel", model: cloudModel)
 
     let objectSpereParameters = SphereParameters(radius: 0.2, latitudeBands: 20, longitudeBands: 20)
     let objectSphere = LeonMesh(sphere: objectSpereParameters)
@@ -71,7 +70,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     Logger.info("resource loading done");
 
     // Create the scene
-    let scene = Scene(terrain: terrainModel, water: waterModel)
+    let scene = Scene(terrain: terrainModel, water: waterModel, cloud: cloudModel)
 
     let gridVertices: [Vertex] = [
         Vertex(position: SIMD3<Float>(-1.0, -1.0, 0.0),   normal: SIMD3<Float>(),   texCoords: SIMD2<Float>()),

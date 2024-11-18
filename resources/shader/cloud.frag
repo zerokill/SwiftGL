@@ -2,53 +2,56 @@
 
 uniform sampler3D tex0;
 uniform vec3 cameraPos;
-uniform vec3 lightPos;
+uniform mat4 model;
 
-in vec3 normal;
-in vec3 fragPos;
+smooth in vec3 vUV;
 
 out vec4 FragColor;
 
+//constants
+const int MAX_SAMPLES = 300;    //total samples for each ray march step
+const vec3 texMin = vec3(0);    //minimum texture access coordinate
+const vec3 texMax = vec3(1);    //maximum texture access coordinate
+
 // Ray marching parameters
-const int MAX_STEPS = 64;
-const float MAX_DISTANCE = 100.0;
-const float STEP_SIZE = MAX_DISTANCE / float(MAX_STEPS);
+const vec3 STEP_SIZE = vec3(1.0/256.0, 1.0/256.0, 1.0/256.0);
 
 void main() {
-
-    vec3 rayOrigin = cameraPos;
-    vec3 rayDirection = normalize(fragPos - cameraPos);
-
     float totalDensity = 0.0;
+
+    vec3 dataPos = vUV;
+
+    vec3 localCameraPos = vec3(inverse(model) * vec4(cameraPos, 1.0));
+
+    vec3 geomDir = normalize((vUV-vec3(0.5)) - localCameraPos);
+
+    vec3 dirStep = geomDir * STEP_SIZE;
+
+    bool stop = false;
+
     float stepDensity;
-    vec3 position;
 
-    vec3 volumeMin = vec3(-5.0, -5.0, -5.0);
-    vec3 volumeMax = vec3(5.0, 5.0, 5.0);
-    vec3 volumeSize = volumeMax - volumeMin;
+    for (int i = 0; i < MAX_SAMPLES; i++) {
+        dataPos = dataPos + dirStep;
 
-    for (int i = 0; i < MAX_STEPS; i++) {
-        float distance = float(i) * STEP_SIZE;
-        position = rayOrigin + rayDirection * distance;
-        position.z += 5.0;
-        position.y -= 5.0;
-        position.x -= 5.0;
 
-        // Sample noise texture
-        float noiseValue = texture(tex0, position * 0.010).r;
+        stop = dot(sign(dataPos-texMin),sign(texMax-dataPos)) < 3.0;
 
-        if (noiseValue > 0.1) {
-            totalDensity = 1.0;
+        if (stop)
+            break;
+
+        float sample = texture(tex0, dataPos).r;
+
+        stepDensity = clamp(sample - 0.5, 0.0, 1.0);
+
+        totalDensity += stepDensity;
+
+        if (totalDensity >= 1.0) {
             break;
         }
     }
 
-    // Compute lighting
-    vec3 lightDir = normalize(lightPos - fragPos);
-    float lightIntensity = max(dot(rayDirection, lightDir), 0.0);
-
-    // Final color
-    vec3 cloudColor = vec3(1.0) * lightIntensity;
+    vec3 cloudColor = vec3(1.0);
     FragColor = vec4(cloudColor, totalDensity);
 }
 

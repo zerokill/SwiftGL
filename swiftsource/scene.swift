@@ -11,19 +11,21 @@ class Scene {
 
     var terrain: TerrainModel
     var water: WaterModel
+    var cloud: CloudModel
 
     var octaves: Int = 4
     var previousConfig: config_t = config_t()
 
     var hdrFramebuffer: Framebuffer
 
-    init(terrain: TerrainModel, water: WaterModel) {
+    init(terrain: TerrainModel, water: WaterModel, cloud: CloudModel) {
         Logger.info("scene init");
 
         self.hdrFramebuffer = Framebuffer(internalFormat: GL_RGBA16F)
 
         self.terrain = terrain
         self.water = water
+        self.cloud = cloud
 
         if let model = ResourceManager.shared.getModel(name: "liviaModel") {
             Logger.info("liviaModel loaded");

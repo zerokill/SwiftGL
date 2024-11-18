@@ -49,6 +49,7 @@ class Renderer {
 //        renderHdr()
         renderScene(plane: SIMD4<Float>(0.0, 1.0, 0.0, 10000))
         renderWater()
+        renderCloud()
         renderLight()
 
 //        renderGui()
@@ -128,10 +129,37 @@ class Renderer {
         scene.water.draw()
     }
 
+    func renderCloud() {
+        shaderManager.use(shaderName: "cloudShader")
+        shaderManager.setUniform("model", value: scene.cloud.modelMatrix)
+        shaderManager.setUniform("view", value: camera.viewMatrix)
+        shaderManager.setUniform("proj", value: camera.projectionMatrix)
+        shaderManager.setUniform("tex0", value: GLuint(0))
+        shaderManager.setUniform("cameraPos", value: camera.position)
+        if let light = scene.light {
+            let position = SIMD3<Float>(
+                light.modelMatrix.columns.3.x,
+                light.modelMatrix.columns.3.y,
+                light.modelMatrix.columns.3.z
+            )
+            shaderManager.setUniform("lightPos",    value: position)
+            shaderManager.setUniform("lightColor",  value: light.lightColor)
+        }
+        scene.cloud.draw()
+
+    }
+
     func renderScene(plane: SIMD4<Float>) {
         // Clear the color and depth buffers
         glClearColor(0.07, 0.13, 0.17, 1.0)
         glClear(GLbitfield(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT))
+
+        let viewMatrix = getViewMatrixWithoutTranslation(from: camera.viewMatrix)
+        shaderManager.use(shaderName: "skyboxShader")
+        shaderManager.setUniform("view",    value: viewMatrix)
+        shaderManager.setUniform("proj",    value: camera.projectionMatrix)
+        shaderManager.setUniform("skybox",  value: GLuint(0))
+        scene.skybox?.draw()
 
         shaderManager.use(shaderName: "terrainShader")
         shaderManager.setUniform("view", value: camera.viewMatrix)
@@ -150,6 +178,7 @@ class Renderer {
         shaderManager.setUniform("plane", value: plane)
         scene.terrain.draw()
 
+
         for model in scene.models {
             shaderManager.use(shaderName: model.shaderName)
             if let lightModel = model as? LightModel {
@@ -157,9 +186,6 @@ class Renderer {
             }
             if let objectModel = model as? ObjectModel {
                 shaderManager.setUniform("model", value: objectModel.modelMatrix)
-            }
-            if let cloudModel = model as? CloudModel {
-                shaderManager.setUniform("model", value: cloudModel.modelMatrix)
             }
             shaderManager.setUniform("view", value: camera.viewMatrix)
             shaderManager.setUniform("proj", value: camera.projectionMatrix)
@@ -193,17 +219,13 @@ class Renderer {
             }
         }
 
+
 //        shaderManager.use(shaderName: "infiniteGridShader")
 //        shaderManager.setUniform("view", value: camera.viewMatrix)
 //        shaderManager.setUniform("proj", value: camera.projectionMatrix)
 //        shaderManager.setUniform("cameraPos", value: camera.position)
 //        scene.grid?.draw2()
 
-        let viewMatrix = getViewMatrixWithoutTranslation(from: camera.viewMatrix)
-        shaderManager.use(shaderName: "skyboxShader")
-        shaderManager.setUniform("view", value: viewMatrix)
-        shaderManager.setUniform("proj", value: camera.projectionMatrix)
-        scene.skybox?.draw()
     }
 
     func renderLight() {
