@@ -49,8 +49,8 @@ class Renderer {
 //        renderHdr()
         renderScene(plane: SIMD4<Float>(0.0, 1.0, 0.0, 10000))
         renderWater()
-        renderCloud()
         renderLight()
+        renderCloud()
 
 //        renderGui()
     }

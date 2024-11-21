@@ -126,4 +126,78 @@ func generateFractalPerlinNoise2D(width: Int, width_offset: Int, height: Int, he
     return totalNoise
 }
 
+class PerlinNoise3D {
+    private var permutation: [Int]
+
+    init(seed: UInt32 = 0) {
+        // Initialize the permutation array with a given seed
+        var p = Array(0...255)
+        p.shuffle()
+        permutation = p + p // Extend the permutation array
+    }
+
+    private func fade(_ t: Float) -> Float {
+        // Fade function as defined by Ken Perlin
+        return t * t * t * (t * (t * 6 - 15) + 10)
+    }
+
+    private func lerp(_ t: Float, _ a: Float, _ b: Float) -> Float {
+        // Linear interpolation
+        return a + t * (b - a)
+    }
+
+    private func grad(_ hash: Int, _ x: Float, _ y: Float, _ z: Float) -> Float {
+        // Convert lower 4 bits of hash code into 12 gradient directions
+        let h = hash & 15
+        let u = h < 8 ? x : y
+        let v = h < 4 ? y : (h == 12 || h == 14 ? x : z)
+        return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v)
+    }
+
+    func noise(x: Float, y: Float, z: Float) -> Float {
+        // Calculate unit cube coordinates
+        let xi = Int(floor(x)) & 255
+        let yi = Int(floor(y)) & 255
+        let zi = Int(floor(z)) & 255
+
+        // Relative position in cube
+        let xf = x - floor(x)
+        let yf = y - floor(y)
+        let zf = z - floor(z)
+
+        // Fade curves
+        let u = fade(xf)
+        let v = fade(yf)
+        let w = fade(zf)
+
+        // Hash coordinates
+        let aaa = permutation[permutation[permutation[xi] + yi] + zi]
+        let aba = permutation[permutation[permutation[xi] + yi + 1] + zi]
+        let aab = permutation[permutation[permutation[xi] + yi] + zi + 1]
+        let abb = permutation[permutation[permutation[xi] + yi + 1] + zi + 1]
+        let baa = permutation[permutation[permutation[xi + 1] + yi] + zi]
+        let bba = permutation[permutation[permutation[xi + 1] + yi + 1] + zi]
+        let bab = permutation[permutation[permutation[xi + 1] + yi] + zi + 1]
+        let bbb = permutation[permutation[permutation[xi + 1] + yi + 1] + zi + 1]
+
+        // Blend results from corners
+        let x1 = lerp(u, grad(aaa, xf, yf, zf), grad(baa, xf - 1, yf, zf))
+        let x2 = lerp(u, grad(aba, xf, yf - 1, zf), grad(bba, xf - 1, yf - 1, zf))
+        let y1 = lerp(v, x1, x2)
+
+        let x3 = lerp(u, grad(aab, xf, yf, zf - 1), grad(bab, xf - 1, yf, zf - 1))
+        let x4 = lerp(u, grad(abb, xf, yf - 1, zf - 1), grad(bbb, xf - 1, yf - 1, zf - 1))
+        let y2 = lerp(v, x3, x4)
+
+        let result = lerp(w, y1, y2)
+
+        return (result + 1) / 2 // Normalize to [0,1]
+    }
+}
+
+// Helper struct for seeded randomization
+struct RandomNumberGeneratorSeeded: RandomNumberGenerator {
+    init(seed: UInt32) { srand48(Int(seed)) }
+    mutating func next() -> UInt64 { return UInt64(drand48() * Double(UInt64.max)) }
+}
 

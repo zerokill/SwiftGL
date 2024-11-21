@@ -21,7 +21,7 @@ class CloudMesh: Mesh {
                                 ]
 
         //unit cube indices
-        var indices: [GLuint] =  [0,5,4,
+        let indices: [GLuint] =  [0,5,4,
                                   5,0,1,
                                   3,7,6,
                                   3,6,2,
@@ -33,8 +33,6 @@ class CloudMesh: Mesh {
                                   7,0,4,
                                   6,5,2,
                                   2,5,1]
-
-        Logger.info(indices)
 
         return (vertices, indices)
     }
