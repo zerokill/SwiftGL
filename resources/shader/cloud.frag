@@ -56,11 +56,22 @@ float fbm(vec3 p) {
 
 
 float sampleDensity(vec3 p) {
-//    float d = clamp(texture(tex0, p).r - 0.5, 0.0, 1.0);
     float raw   = texture(tex0, p).r;
     float noise = fbm(p);
     float d     = clamp(raw + noise * 0.5 - 0.5, 0.0, 1.0);
     return d;
+}
+
+float sdSphere(vec3 p, float radius) {
+  return length(p) - radius;
+}
+
+float scene(vec3 p) {
+  float distance = sdSphere(p - 0.5, 0.5);
+
+  float f = fbm(p);
+
+  return -distance + f;
 }
 
 vec4 raymarchMau2(vec3 rayOrigin) {
@@ -88,13 +99,13 @@ vec4 raymarchMau2(vec3 rayOrigin) {
     for (int i = 0; i < NUM_STEPS; i++) {
         rayOrigin += rayStep;
 
-
         // Bail when outside [0,1]^3
         if (any(lessThan(rayOrigin, texMin)) ||
             any(greaterThan(rayOrigin, texMax)))
             break;
 
-        float d = sampleDensity(rayOrigin);
+//        float d = sampleDensity(rayOrigin);
+        float d = scene(rayOrigin);
         if (d < 0.001) continue;        // empty space skip
 
         // ------- Shadow pass ---------
@@ -132,8 +143,43 @@ vec4 raymarchMau2(vec3 rayOrigin) {
 }
 
 
+vec4 raymarchMau3(vec3 rayOrigin) {
+    const int NUM_STEPS = 100;
+    const float MARCH_SIZE = 0.08;
+
+    float tStep = 1.0/float(NUM_STEPS);
+
+    vec3 localCameraPos = vec3(inverse(model) * vec4(cameraPos, 1.0));
+    vec3 rayDirection = normalize((vUV-vec3(0.5)) - localCameraPos);
+    vec3 rayStep = rayDirection * tStep;
+
+
+    vec4 res = vec4(0.0);
+
+
+    for (int i = 0; i < NUM_STEPS; i++) {
+        float density = scene(rayOrigin);
+
+        if (density > 0.0)
+        {
+            vec4 color = vec4(mix(vec3(1.0,1.0,1.0), vec3(0.0, 0.0, 0.0), density), density );
+            color.rgb *= color.a;
+            res += color*(1.0-res.a);
+        }
+
+
+        rayOrigin += rayStep;
+
+
+    }
+
+    return res;
+
+}
+
+
 void main() {
     vec3 dataPos = vUV;
 
-    FragColor = raymarchMau2(dataPos);
+    FragColor = raymarchMau3(dataPos);
 }

@@ -9,8 +9,8 @@ class CloudModel: BaseModel {
     var noiseTexture: texture_t
 
     init(mesh: Mesh, shaderName: String, texture: texture_t) {
-        let scale = SIMD3<Float>(4.0, 2.0, 4.0)
-        modelMatrix = float4x4.translation(SIMD3<Float>(10.0, 10.0, 0.0)) * float4x4.scale(scale)
+        let scale = SIMD3<Float>(2.0, 2.0, 2.0)
+        modelMatrix = float4x4.translation(SIMD3<Float>(5.0, 10.0, 0.0)) * float4x4.scale(scale)
 //        self.noiseTexture = CloudModel.generate3DNoiseTexture(size: 256)
 //        self.noiseTexture = CloudModel.loadBinaryCube(from: "resources/Engine256.raw")
         self.noiseTexture = CloudModel.generatePerlin3DNoiseTexture(size: 128)
@@ -23,26 +23,26 @@ class CloudModel: BaseModel {
         let perlin = PerlinNoise3D()
         let dataSize = size * size * size
         var data = [GLubyte](repeating: 0, count: dataSize)
-    
+
         for z in 0..<size {
             for y in 0..<size {
                 for x in 0..<size {
                     let nx = Float(x) / Float(size)
                     let ny = Float(y) / Float(size)
                     let nz = Float(z) / Float(size)
-                    let noiseValue = perlin.noise(x: nx * 10, y: ny * 10, z: nz * 10)
+                    let noiseValue = 0.5 //perlin.noise(x: nx * 10, y: ny * 10, z: nz * 10)
                     let index = x + y * size + z * size * size
                     data[index] = GLubyte(noiseValue * 255)
                 }
             }
         }
-    
+
         var texture = texture_t()
         texture.type = GLenum(GL_TEXTURE_3D)
 
         glGenTextures(1, &texture.ID)
         glBindTexture(GLenum(GL_TEXTURE_3D), texture.ID)
-    
+
         glTexImage3D(texture.type, 0, GL_R8, GLsizei(size), GLsizei(size), GLsizei(size), 0, GLenum(GL_RED), GLenum(GL_UNSIGNED_BYTE), &data)
 
         glTexParameteri(GLenum(GL_TEXTURE_3D), GLenum(GL_TEXTURE_WRAP_S), GLint(GL_CLAMP))
