@@ -1,9 +1,11 @@
 #version 330 core
 
 uniform sampler3D tex0;
+uniform sampler2D noiseTexture;
 uniform vec3 cameraPos;
 uniform vec3 lightPos;
 uniform mat4 model;
+uniform float uTime;
 
 smooth in vec3 vUV;
 
@@ -11,24 +13,71 @@ out vec4 FragColor;
 
 //constants
 const int MAX_SAMPLES = 300;    //total samples for each ray march step
+const float PI = 3.14159265359;
+const float PHASEG = 0.8;
+
 const vec3 texMin = vec3(0);    //minimum texture access coordinate
 const vec3 texMax = vec3(1);    //maximum texture access coordinate
+
+// precompute once
+float phaseHG(float cosTheta, float g) {
+    float denom = 4.0 * PI * pow(1.0 - g*g, 1.5);
+    return (1.0 - g*g) / (denom * pow(1.0 + g*g - 2.0*g*cosTheta, 1.5));
+}
+
+float noise(vec3 x ) {
+  vec3 p = floor(x);
+  vec3 f = fract(x);
+  f = f*f*(3.0-2.0*f);
+
+  vec2 uv = (p.xy+vec2(37.0,239.0)*p.z) + f.xy;
+  vec2 tex = texture(noiseTexture,(uv)/256.0).yx;
+
+  return mix( tex.x, tex.y, f.z ) * 2.0 - 1.0;
+}
+
+float fbm(vec3 p) {
+  vec3 q = p + uTime * 0.5 * vec3(1.0, -0.2, -1.0);
+  float g = noise(q);
+
+  float f = 0.0;
+  float scale = 0.5;
+  float factor = 2.02;
+
+  for (int i = 0; i < 6; i++) {
+      f += scale * noise(q);
+      q *= factor;
+      factor += 0.21;
+      scale *= 0.5;
+  }
+
+  return f;
+}
+
+
+float sampleDensity(vec3 p) {
+//    float d = clamp(texture(tex0, p).r - 0.5, 0.0, 1.0);
+    float raw   = texture(tex0, p).r;
+    float noise = fbm(p);
+    float d     = clamp(raw + noise * 0.5 - 0.5, 0.0, 1.0);
+    return d;
+}
 
 vec4 raymarchMau2(vec3 rayOrigin) {
     const int NUM_STEPS = 50;
     const int NUM_LIGHT_STEPS = 20;
 
-    const vec3 STEP_SIZE = vec3(1.0/NUM_STEPS, 1.0/NUM_STEPS, 1.0/NUM_STEPS);
+    float tStep = 1.0/float(NUM_STEPS);
 
     vec3 localCameraPos = vec3(inverse(model) * vec4(cameraPos, 1.0));
     vec3 localSunPos = vec3(inverse(model) * vec4(lightPos, 1.0));
     vec3 rayDirection = normalize((vUV-vec3(0.5)) - localCameraPos);
-    vec3 rayStep = rayDirection * STEP_SIZE;
+    vec3 rayStep = rayDirection * tStep;
 
     vec3 lightRayOrigin = vec3(0.0);
     vec3 lightDir = vec3(0.0);
 
-    float transmittance = 1.5;
+    float transmittance = 1.0;
     const float DARKNESS_THRESHOLD = 0.10;
 
     float density = 0.0;
@@ -37,47 +86,49 @@ vec4 raymarchMau2(vec3 rayOrigin) {
     float finalLight = 0.0;
 
     for (int i = 0; i < NUM_STEPS; i++) {
-        rayOrigin += rayDirection * STEP_SIZE;
-        lightDir = normalize(localSunPos - rayOrigin);
+        rayOrigin += rayStep;
 
-        if (dot(sign(rayOrigin-texMin),sign(texMax-rayOrigin)) < 3.0) {
+
+        // Bail when outside [0,1]^3
+        if (any(lessThan(rayOrigin, texMin)) ||
+            any(greaterThan(rayOrigin, texMax)))
             break;
-        }
 
-        float sampleDensity = texture(tex0, rayOrigin).r;
+        float d = sampleDensity(rayOrigin);
+        if (d < 0.001) continue;        // empty space skip
 
-        // Compute density
-        float stepDensity = clamp(sampleDensity - 0.5, 0.0, 1.0);
+        // ------- Shadow pass ---------
+        float lightT = 1.0;
+        vec3  lightPosStep = rayOrigin;
+        vec3  lightDir = normalize(localSunPos - rayOrigin);
+        for (int j = 0; j < NUM_LIGHT_STEPS; ++j)
+        {
+            lightPosStep += lightDir * 0.1;          // light step size
 
-        density += stepDensity;
-
-        lightRayOrigin = rayOrigin;
-        for (int j = 0; j < NUM_LIGHT_STEPS; j++) {
-            const vec3 LIGHT_STEP_SIZE = vec3(1.0/10, 1.0/10, 1.0/10);
-            lightRayOrigin += lightDir*(LIGHT_STEP_SIZE);
-
-            if (dot(sign(lightRayOrigin-texMin),sign(texMax-lightRayOrigin)) < 3.0) {
+            if (any(lessThan(lightPosStep, texMin)) ||
+                any(greaterThan(lightPosStep, texMax)))
                 break;
-            }
 
-            float lightDensity = texture(tex0, lightRayOrigin).r;
-            float stepLightDensity = clamp(lightDensity - 0.5, 0.0, 1.0);
-
-            lightAccumulation += stepLightDensity;
+            float ld = sampleDensity(lightPosStep);
+            lightT *= exp(-ld * 2.0);                // extinction
+            if (lightT < 0.01) break;               // early shadow exit
         }
 
-        float lightTransmission = exp(-lightAccumulation);
+        // Phase-based scattering
+        float cosTheta = dot(rayDirection, lightDir);
+        float phase    = phaseHG(cosTheta, PHASEG);
+        float shaded   = phase * lightT;
 
-        float shadow = DARKNESS_THRESHOLD + lightTransmission * (1.0 - DARKNESS_THRESHOLD);
+        // ------- Accumulate color -------
+        finalLight    += d * shaded * transmittance;
+        transmittance *= exp(-d * 2.0);
 
-        finalLight += density*transmittance*shadow;
+        if (transmittance < 0.01) break;             // early primary exit
 
-        transmittance *= exp(-density*0.5);
     }
 
-    transmission = exp(-density);
+    return vec4(vec3(finalLight), 1.0 - transmittance);
 
-    return vec4(vec3(finalLight), 1-transmission);
 }
 
 

@@ -8,13 +8,14 @@ class CloudModel: BaseModel {
     var modelMatrix: float4x4 = matrix_identity_float4x4
     var noiseTexture: texture_t
 
-    init(mesh: Mesh, shaderName: String) {
+    init(mesh: Mesh, shaderName: String, texture: texture_t) {
         let scale = SIMD3<Float>(4.0, 2.0, 4.0)
         modelMatrix = float4x4.translation(SIMD3<Float>(10.0, 10.0, 0.0)) * float4x4.scale(scale)
 //        self.noiseTexture = CloudModel.generate3DNoiseTexture(size: 256)
 //        self.noiseTexture = CloudModel.loadBinaryCube(from: "resources/Engine256.raw")
         self.noiseTexture = CloudModel.generatePerlin3DNoiseTexture(size: 128)
-        super.init(mesh: mesh, shaderName: shaderName, texture: nil)
+//        super.init(mesh: mesh, shaderName: shaderName, texture: nil)
+        super.init(mesh: mesh, shaderName: shaderName, texture: texture)
     }
 
 
@@ -128,6 +129,11 @@ class CloudModel: BaseModel {
 
         glActiveTexture(GLenum(GL_TEXTURE0))
         glBindTexture(self.noiseTexture.type, self.noiseTexture.ID)
+
+        if let texture = self.texture {
+            glActiveTexture(GLenum(GL_TEXTURE1))
+            glBindTexture(texture.type, texture.ID)
+        }
 
         mesh.draw()
 

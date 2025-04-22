@@ -42,7 +42,7 @@ class Renderer {
         glDisable(GLenum(GL_FRAMEBUFFER_SRGB))
     }
 
-    func render() {
+    func render(deltaTime: Float) {
         ImGuiWrapper_Text(String(format: "test"))
         renderReflection()
         renderRefraction()
@@ -50,7 +50,7 @@ class Renderer {
         renderScene(plane: SIMD4<Float>(0.0, 1.0, 0.0, 10000))
         renderWater()
         renderLight()
-        renderCloud()
+        renderCloud(deltaTime: deltaTime)
 
 //        renderGui()
     }
@@ -129,13 +129,15 @@ class Renderer {
         scene.water.draw()
     }
 
-    func renderCloud() {
+    func renderCloud(deltaTime: Float) {
         shaderManager.use(shaderName: "cloudShader")
-        shaderManager.setUniform("model", value: scene.cloud.modelMatrix)
-        shaderManager.setUniform("view", value: camera.viewMatrix)
-        shaderManager.setUniform("proj", value: camera.projectionMatrix)
-        shaderManager.setUniform("tex0", value: GLuint(0))
-        shaderManager.setUniform("cameraPos", value: camera.position)
+        shaderManager.setUniform("model",           value: scene.cloud.modelMatrix)
+        shaderManager.setUniform("view",            value: camera.viewMatrix)
+        shaderManager.setUniform("proj",            value: camera.projectionMatrix)
+        shaderManager.setUniform("tex0",            value: Int32(0)) //GLuint(0))
+        shaderManager.setUniform("noiseTexture",    value: Int32(1)) //GLuint(1))
+        shaderManager.setUniform("cameraPos",       value: camera.position)
+        shaderManager.setUniform("uTime",           value: deltaTime)
         if let light = scene.light {
             let position = SIMD3<Float>(
                 light.modelMatrix.columns.3.x,
