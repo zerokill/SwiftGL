@@ -132,12 +132,13 @@ class Renderer {
     func renderCloud(deltaTime: Float) {
         shaderManager.use(shaderName: "cloudShader")
         shaderManager.setUniform("model",           value: scene.cloud.modelMatrix)
+        shaderManager.setUniform("invModel",        value: simd_inverse(scene.cloud.modelMatrix))
         shaderManager.setUniform("view",            value: camera.viewMatrix)
         shaderManager.setUniform("proj",            value: camera.projectionMatrix)
         shaderManager.setUniform("tex0",            value: Int32(0)) //GLuint(0))
         shaderManager.setUniform("noiseTexture",    value: Int32(1)) //GLuint(1))
         shaderManager.setUniform("cameraPos",       value: camera.position)
-        shaderManager.setUniform("uTime",           value: deltaTime)
+        shaderManager.setUniform("uTime",           value: deltaTime/10.0)
         if let light = scene.light {
             let position = SIMD3<Float>(
                 light.modelMatrix.columns.3.x,

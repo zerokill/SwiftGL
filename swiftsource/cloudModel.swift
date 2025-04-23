@@ -9,11 +9,11 @@ class CloudModel: BaseModel {
     var noiseTexture: texture_t
 
     init(mesh: Mesh, shaderName: String, texture: texture_t) {
-        let scale = SIMD3<Float>(2.0, 2.0, 2.0)
-        modelMatrix = float4x4.translation(SIMD3<Float>(5.0, 10.0, 0.0)) * float4x4.scale(scale)
+        let scale = SIMD3<Float>(10.0, 10.0, 10.0)
+        modelMatrix = float4x4.translation(SIMD3<Float>(15.0, 10.0, 0.0)) * float4x4.scale(scale)
 //        self.noiseTexture = CloudModel.generate3DNoiseTexture(size: 256)
 //        self.noiseTexture = CloudModel.loadBinaryCube(from: "resources/Engine256.raw")
-        self.noiseTexture = CloudModel.generatePerlin3DNoiseTexture(size: 128)
+        self.noiseTexture = CloudModel.generatePerlin3DNoiseTexture(size: 32)
 //        super.init(mesh: mesh, shaderName: shaderName, texture: nil)
         super.init(mesh: mesh, shaderName: shaderName, texture: texture)
     }
@@ -30,7 +30,7 @@ class CloudModel: BaseModel {
                     let nx = Float(x) / Float(size)
                     let ny = Float(y) / Float(size)
                     let nz = Float(z) / Float(size)
-                    let noiseValue = 0.5 //perlin.noise(x: nx * 10, y: ny * 10, z: nz * 10)
+                    let noiseValue = perlin.noise(x: nx, y: ny, z: nz)
                     let index = x + y * size + z * size * size
                     data[index] = GLubyte(noiseValue * 255)
                 }
@@ -45,9 +45,9 @@ class CloudModel: BaseModel {
 
         glTexImage3D(texture.type, 0, GL_R8, GLsizei(size), GLsizei(size), GLsizei(size), 0, GLenum(GL_RED), GLenum(GL_UNSIGNED_BYTE), &data)
 
-        glTexParameteri(GLenum(GL_TEXTURE_3D), GLenum(GL_TEXTURE_WRAP_S), GLint(GL_CLAMP))
-        glTexParameteri(GLenum(GL_TEXTURE_3D), GLenum(GL_TEXTURE_WRAP_T), GLint(GL_CLAMP))
-        glTexParameteri(GLenum(GL_TEXTURE_3D), GLenum(GL_TEXTURE_WRAP_R), GLint(GL_CLAMP))
+        glTexParameteri(GLenum(GL_TEXTURE_3D), GLenum(GL_TEXTURE_WRAP_S), GLint(GL_REPEAT))
+        glTexParameteri(GLenum(GL_TEXTURE_3D), GLenum(GL_TEXTURE_WRAP_T), GLint(GL_REPEAT))
+        glTexParameteri(GLenum(GL_TEXTURE_3D), GLenum(GL_TEXTURE_WRAP_R), GLint(GL_REPEAT))
 
         glTexParameteri(GLenum(GL_TEXTURE_3D), GLenum(GL_TEXTURE_MAG_FILTER), GL_LINEAR);
         glTexParameteri(GLenum(GL_TEXTURE_3D), GLenum(GL_TEXTURE_MIN_FILTER), GL_LINEAR);
