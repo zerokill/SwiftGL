@@ -2,6 +2,7 @@
 
 uniform sampler3D tex0;
 uniform sampler2D noiseTexture;
+uniform sampler2D bluenoiseTexture;
 uniform vec3 cameraPos;
 uniform vec3 lightPos;
 uniform mat4 model;
@@ -11,6 +12,9 @@ uniform float uTime;
 smooth in vec3 vUV;
 
 out vec4 FragColor;
+
+#define MAX_STEPS 50
+#define ABSORPTION_COEFFICIENT 0.9
 
 float noise(vec3 x ) {
   vec3 p = floor(x);
@@ -23,10 +27,6 @@ float noise(vec3 x ) {
   return mix( tex.x, tex.y, f.z ) * 2.0 - 1.0;
 }
 
-float noise3d(vec3 x) {
-    return texture(tex0, (x+0.5)/32.0).r;
-}
-
 float fbm(vec3 p) {
   vec3 q = p + uTime * 0.5 * vec3(1.0, -0.2, -1.0);
   float g = noise(q);
@@ -35,7 +35,7 @@ float fbm(vec3 p) {
   float scale = 0.5;
   float factor = 2.02;
 
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < 5; i++) {
       f += scale * noise(q);
       q *= factor;
       factor += 0.21;
@@ -57,20 +57,19 @@ float scene(vec3 p) {
   return -distance + f;
 }
 
-vec4 raymarchMau3(vec3 rayOrigin) {
-    const int NUM_STEPS = 100;
-    const float MARCH_SIZE = 0.03;
+vec4 raymarchDiffuse(vec3 rayOrigin, float offset) {
+    const float MARCH_SIZE = 0.16;
 
     vec3 localCameraPos = vec3(invModel * vec4(cameraPos, 1.0));
     vec3 rayDirection = normalize((vUV-vec3(0.5)) - localCameraPos);
-    vec3 rayStep = rayDirection * MARCH_SIZE;
+    vec3 rayStep = rayDirection * MARCH_SIZE * offset;
 
     vec3 localSunPos = vec3(invModel * vec4(lightPos, 1.0));
     vec3 lightDir = normalize(localSunPos - rayOrigin);
 
     vec4 res = vec4(0.0);
 
-    for (int i = 0; i < NUM_STEPS; i++) {
+    for (int i = 0; i < MAX_STEPS; i++) {
         float density = scene(rayOrigin);
 
         if (density > 0.0)
@@ -93,9 +92,13 @@ vec4 raymarchMau3(vec3 rayOrigin) {
     return res;
 }
 
-
 void main() {
     vec3 dataPos = vUV;
 
-    FragColor = raymarchMau3(dataPos);
+    // Not sure if this works
+    float blueNoise = texture(bluenoiseTexture, vUV.xy / 1024.0).r;
+    float offset = fract(blueNoise); // + float(uTime) / sqrt(0.5));
+
+
+    FragColor = raymarchDiffuse(dataPos, offset);
 }

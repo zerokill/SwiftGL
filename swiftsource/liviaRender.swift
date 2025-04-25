@@ -22,6 +22,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     let leonTexture = texture("resources/leon.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGB), GLenum(GL_UNSIGNED_BYTE))
     let sheepTexture = texture("resources/sheep.jpg", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGB), GLenum(GL_UNSIGNED_BYTE))
     let noiseTexture = texture("resources/noise2.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGBA), GLenum(GL_UNSIGNED_BYTE))
+    let bluenoiseTexture = texture("resources/LDR_RGBA_0.png", GLenum(GL_TEXTURE_2D), GLenum(GL_TEXTURE0), GLenum(GL_RGBA), GLenum(GL_UNSIGNED_BYTE))
     let skyTexture = textureCubeMap(images: [
             "resources/skybox/right.jpg",
             "resources/skybox/left.jpg",
@@ -36,6 +37,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     ResourceManager.shared.loadTexture(name: "leonTexture", texture: leonTexture)
     ResourceManager.shared.loadTexture(name: "sheepTexture", texture: sheepTexture)
     ResourceManager.shared.loadTexture(name: "noiseTexture", texture: noiseTexture)
+    ResourceManager.shared.loadTexture(name: "bluenoiseTexture", texture: bluenoiseTexture)
     ResourceManager.shared.loadTexture(name: "skyboxTexture", texture: skyTexture)
 
     let terrainMesh = TerrainMesh(width: 1000, width_offset: 0, depth: 1000, depth_offset: 0, scale: 5, octaves: 9, persistence: 0.5, exponent: 0.0, height: 1.0, seed: 1)
@@ -63,7 +65,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     }
 
     let cloudMesh = CloudMesh()
-    let cloudModel = CloudModel(mesh: cloudMesh, shaderName: "cloudShader", texture: noiseTexture)
+    let cloudModel = CloudModel(mesh: cloudMesh, shaderName: "cloudShader", texture: noiseTexture, texture2: bluenoiseTexture)
 
     let objectSpereParameters = SphereParameters(radius: 0.2, latitudeBands: 20, longitudeBands: 20)
     let objectSphere = LeonMesh(sphere: objectSpereParameters)

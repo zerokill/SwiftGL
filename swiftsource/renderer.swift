@@ -137,6 +137,7 @@ class Renderer {
         shaderManager.setUniform("proj",            value: camera.projectionMatrix)
         shaderManager.setUniform("tex0",            value: Int32(0)) //GLuint(0))
         shaderManager.setUniform("noiseTexture",    value: Int32(1)) //GLuint(1))
+        shaderManager.setUniform("bluenoiseTexture",value: Int32(2)) //GLuint(1))
         shaderManager.setUniform("cameraPos",       value: camera.position)
         shaderManager.setUniform("uTime",           value: deltaTime/10.0)
         if let light = scene.light {
