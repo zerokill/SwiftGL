@@ -48,4 +48,5 @@ void ImGuiWrapper_SwapBuffers(GLFWwindow* window);
 void ImGuiWrapper_RenderStart();
 void ImGuiWrapper_RenderEnd();
 void ImGuiWrapper_Text(const char* text);
+void ImGuiWrapper_SliderFloat(const char* text);
 config_t ImGuiWrapper_Config();

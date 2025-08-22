@@ -108,6 +108,11 @@ void ImGuiWrapper_Text(const char* text) {
     ImGui::Text(text);
 }
 
+float ImGuiWrapper_SliderFloat(const char* text) {
+    static float slider;
+    ImGui::SliderFloat(text, &slider, -10.0f, 10.0f, "%.3f");
+}
+
 GLFWwindow* ImGuiWrapper_CreateWindow(int width, int height, const char* title) {
     if (!glfwInit()) {
         return nullptr;

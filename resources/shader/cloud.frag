@@ -50,6 +50,7 @@ float sdSphere(vec3 p, float radius) {
 }
 
 float scene(vec3 p) {
+    return fbm(p);
   float distance = sdSphere(p - 0.5, 0.5);
 
   float f = fbm(p);

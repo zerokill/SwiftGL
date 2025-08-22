@@ -43,7 +43,7 @@ class Renderer {
     }
 
     func render(deltaTime: Float) {
-        ImGuiWrapper_Text(String(format: "test"))
+        ImGuiWrapper_Text(String(format: "test2"))
         renderReflection()
         renderRefraction()
 //        renderHdr()
@@ -130,6 +130,7 @@ class Renderer {
     }
 
     func renderCloud(deltaTime: Float) {
+        float slider = ImGuiWrapper_SliderFloat(String(format: "test2"))
         shaderManager.use(shaderName: "cloudShader")
         shaderManager.setUniform("model",           value: scene.cloud.modelMatrix)
         shaderManager.setUniform("invModel",        value: simd_inverse(scene.cloud.modelMatrix))
