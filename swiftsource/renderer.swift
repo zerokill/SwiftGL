@@ -18,6 +18,12 @@ class Renderer {
     var rotation_x: Float = 0.0
     var rotation_y: Float = 0.0
     var time: Float = 0.0
+    var cloudConfig: cloud_config_t = cloud_config_t(
+        coverage: 0.62, densityScale: 10.0, absorption: 1.0, darkness: 0.15,
+        phaseG: 0.35, scatterStrength: 12.5, tiling: 1.0, detailWeight: 0.35,
+        windSpeed: 0.02, windDirX: 1.0, windDirZ: 0.3, evolveSpeed: 0.015,
+        steps: 96, lightSteps: 12, noiseOctaves: 6, noisePeriod: 4.0,
+        noiseSeed: 1, regenerate: false)
 
     init(width: Int32, height: Int32, scene: Scene) {
         camera = Camera(position: SIMD3(0.0, 10.0, 0.0), target: SIMD3(0.0, 0.0, 0.0), worldUp: SIMD3(0.0, 1.0, 0.0))
@@ -139,21 +145,23 @@ class Renderer {
         shaderManager.setUniform("tex0", value: Int32(0))
         shaderManager.setUniform("cameraPos", value: camera.position)
 
-        // Raymarch parameters (hardcoded until the ImGui cloud config lands)
-        shaderManager.setUniform("uCoverage",        value: Float(0.62))
-        shaderManager.setUniform("uDensityScale",    value: Float(10.0))
-        shaderManager.setUniform("uAbsorption",      value: Float(1.0))
-        shaderManager.setUniform("uDarkness",        value: Float(0.15))
-        shaderManager.setUniform("uPhaseG",          value: Float(0.35))
-        shaderManager.setUniform("uScatterStrength", value: Float(12.5))
-        shaderManager.setUniform("uTiling",          value: Float(1.0))
-        shaderManager.setUniform("uDetailWeight",    value: Float(0.35))
-        shaderManager.setUniform("uSteps",           value: Int32(96))
-        shaderManager.setUniform("uLightSteps",      value: Int32(12))
+        var windDir = SIMD3<Float>(cloudConfig.windDirX, 0.0, cloudConfig.windDirZ)
+        windDir = length(windDir) > 1e-4 ? normalize(windDir) : SIMD3<Float>(1.0, 0.0, 0.0)
+
+        shaderManager.setUniform("uCoverage",        value: cloudConfig.coverage)
+        shaderManager.setUniform("uDensityScale",    value: cloudConfig.densityScale)
+        shaderManager.setUniform("uAbsorption",      value: cloudConfig.absorption)
+        shaderManager.setUniform("uDarkness",        value: cloudConfig.darkness)
+        shaderManager.setUniform("uPhaseG",          value: cloudConfig.phaseG)
+        shaderManager.setUniform("uScatterStrength", value: cloudConfig.scatterStrength)
+        shaderManager.setUniform("uTiling",          value: cloudConfig.tiling)
+        shaderManager.setUniform("uDetailWeight",    value: cloudConfig.detailWeight)
+        shaderManager.setUniform("uSteps",           value: cloudConfig.steps)
+        shaderManager.setUniform("uLightSteps",      value: cloudConfig.lightSteps)
         shaderManager.setUniform("uTime",            value: time)
-        shaderManager.setUniform("uWindDir",         value: normalize(SIMD3<Float>(1.0, 0.0, 0.3)))
-        shaderManager.setUniform("uWindSpeed",       value: Float(0.02))
-        shaderManager.setUniform("uEvolveSpeed",     value: Float(0.015))
+        shaderManager.setUniform("uWindDir",         value: windDir)
+        shaderManager.setUniform("uWindSpeed",       value: cloudConfig.windSpeed)
+        shaderManager.setUniform("uEvolveSpeed",     value: cloudConfig.evolveSpeed)
 
         if let light = scene.light {
             let position = SIMD3<Float>(

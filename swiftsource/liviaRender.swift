@@ -133,6 +133,17 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     while glfwWindowShouldClose(window) == 0 {
         ImGuiWrapper_RenderStart()
         config = ImGuiWrapper_Config()
+        let cloudConfig = ImGuiWrapper_CloudConfig()
+        renderer.cloudConfig = cloudConfig
+        if cloudConfig.regenerate {
+            scene.cloud.regenerateNoise(shaderManager: renderer.shaderManager,
+                                        size: 128,
+                                        octaves: cloudConfig.noiseOctaves,
+                                        period: cloudConfig.noisePeriod,
+                                        seed: GLuint(cloudConfig.noiseSeed),
+                                        displayWidth: width,
+                                        displayHeight: height)
+        }
         ImGuiWrapper_Text(String(format: "FPS: %-4.0f",             1.0/dt))
         ImGuiWrapper_Text(String(format: "numLeon: %0d",            stats.numLeon))
         ImGuiWrapper_Text(String(format: "numLivia: %0d",           stats.numLivia))

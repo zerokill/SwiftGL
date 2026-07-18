@@ -88,6 +88,69 @@ config_t ImGuiWrapper_Config() {
     return config;
 }
 
+cloud_config_t ImGuiWrapper_CloudConfig() {
+    static float coverage = 0.62f;
+    static float densityScale = 10.0f;
+    static float absorption = 1.0f;
+    static float darkness = 0.15f;
+    static float phaseG = 0.35f;
+    static float scatterStrength = 12.5f;
+    static float tiling = 1.0f;
+    static float detailWeight = 0.35f;
+    static float windSpeed = 0.02f;
+    static float windDirX = 1.0f;
+    static float windDirZ = 0.3f;
+    static float evolveSpeed = 0.015f;
+    static int steps = 96;
+    static int lightSteps = 12;
+    static int noiseOctaves = 6;
+    static float noisePeriod = 4.0f;
+    static int noiseSeed = 1;
+
+    cloud_config_t config;
+    config.regenerate = false;
+
+    if (ImGui::CollapsingHeader("Clouds")) {
+        ImGui::SliderFloat("coverage", &coverage, 0.0f, 1.0f, "%.3f");
+        ImGui::SliderFloat("density", &densityScale, 0.0f, 40.0f, "%.1f");
+        ImGui::SliderFloat("absorption", &absorption, 0.0f, 4.0f, "%.2f");
+        ImGui::SliderFloat("darkness", &darkness, 0.0f, 1.0f, "%.2f");
+        ImGui::SliderFloat("phase g", &phaseG, -0.99f, 0.99f, "%.2f");
+        ImGui::SliderFloat("scatter", &scatterStrength, 0.0f, 50.0f, "%.1f");
+        ImGui::SliderFloat("tiling", &tiling, 0.25f, 8.0f, "%.2f");
+        ImGui::SliderFloat("detail weight", &detailWeight, 0.0f, 1.0f, "%.2f");
+        ImGui::SliderFloat("wind speed", &windSpeed, 0.0f, 0.2f, "%.3f");
+        ImGui::SliderFloat("wind dir x", &windDirX, -1.0f, 1.0f, "%.2f");
+        ImGui::SliderFloat("wind dir z", &windDirZ, -1.0f, 1.0f, "%.2f");
+        ImGui::SliderFloat("evolve speed", &evolveSpeed, 0.0f, 0.2f, "%.3f");
+        ImGui::SliderInt("steps", &steps, 8, 256);
+        ImGui::SliderInt("light steps", &lightSteps, 1, 64);
+        ImGui::SliderInt("noise octaves", &noiseOctaves, 2, 8);
+        ImGui::SliderFloat("noise period", &noisePeriod, 1.0f, 16.0f, "%.0f");
+        ImGui::SliderInt("noise seed", &noiseSeed, 1, 1000);
+        config.regenerate = ImGui::Button("Regenerate noise");
+    }
+
+    config.coverage = coverage;
+    config.densityScale = densityScale;
+    config.absorption = absorption;
+    config.darkness = darkness;
+    config.phaseG = phaseG;
+    config.scatterStrength = scatterStrength;
+    config.tiling = tiling;
+    config.detailWeight = detailWeight;
+    config.windSpeed = windSpeed;
+    config.windDirX = windDirX;
+    config.windDirZ = windDirZ;
+    config.evolveSpeed = evolveSpeed;
+    config.steps = steps;
+    config.lightSteps = lightSteps;
+    config.noiseOctaves = noiseOctaves;
+    config.noisePeriod = noisePeriod;
+    config.noiseSeed = noiseSeed;
+    return config;
+}
+
 void ImGuiWrapper_RenderEnd() {
     // Start the Dear ImGui frame
     ImGui::End();

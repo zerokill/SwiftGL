@@ -31,6 +31,28 @@ typedef struct
     bool updated;
 } config_t;
 
+typedef struct
+{
+    float coverage;
+    float densityScale;
+    float absorption;
+    float darkness;
+    float phaseG;
+    float scatterStrength;
+    float tiling;
+    float detailWeight;
+    float windSpeed;
+    float windDirX;
+    float windDirZ;
+    float evolveSpeed;
+    int steps;
+    int lightSteps;
+    int noiseOctaves;
+    float noisePeriod;
+    int noiseSeed;
+    bool regenerate;
+} cloud_config_t;
+
 
 // Render ImGui frame
 //void ImGuiWrapper_Render(stats_t stats);
@@ -49,3 +71,4 @@ void ImGuiWrapper_RenderStart();
 void ImGuiWrapper_RenderEnd();
 void ImGuiWrapper_Text(const char* text);
 config_t ImGuiWrapper_Config();
+cloud_config_t ImGuiWrapper_CloudConfig();
