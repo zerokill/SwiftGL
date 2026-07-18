@@ -132,10 +132,22 @@ class Renderer {
     func renderCloud() {
         shaderManager.use(shaderName: "cloudShader")
         shaderManager.setUniform("model", value: scene.cloud.modelMatrix)
+        shaderManager.setUniform("invModel", value: scene.cloud.modelMatrix.inverse)
         shaderManager.setUniform("view", value: camera.viewMatrix)
         shaderManager.setUniform("proj", value: camera.projectionMatrix)
-        shaderManager.setUniform("tex0", value: GLuint(0))
+        shaderManager.setUniform("tex0", value: Int32(0))
         shaderManager.setUniform("cameraPos", value: camera.position)
+
+        // Raymarch parameters (hardcoded until the ImGui cloud config lands)
+        shaderManager.setUniform("uCoverage",        value: Float(0.45))
+        shaderManager.setUniform("uDensityScale",    value: Float(8.0))
+        shaderManager.setUniform("uAbsorption",      value: Float(1.0))
+        shaderManager.setUniform("uDarkness",        value: Float(0.15))
+        shaderManager.setUniform("uPhaseG",          value: Float(0.35))
+        shaderManager.setUniform("uScatterStrength", value: Float(12.5))
+        shaderManager.setUniform("uSteps",           value: Int32(96))
+        shaderManager.setUniform("uLightSteps",      value: Int32(12))
+
         if let light = scene.light {
             let position = SIMD3<Float>(
                 light.modelMatrix.columns.3.x,
@@ -144,6 +156,10 @@ class Renderer {
             )
             shaderManager.setUniform("lightPos",    value: position)
             shaderManager.setUniform("lightColor",  value: light.lightColor)
+        } else {
+            // No light in the scene yet: fall back to a fixed daylight sun
+            shaderManager.setUniform("lightPos",    value: SIMD3<Float>(500.0, 500.0, 0.0))
+            shaderManager.setUniform("lightColor",  value: SIMD3<Float>(0.9, 0.9, 0.9))
         }
         scene.cloud.draw()
 

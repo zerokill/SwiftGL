@@ -44,9 +44,9 @@ class CloudModel: BaseModel {
     
         glTexImage3D(texture.type, 0, GL_R8, GLsizei(size), GLsizei(size), GLsizei(size), 0, GLenum(GL_RED), GLenum(GL_UNSIGNED_BYTE), &data)
 
-        glTexParameteri(GLenum(GL_TEXTURE_3D), GLenum(GL_TEXTURE_WRAP_S), GLint(GL_CLAMP))
-        glTexParameteri(GLenum(GL_TEXTURE_3D), GLenum(GL_TEXTURE_WRAP_T), GLint(GL_CLAMP))
-        glTexParameteri(GLenum(GL_TEXTURE_3D), GLenum(GL_TEXTURE_WRAP_R), GLint(GL_CLAMP))
+        glTexParameteri(GLenum(GL_TEXTURE_3D), GLenum(GL_TEXTURE_WRAP_S), GLint(GL_REPEAT))
+        glTexParameteri(GLenum(GL_TEXTURE_3D), GLenum(GL_TEXTURE_WRAP_T), GLint(GL_REPEAT))
+        glTexParameteri(GLenum(GL_TEXTURE_3D), GLenum(GL_TEXTURE_WRAP_R), GLint(GL_REPEAT))
 
         glTexParameteri(GLenum(GL_TEXTURE_3D), GLenum(GL_TEXTURE_MAG_FILTER), GL_LINEAR);
         glTexParameteri(GLenum(GL_TEXTURE_3D), GLenum(GL_TEXTURE_MIN_FILTER), GL_LINEAR);
@@ -125,12 +125,20 @@ class CloudModel: BaseModel {
 
     override func draw() {
         glEnable(GLenum(GL_BLEND))
+        // Premultiplied alpha: the raymarcher outputs color already weighted by transmittance
+        glBlendFunc(GLenum(GL_ONE), GLenum(GL_ONE_MINUS_SRC_ALPHA))
+        // Read depth (scene occludes clouds) but never write it
+        glDepthMask(GLboolean(GL_FALSE))
+        // Rasterize the back faces so the volume still renders with the camera inside it
+        glCullFace(GLenum(GL_FRONT))
 
         glActiveTexture(GLenum(GL_TEXTURE0))
         glBindTexture(self.noiseTexture.type, self.noiseTexture.ID)
 
         mesh.draw()
 
+        glCullFace(GLenum(GL_BACK))
+        glDepthMask(GLboolean(GL_TRUE))
         glActiveTexture(GLenum(GL_TEXTURE0))
         glDisable(GLenum(GL_BLEND))
     }
