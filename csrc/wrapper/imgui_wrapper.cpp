@@ -89,12 +89,12 @@ config_t ImGuiWrapper_Config() {
 }
 
 cloud_config_t ImGuiWrapper_CloudConfig() {
-    static float coverage = 0.62f;
-    static float densityScale = 10.0f;
-    static float absorption = 1.0f;
+    static float coverage = 0.50f;
+    static float densityScale = 0.25f;
+    static float absorption = 0.4f;
     static float darkness = 0.15f;
     static float phaseG = 0.35f;
-    static float scatterStrength = 12.5f;
+    static float scatterStrength = 6.0f;
     static float tiling = 1.0f;
     static float detailWeight = 0.35f;
     static float windSpeed = 0.02f;
@@ -106,14 +106,22 @@ cloud_config_t ImGuiWrapper_CloudConfig() {
     static int noiseOctaves = 6;
     static float noisePeriod = 4.0f;
     static int noiseSeed = 1;
+    static bool skyLayer = true;
+    static float cloudBase = 150.0f;
+    static float cloudTop = 300.0f;
+    static float worldNoiseScale = 400.0f;
 
     cloud_config_t config;
     config.regenerate = false;
 
     if (ImGui::CollapsingHeader("Clouds")) {
+        ImGui::Checkbox("sky layer", &skyLayer);
+        ImGui::SliderFloat("cloud base", &cloudBase, 20.0f, 500.0f, "%.0f");
+        ImGui::SliderFloat("cloud top", &cloudTop, 50.0f, 800.0f, "%.0f");
+        ImGui::SliderFloat("noise scale", &worldNoiseScale, 50.0f, 2000.0f, "%.0f");
         ImGui::SliderFloat("coverage", &coverage, 0.0f, 1.0f, "%.3f");
-        ImGui::SliderFloat("density", &densityScale, 0.0f, 40.0f, "%.1f");
-        ImGui::SliderFloat("absorption", &absorption, 0.0f, 4.0f, "%.2f");
+        ImGui::SliderFloat("density", &densityScale, 0.0f, 1.0f, "%.3f");
+        ImGui::SliderFloat("absorption", &absorption, 0.0f, 2.0f, "%.2f");
         ImGui::SliderFloat("darkness", &darkness, 0.0f, 1.0f, "%.2f");
         ImGui::SliderFloat("phase g", &phaseG, -0.99f, 0.99f, "%.2f");
         ImGui::SliderFloat("scatter", &scatterStrength, 0.0f, 50.0f, "%.1f");
@@ -148,6 +156,10 @@ cloud_config_t ImGuiWrapper_CloudConfig() {
     config.noiseOctaves = noiseOctaves;
     config.noisePeriod = noisePeriod;
     config.noiseSeed = noiseSeed;
+    config.skyLayer = skyLayer;
+    config.cloudBase = cloudBase;
+    config.cloudTop = cloudTop;
+    config.worldNoiseScale = worldNoiseScale;
     return config;
 }
 

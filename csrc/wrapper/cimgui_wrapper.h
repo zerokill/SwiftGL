@@ -51,6 +51,10 @@ typedef struct
     float noisePeriod;
     int noiseSeed;
     bool regenerate;
+    bool skyLayer;
+    float cloudBase;
+    float cloudTop;
+    float worldNoiseScale;
 } cloud_config_t;
 
 

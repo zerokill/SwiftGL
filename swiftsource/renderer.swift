@@ -19,11 +19,12 @@ class Renderer {
     var rotation_y: Float = 0.0
     var time: Float = 0.0
     var cloudConfig: cloud_config_t = cloud_config_t(
-        coverage: 0.62, densityScale: 10.0, absorption: 1.0, darkness: 0.15,
-        phaseG: 0.35, scatterStrength: 12.5, tiling: 1.0, detailWeight: 0.35,
+        coverage: 0.50, densityScale: 0.25, absorption: 0.4, darkness: 0.15,
+        phaseG: 0.35, scatterStrength: 6.0, tiling: 1.0, detailWeight: 0.35,
         windSpeed: 0.02, windDirX: 1.0, windDirZ: 0.3, evolveSpeed: 0.015,
         steps: 96, lightSteps: 12, noiseOctaves: 6, noisePeriod: 4.0,
-        noiseSeed: 1, regenerate: false)
+        noiseSeed: 1, regenerate: false, skyLayer: true,
+        cloudBase: 150.0, cloudTop: 300.0, worldNoiseScale: 400.0)
 
     init(width: Int32, height: Int32, scene: Scene) {
         camera = Camera(position: SIMD3(0.0, 10.0, 0.0), target: SIMD3(0.0, 0.0, 0.0), worldUp: SIMD3(0.0, 1.0, 0.0))
@@ -137,9 +138,43 @@ class Renderer {
     }
 
     func renderCloud() {
+        // Sky mode: a horizon-spanning slab between cloudBase and cloudTop.
+        // Box mode: the original small debug volume at (10,10,0).
+        let cloudBase: Float
+        let cloudTop: Float
+        let worldNoiseScale: Float
+        let fadeStart: Float
+        let fadeEnd: Float
+        let lightMarchDist: Float
+        if cloudConfig.skyLayer {
+            cloudBase = cloudConfig.cloudBase
+            cloudTop = max(cloudConfig.cloudTop, cloudConfig.cloudBase + 10.0)
+            worldNoiseScale = cloudConfig.worldNoiseScale
+            fadeStart = 600.0
+            fadeEnd = 950.0
+            lightMarchDist = 80.0
+            scene.cloud.modelMatrix = float4x4.translation(SIMD3<Float>(0.0, (cloudBase + cloudTop) * 0.5, 0.0))
+                * float4x4.scale(SIMD3<Float>(1900.0, cloudTop - cloudBase, 1900.0))
+        } else {
+            cloudBase = 8.0
+            cloudTop = 12.0
+            worldNoiseScale = 8.0
+            fadeStart = 1e6
+            fadeEnd = 2e6
+            lightMarchDist = 5.0
+            scene.cloud.modelMatrix = float4x4.translation(SIMD3<Float>(10.0, 10.0, 0.0))
+                * float4x4.scale(SIMD3<Float>(4.0, 2.0, 4.0))
+        }
+
         shaderManager.use(shaderName: "cloudShader")
         shaderManager.setUniform("model", value: scene.cloud.modelMatrix)
         shaderManager.setUniform("invModel", value: scene.cloud.modelMatrix.inverse)
+        shaderManager.setUniform("uCloudBase",       value: cloudBase)
+        shaderManager.setUniform("uCloudTop",        value: cloudTop)
+        shaderManager.setUniform("uWorldNoiseScale", value: worldNoiseScale)
+        shaderManager.setUniform("uFadeStart",       value: fadeStart)
+        shaderManager.setUniform("uFadeEnd",         value: fadeEnd)
+        shaderManager.setUniform("uLightMarchDist",  value: lightMarchDist)
         shaderManager.setUniform("view", value: camera.viewMatrix)
         shaderManager.setUniform("proj", value: camera.projectionMatrix)
         shaderManager.setUniform("tex0", value: Int32(0))
