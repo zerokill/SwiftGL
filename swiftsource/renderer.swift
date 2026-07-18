@@ -139,12 +139,14 @@ class Renderer {
         shaderManager.setUniform("cameraPos", value: camera.position)
 
         // Raymarch parameters (hardcoded until the ImGui cloud config lands)
-        shaderManager.setUniform("uCoverage",        value: Float(0.45))
-        shaderManager.setUniform("uDensityScale",    value: Float(8.0))
+        shaderManager.setUniform("uCoverage",        value: Float(0.62))
+        shaderManager.setUniform("uDensityScale",    value: Float(10.0))
         shaderManager.setUniform("uAbsorption",      value: Float(1.0))
         shaderManager.setUniform("uDarkness",        value: Float(0.15))
         shaderManager.setUniform("uPhaseG",          value: Float(0.35))
         shaderManager.setUniform("uScatterStrength", value: Float(12.5))
+        shaderManager.setUniform("uTiling",          value: Float(1.0))
+        shaderManager.setUniform("uDetailWeight",    value: Float(0.35))
         shaderManager.setUniform("uSteps",           value: Int32(96))
         shaderManager.setUniform("uLightSteps",      value: Int32(12))
 

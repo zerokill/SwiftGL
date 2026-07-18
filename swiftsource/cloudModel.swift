@@ -17,6 +17,19 @@ class CloudModel: BaseModel {
         super.init(mesh: mesh, shaderName: shaderName, texture: nil)
     }
 
+    // Replaces the CPU-generated fallback texture with a GPU-generated
+    // tileable FBM texture. Must run after the noise3d shader is loaded.
+    func regenerateNoise(shaderManager: ShaderManager, size: Int, octaves: Int32, period: Float, seed: GLuint, displayWidth: Int32, displayHeight: Int32) {
+        glDeleteTextures(1, &noiseTexture.ID)
+        noiseTexture = NoiseTextureGenerator.generate(size: size,
+                                                      shaderManager: shaderManager,
+                                                      octaves: octaves,
+                                                      period: period,
+                                                      seed: seed,
+                                                      displayWidth: displayWidth,
+                                                      displayHeight: displayHeight)
+    }
+
 
     private static func generatePerlin3DNoiseTexture(size: Int) -> texture_t {
         let perlin = PerlinNoise3D()

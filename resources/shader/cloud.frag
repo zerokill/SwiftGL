@@ -12,6 +12,8 @@ uniform float uAbsorption;    // extinction coefficient multiplier
 uniform float uDarkness;      // minimum shadow term (darkness threshold)
 uniform float uPhaseG;        // Henyey-Greenstein anisotropy
 uniform float uScatterStrength; // in-scatter multiplier (~4*pi keeps clouds white)
+uniform float uTiling;        // noise repetitions across the volume
+uniform float uDetailWeight;  // how strongly detail noise erodes the base
 uniform int   uSteps;         // view ray steps
 uniform int   uLightSteps;    // sun ray steps
 
@@ -33,8 +35,14 @@ vec2 intersectBox(vec3 ro, vec3 rd) {
                 min(min(tmax.x, tmax.y), tmax.z));
 }
 
+float remap(float v, float oldMin, float oldMax, float newMin, float newMax) {
+    return newMin + (v - oldMin) / (oldMax - oldMin) * (newMax - newMin);
+}
+
 float sampleDensity(vec3 p) {
-    float n = texture(tex0, p).r;
+    vec2 noise = texture(tex0, p * uTiling).rg;
+    // High-frequency detail erodes the low-frequency base shape
+    float n = clamp(remap(noise.r, uDetailWeight * noise.g, 1.0, 0.0, 1.0), 0.0, 1.0);
     float d = clamp(n - (1.0 - uCoverage), 0.0, 1.0);
     return d * uDensityScale;
 }
