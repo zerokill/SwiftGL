@@ -2,7 +2,7 @@
 
 uniform sampler3D tex0;
 uniform vec3 cameraPos;
-uniform vec3 lightPos;
+uniform vec3 uSunDir;   // world-space direction TO the sun (directional light)
 uniform vec3 lightColor;
 uniform mat4 model;
 uniform mat4 invModel;
@@ -149,9 +149,8 @@ void main() {
             d *= 1.0 - smoothstep(uFadeStart, uFadeEnd, distCam);
         }
         if (d > 1e-5) {
-            vec3 sunDir = normalize(lightPos - worldP);
-            float lightEnergy = lightMarch(worldP, sunDir);
-            float phase = hgPhase(dot(worldRd, sunDir), uPhaseG);
+            float lightEnergy = lightMarch(worldP, uSunDir);
+            float phase = hgPhase(dot(worldRd, uSunDir), uPhaseG);
             color += T * lightEnergy * phase * uScatterStrength * d * stepWorld * lightColor;
             T *= exp(-d * uAbsorption * stepWorld);
             if (T < 0.01) {

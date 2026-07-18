@@ -199,16 +199,27 @@ class Renderer {
         shaderManager.setUniform("uEvolveSpeed",     value: cloudConfig.evolveSpeed)
 
         if let light = scene.light {
+            // The scene light is a sphere orbiting its spawn point at ~100
+            // units - useless as a positional sun for a 1900-unit cloud
+            // layer. Its offset from the orbit center gives the celestial
+            // direction instead, so the whole sky shares one sun direction.
             let position = SIMD3<Float>(
                 light.modelMatrix.columns.3.x,
                 light.modelMatrix.columns.3.y,
                 light.modelMatrix.columns.3.z
             )
-            shaderManager.setUniform("lightPos",    value: position)
+            let orbitCenter = SIMD3<Float>(
+                light.positionMatrix.columns.3.x,
+                light.positionMatrix.columns.3.y,
+                light.positionMatrix.columns.3.z
+            )
+            let offset = position - orbitCenter
+            let sunDir = length(offset) > 1e-3 ? normalize(offset) : SIMD3<Float>(0.0, 1.0, 0.0)
+            shaderManager.setUniform("uSunDir",     value: sunDir)
             shaderManager.setUniform("lightColor",  value: light.lightColor)
         } else {
             // No light in the scene yet: fall back to a fixed daylight sun
-            shaderManager.setUniform("lightPos",    value: SIMD3<Float>(500.0, 500.0, 0.0))
+            shaderManager.setUniform("uSunDir",     value: normalize(SIMD3<Float>(0.5, 0.7, 0.2)))
             shaderManager.setUniform("lightColor",  value: SIMD3<Float>(0.9, 0.9, 0.9))
         }
         scene.cloud.draw()
