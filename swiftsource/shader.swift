@@ -110,6 +110,11 @@ class Shader {
         glUniform1f(location, value)
     }
 
+    func setUniform(_ name: String, value: SIMD2<Float>) {
+        let location = glGetUniformLocation(programID, name)
+        glUniform2f(location, value.x, value.y)
+    }
+
     func setUniform(_ name: String, value: SIMD3<Float>) {
         let location = glGetUniformLocation(programID, name)
         glUniform3f(location, value.x, value.y, value.z)

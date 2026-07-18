@@ -98,6 +98,7 @@ func liviaRender(window: OpaquePointer, width: Int32, height: Int32) {
     renderer.shaderManager.loadShader(name: "waterShader", vertexPath: "resources/shader/water.vert", geometryPath: nil, fragmentPath: "resources/shader/water.frag")
     renderer.shaderManager.loadShader(name: "guiShader", vertexPath: "resources/shader/gui.vert", geometryPath: nil, fragmentPath: "resources/shader/gui.frag")
     renderer.shaderManager.loadShader(name: "cloudShader", vertexPath: "resources/shader/cloud.vert", geometryPath: nil, fragmentPath: "resources/shader/cloud.frag")
+    renderer.shaderManager.loadShader(name: "cloudCompositeShader", vertexPath: "resources/shader/cloudComposite.vert", geometryPath: nil, fragmentPath: "resources/shader/cloudComposite.frag")
     renderer.shaderManager.loadShader(name: "noise3dShader", vertexPath: "resources/shader/noise3d.vert", geometryPath: nil, fragmentPath: "resources/shader/noise3d.frag")
 
     // Swap the CPU fallback noise for the GPU-generated tileable FBM texture

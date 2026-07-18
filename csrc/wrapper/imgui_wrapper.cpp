@@ -107,15 +107,17 @@ cloud_config_t ImGuiWrapper_CloudConfig() {
     static float noisePeriod = 4.0f;
     static int noiseSeed = 1;
     static bool skyLayer = true;
-    static float cloudBase = 150.0f;
-    static float cloudTop = 300.0f;
+    static float cloudBase = 200.0f;
+    static float cloudTop = 350.0f;
     static float worldNoiseScale = 400.0f;
+    static bool halfRes = true;
 
     cloud_config_t config;
     config.regenerate = false;
 
     if (ImGui::CollapsingHeader("Clouds")) {
         ImGui::Checkbox("sky layer", &skyLayer);
+        ImGui::Checkbox("half-res clouds", &halfRes);
         ImGui::SliderFloat("cloud base", &cloudBase, 20.0f, 500.0f, "%.0f");
         ImGui::SliderFloat("cloud top", &cloudTop, 50.0f, 800.0f, "%.0f");
         ImGui::SliderFloat("noise scale", &worldNoiseScale, 50.0f, 2000.0f, "%.0f");
@@ -160,6 +162,7 @@ cloud_config_t ImGuiWrapper_CloudConfig() {
     config.cloudBase = cloudBase;
     config.cloudTop = cloudTop;
     config.worldNoiseScale = worldNoiseScale;
+    config.halfRes = halfRes;
     return config;
 }
 

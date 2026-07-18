@@ -72,6 +72,12 @@ class InputManager {
         if (glfwGetKey(window, Int32(GLFW_KEY_D)) == GLFW_PRESS) {
             deltaPosition.x += 0.05
         }
+        if (glfwGetKey(window, Int32(GLFW_KEY_Q)) == GLFW_PRESS) {
+            deltaPosition.y += 0.05
+        }
+        if (glfwGetKey(window, Int32(GLFW_KEY_E)) == GLFW_PRESS) {
+            deltaPosition.y -= 0.05
+        }
 
         if (glfwGetKey(window, Int32(GLFW_KEY_UP)) == GLFW_PRESS) {
             if (deltaPitch < 0.9) {

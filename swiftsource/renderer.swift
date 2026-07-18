@@ -24,7 +24,17 @@ class Renderer {
         windSpeed: 0.02, windDirX: 1.0, windDirZ: 0.3, evolveSpeed: 0.015,
         steps: 64, lightSteps: 8, noiseOctaves: 6, noisePeriod: 4.0,
         noiseSeed: 1, regenerate: false, skyLayer: true,
-        cloudBase: 150.0, cloudTop: 300.0, worldNoiseScale: 400.0)
+        cloudBase: 200.0, cloudTop: 350.0, worldNoiseScale: 400.0,
+        halfRes: true)
+
+    // Half-res cloud pass: clouds render into this (logical-size, i.e. half
+    // the retina framebuffer) and get composited full-screen afterwards.
+    var cloudFramebuffer: Framebuffer
+    var depthResolveFramebuffer: DepthFramebuffer
+    var cloudCompositeQuad: GuiMesh
+    // Set to false if the MSAA depth blit turns out not to work; clouds then
+    // skip depth occlusion instead of failing every frame.
+    var depthResolveWorks = true
 
     init(width: Int32, height: Int32, scene: Scene) {
         camera = Camera(position: SIMD3(0.0, 10.0, 0.0), target: SIMD3(0.0, 0.0, 0.0), worldUp: SIMD3(0.0, 1.0, 0.0))
@@ -34,6 +44,10 @@ class Renderer {
         self.height = height
 
         self.scene = scene
+
+        cloudFramebuffer = Framebuffer(internalFormat: GL_RGBA16F, width: width, height: height, withDepthBuffer: false)
+        depthResolveFramebuffer = DepthFramebuffer(width: width * 2, height: height * 2)
+        cloudCompositeQuad = GuiMesh(x: -1.0, y: -1.0, width: 2.0, height: 2.0)
 
         setupOpenGL()
     }
@@ -146,6 +160,8 @@ class Renderer {
         let fadeStart: Float
         let fadeEnd: Float
         let lightMarchDist: Float
+        let maxRayDist: Float   // longest useful ray; uSteps are budgeted over it
+        let curveR: Float       // fake planet radius for the horizon curvature
         if cloudConfig.skyLayer {
             cloudBase = cloudConfig.cloudBase
             cloudTop = max(cloudConfig.cloudTop, cloudConfig.cloudBase + 10.0)
@@ -153,8 +169,18 @@ class Renderer {
             fadeStart = 600.0
             fadeEnd = 950.0
             lightMarchDist = 80.0
-            scene.cloud.modelMatrix = float4x4.translation(SIMD3<Float>(0.0, (cloudBase + cloudTop) * 0.5, 0.0))
-                * float4x4.scale(SIMD3<Float>(1900.0, cloudTop - cloudBase, 1900.0))
+            maxRayDist = fadeEnd * 1.05
+            curveR = 3500.0
+            // The slab is only the raymarch bounding volume (noise is sampled
+            // in world space), so it follows the camera in x/z: there is
+            // always cloud volume out to the fade in every direction and its
+            // edges can never be approached. The bottom sits exactly at the
+            // layer base, so clouds never reach below it; the curvature only
+            // thins the distant deck from above instead of sinking it.
+            let slabBottom = cloudBase
+            let slabSize = 2.2 * fadeEnd
+            scene.cloud.modelMatrix = float4x4.translation(SIMD3<Float>(camera.position.x, (slabBottom + cloudTop) * 0.5, camera.position.z))
+                * float4x4.scale(SIMD3<Float>(slabSize, cloudTop - slabBottom, slabSize))
         } else {
             cloudBase = 8.0
             cloudTop = 12.0
@@ -162,9 +188,16 @@ class Renderer {
             fadeStart = 1e6
             fadeEnd = 2e6
             lightMarchDist = 5.0
+            maxRayDist = 8.0    // ~the debug box diagonal: full step density
+            curveR = 1e9        // effectively flat for the debug box
             scene.cloud.modelMatrix = float4x4.translation(SIMD3<Float>(10.0, 10.0, 0.0))
                 * float4x4.scale(SIMD3<Float>(4.0, 2.0, 4.0))
         }
+
+        // The half-res path needs the scene depth as a texture; resolve the
+        // multisampled default framebuffer's depth before leaving it.
+        let useHalfRes = cloudConfig.halfRes
+        let useDepth = useHalfRes && resolveSceneDepth()
 
         shaderManager.use(shaderName: "cloudShader")
         shaderManager.setUniform("model", value: scene.cloud.modelMatrix)
@@ -175,6 +208,22 @@ class Renderer {
         shaderManager.setUniform("uFadeStart",       value: fadeStart)
         shaderManager.setUniform("uFadeEnd",         value: fadeEnd)
         shaderManager.setUniform("uLightMarchDist",  value: lightMarchDist)
+        shaderManager.setUniform("uMaxRayDist",      value: maxRayDist)
+        shaderManager.setUniform("uCurveR",          value: curveR)
+        shaderManager.setUniform("uUseDepth",        value: Int32(useDepth ? 1 : 0))
+        // Always keep uSceneDepth on unit 1: a sampler2D left at its default
+        // (unit 0, where the sampler3D noise lives) makes the whole draw call
+        // invalid, even when the uUseDepth branch never samples it.
+        shaderManager.setUniform("uSceneDepth",      value: Int32(1))
+        if useDepth {
+            shaderManager.setUniform("uCloudPassSize", value: SIMD2<Float>(Float(cloudFramebuffer.width), Float(cloudFramebuffer.height)))
+            shaderManager.setUniform("uCamForward",  value: camera.front)
+            shaderManager.setUniform("uNear",        value: Float(0.1))
+            shaderManager.setUniform("uFar",         value: Float(1000.0))
+            glActiveTexture(GLenum(GL_TEXTURE1))
+            glBindTexture(GLenum(GL_TEXTURE_2D), depthResolveFramebuffer.texture.ID)
+            glActiveTexture(GLenum(GL_TEXTURE0))
+        }
         shaderManager.setUniform("view", value: camera.viewMatrix)
         shaderManager.setUniform("proj", value: camera.projectionMatrix)
         shaderManager.setUniform("tex0", value: Int32(0))
@@ -222,8 +271,56 @@ class Renderer {
             shaderManager.setUniform("uSunDir",     value: normalize(SIMD3<Float>(0.5, 0.7, 0.2)))
             shaderManager.setUniform("lightColor",  value: SIMD3<Float>(0.9, 0.9, 0.9))
         }
-        scene.cloud.draw()
 
+        if useHalfRes {
+            cloudFramebuffer.bindFramebuffer()
+            glClearColor(0.0, 0.0, 0.0, 0.0)
+            glClear(GLbitfield(GL_COLOR_BUFFER_BIT))
+            scene.cloud.draw()
+            cloudFramebuffer.unbindFramebuffer(displayWidth: width, displayHeight: height)
+            compositeClouds()
+        } else {
+            scene.cloud.draw()
+        }
+    }
+
+    // Blit-resolves the multisampled default framebuffer's depth into a
+    // sampleable texture. Returns false (and stops trying) if the driver
+    // rejects the blit; clouds then simply skip depth occlusion.
+    func resolveSceneDepth() -> Bool {
+        if !depthResolveWorks {
+            return false
+        }
+        while glGetError() != GLenum(GL_NO_ERROR) {}
+        glBindFramebuffer(GLenum(GL_READ_FRAMEBUFFER), 0)
+        glBindFramebuffer(GLenum(GL_DRAW_FRAMEBUFFER), depthResolveFramebuffer.framebuffer)
+        let w = width * 2
+        let h = height * 2
+        glBlitFramebuffer(0, 0, w, h, 0, 0, w, h, GLbitfield(GL_DEPTH_BUFFER_BIT), GLenum(GL_NEAREST))
+        let err = glGetError()
+        glBindFramebuffer(GLenum(GL_FRAMEBUFFER), 0)
+        if err != GLenum(GL_NO_ERROR) {
+            depthResolveWorks = false
+            Logger.info("Cloud depth resolve blit failed (GL error \(err)); cloud depth occlusion disabled")
+            return false
+        }
+        return true
+    }
+
+    // Draws the half-res cloud texture over the scene. The cloud pass output
+    // is premultiplied, so the same ONE / ONE_MINUS_SRC_ALPHA blend applies.
+    func compositeClouds() {
+        shaderManager.use(shaderName: "cloudCompositeShader")
+        shaderManager.setUniform("uCloudTex", value: Int32(0))
+        glActiveTexture(GLenum(GL_TEXTURE0))
+        glBindTexture(GLenum(GL_TEXTURE_2D), cloudFramebuffer.texture.ID)
+
+        glEnable(GLenum(GL_BLEND))
+        glBlendFunc(GLenum(GL_ONE), GLenum(GL_ONE_MINUS_SRC_ALPHA))
+        glDisable(GLenum(GL_DEPTH_TEST))
+        cloudCompositeQuad.draw()
+        glEnable(GLenum(GL_DEPTH_TEST))
+        glDisable(GLenum(GL_BLEND))
     }
 
     func renderScene(plane: SIMD4<Float>) {

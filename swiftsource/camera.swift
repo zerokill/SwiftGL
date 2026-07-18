@@ -47,6 +47,9 @@ class Camera {
         if (abs(delta.x) > 0.00001) {
             position += right * delta.x
         }
+        if (abs(delta.y) > 0.00001) {
+            position.y = max(position.y + delta.y, 0.5)
+        }
         updateViewMatrix()
     }
 

@@ -55,6 +55,7 @@ typedef struct
     float cloudBase;
     float cloudTop;
     float worldNoiseScale;
+    bool halfRes;
 } cloud_config_t;
 
 

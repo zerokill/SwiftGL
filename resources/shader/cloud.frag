@@ -1,6 +1,7 @@
 #version 330 core
 
 uniform sampler3D tex0;
+uniform sampler2D uSceneDepth; // resolved scene depth (half-res pass only)
 uniform vec3 cameraPos;
 uniform vec3 uSunDir;   // world-space direction TO the sun (directional light)
 uniform vec3 lightColor;
@@ -15,7 +16,7 @@ uniform float uPhaseG;          // Henyey-Greenstein anisotropy
 uniform float uScatterStrength; // in-scatter multiplier
 uniform float uTiling;          // noise repetitions
 uniform float uDetailWeight;    // how strongly detail noise erodes the base
-uniform int   uSteps;           // view ray steps
+uniform int   uSteps;           // view ray steps (upper bound; short rays use fewer)
 uniform int   uLightSteps;      // sun ray steps
 uniform float uTime;
 uniform vec3  uWindDir;
@@ -24,9 +25,16 @@ uniform float uEvolveSpeed;     // extra scroll on the detail channel
 uniform float uWorldNoiseScale; // world units per noise-texture repeat
 uniform float uCloudBase;       // world-space bottom of the cloud layer
 uniform float uCloudTop;        // world-space top of the cloud layer
-uniform float uFadeStart;      // distance fade begin (world units from camera)
-uniform float uFadeEnd;        // fully faded here
+uniform float uFadeStart;       // distance fade begin (world units from camera)
+uniform float uFadeEnd;         // fully faded here
 uniform float uLightMarchDist;  // world-space length of the sun march
+uniform float uMaxRayDist;      // longest useful ray; uSteps are budgeted over this
+uniform int   uUseDepth;        // 1 = clamp the march against uSceneDepth
+uniform vec2  uCloudPassSize;   // pixel size of the pass, for gl_FragCoord -> UV
+uniform vec3  uCamForward;      // camera forward, to turn eye depth into ray distance
+uniform float uNear;
+uniform float uFar;
+uniform float uCurveR;          // fake planet radius: deck sinks d^2/2R with distance
 
 smooth in vec3 vUV;
 smooth in vec3 vWorldPos;
@@ -34,6 +42,7 @@ smooth in vec3 vWorldPos;
 out vec4 FragColor;
 
 const float PI = 3.14159265;
+const float DENSITY_EPS = 1e-3; // below this the step contributes nothing visible
 
 // Slab-method intersection of a ray with the [0,1]^3 box.
 vec2 intersectBox(vec3 ro, vec3 rd) {
@@ -56,23 +65,40 @@ float hash12(vec2 p) {
     return fract((p3.x + p3.y) * p3.z);
 }
 
+// Cumulus height shaping: flat-ish rounded bottoms, billowy falloff on top.
+// The sample height is bent down with camera distance (fake planetary
+// curvature) so the deck closes at the horizon instead of ending at the
+// slab's bottom edge with a straight-line gap against the sky.
+float heightShape(float y, float distCam) {
+    float yEff = y + distCam * distCam / (2.0 * uCurveR);
+    float h = clamp((yEff - uCloudBase) / (uCloudTop - uCloudBase), 0.0, 1.0);
+    return smoothstep(0.0, 0.08, h) * (1.0 - smoothstep(0.35, 1.0, h));
+}
+
 // Density sampled by world position, so the anisotropic slab scale never
 // stretches the noise. Base drifts with the wind; detail drifts faster plus
 // a slow vertical scroll so shapes evolve instead of just translating.
-float sampleDensity(vec3 worldP) {
+float sampleDensity(vec3 worldP, float distCam) {
+    float shape = heightShape(worldP.y, distCam);
+    if (shape <= 0.0) {
+        return 0.0;
+    }
+
     vec3 uvw = worldP / uWorldNoiseScale;
     vec3 basePos = uvw * uTiling + uWindDir * (uWindSpeed * uTime);
+    float base = texture(tex0, basePos).r;
+    // Detail erosion only ever lowers density (remap output <= base), so an
+    // empty base sample can skip the second texture fetch entirely.
+    if (base <= 1.0 - uCoverage) {
+        return 0.0;
+    }
+
     vec3 detailPos = uvw * uTiling + uWindDir * (uWindSpeed * uTime * 1.6)
                    + vec3(0.0, uEvolveSpeed * uTime, 0.0);
-    float base = texture(tex0, basePos).r;
     float detail = texture(tex0, detailPos).g;
     float n = clamp(remap(base, uDetailWeight * detail, 1.0, 0.0, 1.0), 0.0, 1.0);
 
-    // Cumulus height shaping: flat-ish rounded bottoms, billowy falloff on top
-    float h = clamp((worldP.y - uCloudBase) / (uCloudTop - uCloudBase), 0.0, 1.0);
-    float heightShape = smoothstep(0.0, 0.08, h) * (1.0 - smoothstep(0.35, 1.0, h));
-
-    float d = clamp(n - (1.0 - uCoverage), 0.0, 1.0) * heightShape;
+    float d = clamp(n - (1.0 - uCoverage), 0.0, 1.0) * shape;
     return d * uDensityScale;
 }
 
@@ -84,26 +110,25 @@ float hgPhase(float cosTheta, float g) {
 // Cheaper density for the sun march: base shape only, no detail erosion.
 // Shadows are low-frequency, so the missing detail is invisible but halves
 // the texture fetches in the hottest loop.
-float sampleDensityCheap(vec3 worldP) {
+float sampleDensityCheap(vec3 worldP, float distCam) {
     vec3 uvw = worldP / uWorldNoiseScale;
     vec3 basePos = uvw * uTiling + uWindDir * (uWindSpeed * uTime);
     float base = texture(tex0, basePos).r;
 
-    float h = clamp((worldP.y - uCloudBase) / (uCloudTop - uCloudBase), 0.0, 1.0);
-    float heightShape = smoothstep(0.0, 0.08, h) * (1.0 - smoothstep(0.35, 1.0, h));
-
-    float d = clamp(base - (1.0 - uCoverage), 0.0, 1.0) * heightShape;
+    float d = clamp(base - (1.0 - uCoverage), 0.0, 1.0) * heightShape(worldP.y, distCam);
     return d * uDensityScale;
 }
 
 // Beer's-law march toward the sun over a fixed world-space distance; the
 // height shape zeroes density outside the layer, so no bounds test needed.
-float lightMarch(vec3 worldP, vec3 sunDir) {
+// distCam: the view-sample's camera distance; the sun march is short (~80
+// world units) so the curvature drop barely changes along it.
+float lightMarch(vec3 worldP, vec3 sunDir, float distCam) {
     float stepLen = uLightMarchDist / float(uLightSteps);
     float opticalDepth = 0.0;
     for (int j = 0; j < uLightSteps; j++) {
         vec3 q = worldP + sunDir * ((float(j) + 0.5) * stepLen);
-        opticalDepth += sampleDensityCheap(q) * stepLen;
+        opticalDepth += sampleDensityCheap(q, distCam) * stepLen;
         // Already essentially opaque toward the sun: transmit < e^-6
         if (opticalDepth * uAbsorption > 6.0) {
             break;
@@ -129,29 +154,53 @@ void main() {
     float uvwToWorld = length(mat3(model) * rd);
     vec3 worldRd = normalize(mat3(model) * rd);
 
-    // Clamp horizon rays: beyond the fade there is nothing to see anyway
-    float worldSegLen = min((tEnd - tStart) * uvwToWorld, uFadeEnd * 1.05);
-    float stepWorld = worldSegLen / float(uSteps);
+    // Everything past the fade (or behind scene geometry) is invisible, so
+    // clamp the march to the visible interval - measured from the camera.
+    float distStart = tStart * uvwToWorld;
+    float distEnd = min(tEnd * uvwToWorld, uFadeEnd * 1.05);
+    if (uUseDepth == 1) {
+        float depth = texture(uSceneDepth, gl_FragCoord.xy / uCloudPassSize).r;
+        float ndcZ = depth * 2.0 - 1.0;
+        float eyeZ = 2.0 * uNear * uFar / (uFar + uNear - ndcZ * (uFar - uNear));
+        float sceneDist = eyeZ / max(dot(worldRd, uCamForward), 1e-3);
+        distEnd = min(distEnd, sceneDist);
+    }
+    if (distEnd <= distStart) {
+        discard;
+    }
+    float worldSegLen = distEnd - distStart;
+
+    // Fixed world-space sample density: uSteps are budgeted over the longest
+    // useful ray, so a short ray straight up takes proportionally fewer steps
+    // instead of oversampling 64x.
+    float targetStep = uMaxRayDist / float(uSteps);
+    int steps = clamp(int(ceil(worldSegLen / targetStep)), 8, uSteps);
+    float stepWorld = worldSegLen / float(steps);
     float stepUVW = stepWorld / uvwToWorld;
 
     // Per-fragment jitter of the march start hides step banding
     float jitter = hash12(gl_FragCoord.xy);
 
+    // Phase and sun tint are constant along the ray
+    vec3 sunTerm = hgPhase(dot(worldRd, uSunDir), uPhaseG) * uScatterStrength * lightColor;
+
     float T = 1.0;
     vec3 color = vec3(0.0);
 
     for (int i = 0; i < uSteps; i++) {
+        if (i >= steps) {
+            break;
+        }
         vec3 p = camUVW + rd * (tStart + (float(i) + jitter) * stepUVW);
         vec3 worldP = (model * vec4(p - 0.5, 1.0)).xyz;
-        float d = sampleDensity(worldP);
-        if (d > 1e-5) {
-            float distCam = distance(worldP, cameraPos);
+        float distCam = distStart + (float(i) + jitter) * stepWorld;
+        float d = sampleDensity(worldP, distCam);
+        if (d > DENSITY_EPS) {
             d *= 1.0 - smoothstep(uFadeStart, uFadeEnd, distCam);
         }
-        if (d > 1e-5) {
-            float lightEnergy = lightMarch(worldP, uSunDir);
-            float phase = hgPhase(dot(worldRd, uSunDir), uPhaseG);
-            color += T * lightEnergy * phase * uScatterStrength * d * stepWorld * lightColor;
+        if (d > DENSITY_EPS) {
+            float lightEnergy = lightMarch(worldP, uSunDir, distCam);
+            color += T * lightEnergy * d * stepWorld * sunTerm;
             T *= exp(-d * uAbsorption * stepWorld);
             if (T < 0.01) {
                 break;
