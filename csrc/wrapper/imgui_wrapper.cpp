@@ -101,8 +101,8 @@ cloud_config_t ImGuiWrapper_CloudConfig() {
     static float windDirX = 1.0f;
     static float windDirZ = 0.3f;
     static float evolveSpeed = 0.015f;
-    static int steps = 96;
-    static int lightSteps = 12;
+    static int steps = 64;
+    static int lightSteps = 8;
     static int noiseOctaves = 6;
     static float noisePeriod = 4.0f;
     static int noiseSeed = 1;

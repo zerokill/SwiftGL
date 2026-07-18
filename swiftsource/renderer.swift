@@ -22,7 +22,7 @@ class Renderer {
         coverage: 0.50, densityScale: 0.25, absorption: 0.4, darkness: 0.15,
         phaseG: 0.35, scatterStrength: 6.0, tiling: 1.0, detailWeight: 0.35,
         windSpeed: 0.02, windDirX: 1.0, windDirZ: 0.3, evolveSpeed: 0.015,
-        steps: 96, lightSteps: 12, noiseOctaves: 6, noisePeriod: 4.0,
+        steps: 64, lightSteps: 8, noiseOctaves: 6, noisePeriod: 4.0,
         noiseSeed: 1, regenerate: false, skyLayer: true,
         cloudBase: 150.0, cloudTop: 300.0, worldNoiseScale: 400.0)
 

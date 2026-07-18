@@ -81,6 +81,21 @@ float hgPhase(float cosTheta, float g) {
     return (1.0 - g2) / (4.0 * PI * pow(1.0 + g2 - 2.0 * g * cosTheta, 1.5));
 }
 
+// Cheaper density for the sun march: base shape only, no detail erosion.
+// Shadows are low-frequency, so the missing detail is invisible but halves
+// the texture fetches in the hottest loop.
+float sampleDensityCheap(vec3 worldP) {
+    vec3 uvw = worldP / uWorldNoiseScale;
+    vec3 basePos = uvw * uTiling + uWindDir * (uWindSpeed * uTime);
+    float base = texture(tex0, basePos).r;
+
+    float h = clamp((worldP.y - uCloudBase) / (uCloudTop - uCloudBase), 0.0, 1.0);
+    float heightShape = smoothstep(0.0, 0.08, h) * (1.0 - smoothstep(0.35, 1.0, h));
+
+    float d = clamp(base - (1.0 - uCoverage), 0.0, 1.0) * heightShape;
+    return d * uDensityScale;
+}
+
 // Beer's-law march toward the sun over a fixed world-space distance; the
 // height shape zeroes density outside the layer, so no bounds test needed.
 float lightMarch(vec3 worldP, vec3 sunDir) {
@@ -88,7 +103,11 @@ float lightMarch(vec3 worldP, vec3 sunDir) {
     float opticalDepth = 0.0;
     for (int j = 0; j < uLightSteps; j++) {
         vec3 q = worldP + sunDir * ((float(j) + 0.5) * stepLen);
-        opticalDepth += sampleDensity(q) * stepLen;
+        opticalDepth += sampleDensityCheap(q) * stepLen;
+        // Already essentially opaque toward the sun: transmit < e^-6
+        if (opticalDepth * uAbsorption > 6.0) {
+            break;
+        }
     }
     float transmit = exp(-opticalDepth * uAbsorption);
     return uDarkness + transmit * (1.0 - uDarkness);
