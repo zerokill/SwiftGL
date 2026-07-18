@@ -17,6 +17,7 @@ class Renderer {
 
     var rotation_x: Float = 0.0
     var rotation_y: Float = 0.0
+    var time: Float = 0.0
 
     init(width: Int32, height: Int32, scene: Scene) {
         camera = Camera(position: SIMD3(0.0, 10.0, 0.0), target: SIMD3(0.0, 0.0, 0.0), worldUp: SIMD3(0.0, 1.0, 0.0))
@@ -149,6 +150,10 @@ class Renderer {
         shaderManager.setUniform("uDetailWeight",    value: Float(0.35))
         shaderManager.setUniform("uSteps",           value: Int32(96))
         shaderManager.setUniform("uLightSteps",      value: Int32(12))
+        shaderManager.setUniform("uTime",            value: time)
+        shaderManager.setUniform("uWindDir",         value: normalize(SIMD3<Float>(1.0, 0.0, 0.3)))
+        shaderManager.setUniform("uWindSpeed",       value: Float(0.02))
+        shaderManager.setUniform("uEvolveSpeed",     value: Float(0.015))
 
         if let light = scene.light {
             let position = SIMD3<Float>(
@@ -269,6 +274,7 @@ class Renderer {
         // Update rotations based on user input
         rotation_x += deltaTime
         rotation_y += deltaTime
+        time += deltaTime
 
         scene.update(deltaTime: deltaTime, input: inputManager, camera: camera, config: config)
 

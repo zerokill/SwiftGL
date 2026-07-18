@@ -16,6 +16,10 @@ uniform float uTiling;        // noise repetitions across the volume
 uniform float uDetailWeight;  // how strongly detail noise erodes the base
 uniform int   uSteps;         // view ray steps
 uniform int   uLightSteps;    // sun ray steps
+uniform float uTime;
+uniform vec3  uWindDir;
+uniform float uWindSpeed;     // drift, in volume widths per second
+uniform float uEvolveSpeed;   // extra scroll on the detail channel
 
 smooth in vec3 vUV;
 
@@ -40,9 +44,16 @@ float remap(float v, float oldMin, float oldMax, float newMin, float newMax) {
 }
 
 float sampleDensity(vec3 p) {
-    vec2 noise = texture(tex0, p * uTiling).rg;
+    // Base drifts with the wind; detail drifts faster plus a slow vertical
+    // scroll, so shapes evolve instead of just translating (GL_REPEAT keeps
+    // both seamless).
+    vec3 basePos = p * uTiling + uWindDir * (uWindSpeed * uTime);
+    vec3 detailPos = p * uTiling + uWindDir * (uWindSpeed * uTime * 1.6)
+                   + vec3(0.0, uEvolveSpeed * uTime, 0.0);
+    float base = texture(tex0, basePos).r;
+    float detail = texture(tex0, detailPos).g;
     // High-frequency detail erodes the low-frequency base shape
-    float n = clamp(remap(noise.r, uDetailWeight * noise.g, 1.0, 0.0, 1.0), 0.0, 1.0);
+    float n = clamp(remap(base, uDetailWeight * detail, 1.0, 0.0, 1.0), 0.0, 1.0);
     float d = clamp(n - (1.0 - uCoverage), 0.0, 1.0);
     return d * uDensityScale;
 }
